@@ -33,7 +33,7 @@ trialinfo.start_state = 'fxa';
 trialinfo.end_state = 'trh';
 
 % maximum no:of sites to analyse
-maxsites = 1; % analyse all sites
+maxsites = 1; % inf = analyse all sites
 
 %% Read the required fields from  the processed LFP data for the session
 states_lfp = lfp_tfa_read_LFP(fullfile(pathname, session_filename), all_states, maxsites, root_results_folder);
