@@ -14,14 +14,16 @@ close all;
 [session_filename, pathname, ~] = uigetfile('*.mat', 'Select the mat file containing processed LFP data for the session to analyse', ...
     'MultiSelect', 'off');
 
-% folder to save figuresroot_fig_folder = [pathname '\Figures'];
+% folder to save figures
+root_fig_folder = [pathname '\Figures'];
 
 
 % folder to save results
 root_results_folder = [pathname '\Results'];
 
 % first read in the information about states
-load('C:\Data\MIP_timefreq_analysis\all_states.mat');
+lfp_tfa_define_states;
+load('..\all_states.mat');
 
 % load LFP data for the selected session
 load(fullfile(pathname, session_filename));
