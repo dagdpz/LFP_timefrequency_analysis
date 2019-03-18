@@ -95,6 +95,8 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
             cond_based_tfs(i).site_ID = states_lfp(i).site_ID;
             % make a struct for concatenating TFR for all states
             cond_based_tfs(i).tfs_avg_site = struct(); 
+            % struct to store evoked LFP
+            cond_based_tfs(i).site_evoked_lfp = struct();
             %cond_based_tfs(i).tfs_avg_site.powspctrm = cell(length(analyse_states),length(hs_labels));
             cond_based_tfs(i).ntrials = zeros(1,length(hs_labels));
             
@@ -140,12 +142,16 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                         state_tfs.time = [state_tfs.time, states_lfp(i).trials(t).tfs.time(1, ...
                             (states_lfp(i).trials(t).tfs.time >= state_start_t & ...
                             states_lfp(i).trials(t).tfs.time <= state_end_t)) - state_onset_t];
-                        state_tfs.freq = [state_tfs.freq states_lfp(i).trials(t).tfs.freq];  
+                        state_tfs.freq = [state_tfs.freq states_lfp(i).trials(t).tfs.freq]; 
+                        state_tfs.cfg = states_lfp(i).trials(t).tfs.cfg;
     %                     end
                         % evoked LFP for this state
-    %                     state_tfs.lfp = [state_tfs.lfp, states_lfp(i).trials(t).lfp_data(1, ...
-    %                         (states_lfp(i).trials(t).time >= state_start_t & ...
-    %                         states_lfp(i).trials(t).time <= state_end_t))];
+                        state_tfs.lfp = [state_tfs.lfp, states_lfp(i).trials(t).lfp_data(...
+                            (states_lfp(i).trials(t).time >= state_start_t & ...
+                            states_lfp(i).trials(t).time <= state_end_t))];
+                        state_tfs.lfp_time = states_lfp(i).trials(t).time(...
+                            (states_lfp(i).trials(t).time >= state_start_t & ...
+                            states_lfp(i).trials(t).time <= state_end_t)) - state_onset_t;
                         % LFP power spectrum
     %                     state_tfs.raw_psd =                     
 
@@ -173,8 +179,26 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                     % save average tfs
                     cond_based_tfs(i).tfs_avg_site(st, hs).powspctrm = state_tfs.powspctrm_normmean;
                     cond_based_tfs(i).tfs_avg_site(st, hs).time = state_tfs.time{1};
-                    cond_based_tfs(i).tfs_avg_site(st, hs).freq = state_tfs.freq{1};                
+                    cond_based_tfs(i).tfs_avg_site(st, hs).freq = state_tfs.freq{1}; 
+                    cond_based_tfs(i).tfs_avg_site(st, hs).cfg = state_tfs.cfg;
                     cond_based_tfs(i).tfs_avg_site(st, hs).label = hs_labels(hs);
+                    
+                    % evoked LFP average
+                     % crop each lfp to same number of samples
+                    nsamples = min(cellfun('length', state_tfs.lfp));
+                    for k = 1:length(state_tfs.lfp)
+                        state_tfs.lfp{k} = state_tfs.lfp{k}(1:nsamples);
+                    end
+                    state_tfs.lfp_time = state_tfs.lfp_time(1:nsamples);
+                    arr_state_lfp = vertcat(state_tfs.lfp{:});
+                    evoked_state_lfp_mean = nanmean(arr_state_lfp, 1);
+                    evoked_state_lfp_std = nanstd(arr_state_lfp, 0, 1);
+                    
+                    % save evoked LFP
+                    cond_based_tfs(i).site_evoked_lfp(st, hs).mean = evoked_state_lfp_mean;
+                    cond_based_tfs(i).site_evoked_lfp(st, hs).std = evoked_state_lfp_std; 
+                    cond_based_tfs(i).site_evoked_lfp(st, hs).time = state_tfs.lfp_time;
+                    
 
                 end
                 
@@ -204,16 +228,49 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                     end
                     cond_based_tfs(1).tfs_avg_session{st, hs}.time = cond_based_tfs(i).tfs_avg_site(st, hs).time;
                     cond_based_tfs(1).tfs_avg_session{st, hs}.freq = cond_based_tfs(i).tfs_avg_site(st, hs).freq;
-                    cond_based_tfs(1).tfs_avg_session{st, hs}.label = cond_based_tfs(i).tfs_avg_site(st, hs).label;                
+                    cond_based_tfs(1).tfs_avg_session{st, hs}.label = cond_based_tfs(i).tfs_avg_site(st, hs).label; 
+                    cond_based_tfs(1).tfs_avg_session{st, hs}.cfg = cond_based_tfs(i).tfs_avg_site(st, hs).cfg;
 
                 end
             end
         end
     end
     
+    % calculate the average evoked LFP across sites for this condition 
+    if isfield(cond_based_tfs, 'site_evoked_lfp')
+        % struct to store average evoked LFP across sites
+        cond_based_tfs(1).evoked_lfp_session = cell(length(analyse_states),length(hs_labels));
+        
+        for i = 1:length(cond_based_tfs)
+            
+            for hs = 1:length(hs_labels)
+                for st = 1:length(analyse_states)
+                    if i == 1
+                        cond_based_tfs(1).tfs_avg_session{st, hs}.powspctrm = ...
+                            (1/length(cond_based_tfs))*cond_based_tfs(i).tfs_avg_site(st, hs).powspctrm ;
+
+                    else
+                        cond_based_tfs(1).tfs_avg_session{st, hs}.powspctrm = ...
+                            cond_based_tfs(1).tfs_avg_session{st, hs}.powspctrm + ...
+                            (1/length(cond_based_tfs)) * cond_based_tfs(i).tfs_avg_site(st, hs).powspctrm ;
+                    end
+                    cond_based_tfs(1).evoked_lfp_session{st, hs}.time = ...
+                        cond_based_tfs(i).site_evoked_lfp(st, hs).time;
+                    cond_based_tfs(1).evoked_lfp_session{st, hs}.mean = ...
+                        cond_based_tfs(i).site_evoked_lfp(st, hs).mean;
+                    cond_based_tfs(1).evoked_lfp_session{st, hs}.std = ...
+                        cond_based_tfs(i).site_evoked_lfp(st, hs).std;
+                    
+                end
+            end
+        end
+    end
+    
     % plots
+    
     % site averages
     for i = 1:length(cond_based_tfs)
+        % TFR
         if isfield(cond_based_tfs, 'tfs_avg_site')
             figure;
             cm = colormap('jet');
@@ -298,47 +355,124 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                 , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
             saveas(gca, fullfile(cond_tfs_folder, [states_lfp(i).site_ID '.png']));
         end
+        
+        % Evoked LFP
+        if isfield(cond_based_tfs, 'site_evoked_lfp')
+            figure;
+            
+            % loop through handspace
+            for hs = 1:size(cond_based_tfs(i).site_evoked_lfp, 2)
+                % concatenate states
+                concat_states_lfp = struct();
+                concat_states_lfp.mean = [];
+                concat_states_lfp.std = [];
+                concat_states_lfp.time = [];
+                
+                state_info = struct();
+                for st = 1:size(cond_based_tfs(i).site_evoked_lfp, 1)
+                    
+                    % concatenate mean, std and time of evoked LFP for
+                    % different states
+                    concat_states_lfp.mean = [concat_states_lfp.mean, ...
+                        cond_based_tfs(i).site_evoked_lfp(st, hs).mean, nan(1, 100)];
+                    concat_states_lfp.std = [concat_states_lfp.std, ...
+                        cond_based_tfs(i).site_evoked_lfp(st, hs).std, nan(1, 100)];
+                    concat_states_lfp.time = [concat_states_lfp.time, ...
+                        cond_based_tfs(i).site_evoked_lfp(st, hs).time, nan(1, 100)];
+                    
+                    state_info(st).onset_s = find(cond_based_tfs(i).site_evoked_lfp(st, hs).time <= 0, 1, 'last');
+                    state_info(st).onset_t = 0;
+                    state_info(st).start_s = 1;
+                    state_info(st).start_t = cond_based_tfs(i).site_evoked_lfp(st, hs).time(1);
+                    state_info(st).finish_s = length(cond_based_tfs(i).site_evoked_lfp(st, hs).time);
+                    state_info(st).finish_t = cond_based_tfs(i).site_evoked_lfp(st, hs).time(end);                    
+                    
+                    if st > 1
+                        state_info(st).start_s = length(cond_based_tfs(i).site_evoked_lfp(st-1, hs).time) + ...
+                            state_info(st).start_s + (st-1)*100;
+                        state_info(st).finish_s = length(cond_based_tfs(i).site_evoked_lfp(st-1, hs).time) + ...
+                            state_info(st).finish_s + (st-1)*100;
+                        state_info(st).onset_s = length(cond_based_tfs(i).site_evoked_lfp(st-1, hs).time) + ...
+                            state_info(st).onset_s + (st-1)*100;
+                    end
+                    
+                end
+                concat_states_tfs.time = 1:1:length(concat_states_lfp.time);
+                state_onsets = find(concat_states_lfp.time(1:end-1) .* ...
+                    concat_states_lfp.time(2:end) <= 0);
+                state_samples = sort([state_info.start_s, state_info.onset_s, ...
+                    state_info.finish_s]);
+
+                % now plot
+                subplot(2,2,hs)
+                hold on;
+                plot(concat_states_lfp.mean, 'b');
+                plot(concat_states_lfp.mean + concat_states_lfp.std, 'r--');
+                plot(concat_states_lfp.mean - concat_states_lfp.std, 'r--');
+                % mark state onsets
+                set(gca,'xtick',state_samples)
+%                 xticklabels = [];
+                for so = state_onsets
+                    line([so so], ylim); 
+                end
+                set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 2))
+                xlabel('Time');
+                ylabel('Frequency');
+                title(sprintf('%s (ntrials = %g)', hs_labels{hs}, cond_based_tfs(i).ntrials(hs)));
+                line([0 0], ylim, 'color', 'k');
+            end
+            plottitle = ['Site ID: ', states_lfp(i).site_ID ', Target = ' states_lfp(i).target ', '  ...
+            '(block ' num2str(cfg_condition.blocks) '), '];
+            if cfg_condition.choice == 0
+                plottitle = [plottitle 'Instructed trials'];
+            else
+                plottitle = [plottitle 'Choice trials'];
+            end
+            ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
+                , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
+            saveas(gca, fullfile(cond_tfs_folder, ['Evoked_LFP_' states_lfp(i).site_ID '.png']));
+        end
     end
-    % plot average across sites for this session
+    
+    % plot average TFR across sites for this session
     figure;
-    cm = colormap('jet');
-    cm(1,:,:) = [1,1,1];
     colormap(cm);
+    
     % loop through handspace
-    for hs = 1:size(cond_based_tfs(i).tfs_avg_site, 2)
+    for hs = 1:size(cond_based_tfs(i).tfs_avg_session, 2)
         % concatenate states
         concat_states_tfs = struct();
         concat_states_tfs.powspctrm = [];
         concat_states_tfs.state_time = [];
-        concat_states_tfs.freq = cond_based_tfs(i).tfs_avg_site(1, hs).freq;
-        concat_states_tfs.label = cond_based_tfs(i).tfs_avg_site(1, hs).label;
+        concat_states_tfs.freq = cond_based_tfs(1).tfs_avg_session{1, hs}.freq;
+        concat_states_tfs.label = cond_based_tfs(1).tfs_avg_session{1, hs}.label;
 
         state_info = struct();
-        for st = 1:size(cond_based_tfs(i).tfs_avg_site, 1)
+        for st = 1:size(cond_based_tfs(1).tfs_avg_session, 1)
 
 
-            concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, cond_based_tfs(i).tfs_avg_site(st, hs).powspctrm);
+            concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, cond_based_tfs(1).tfs_avg_session{st, hs}.powspctrm);
             concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
-                cond_based_tfs(i).tfs_avg_site(st, hs).time];
+                cond_based_tfs(i).tfs_avg_session{st, hs}.time];
             % append nans to separate the states
             concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
                 nan(1, length(concat_states_tfs.freq), 100));
             concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
                 nan(1, 100)];
 
-            state_info(st).onset_s = find(cond_based_tfs(i).tfs_avg_site(st, hs).time <= 0, 1, 'last');
+            state_info(st).onset_s = find(cond_based_tfs(1).tfs_avg_session{st, hs}.time <= 0, 1, 'last');
             state_info(st).onset_t = 0;
             state_info(st).start_s = 1;
-            state_info(st).start_t = cond_based_tfs(i).tfs_avg_site(st, hs).time(1);
-            state_info(st).finish_s = length(cond_based_tfs(i).tfs_avg_site(st, hs).time);
-            state_info(st).finish_t = cond_based_tfs(i).tfs_avg_site(st, hs).time(end);                    
+            state_info(st).start_t = cond_based_tfs(1).tfs_avg_session{st, hs}.time(1);
+            state_info(st).finish_s = length(cond_based_tfs(1).tfs_avg_session{st, hs}.time);
+            state_info(st).finish_t = cond_based_tfs(1).tfs_avg_session{st, hs}.time(end);                    
 
             if st > 1
-                state_info(st).start_s = length(cond_based_tfs(i).tfs_avg_site(st-1, hs).time) + ...
+                state_info(st).start_s = length(cond_based_tfs(1).tfs_avg_session{st-1, hs}.time) + ...
                     state_info(st).start_s + (st-1)*100;
-                state_info(st).finish_s = length(cond_based_tfs(i).tfs_avg_site(st-1, hs).time) + ...
+                state_info(st).finish_s = length(cond_based_tfs(1).tfs_avg_session{st-1, hs}.time) + ...
                     state_info(st).finish_s + (st-1)*100;
-                state_info(st).onset_s = length(cond_based_tfs(i).tfs_avg_site(st-1, hs).time) + ...
+                state_info(st).onset_s = length(cond_based_tfs(1).tfs_avg_session{st-1, hs}.time) + ...
                     state_info(st).onset_s + (st-1)*100;
             end
 
@@ -368,7 +502,7 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
         set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 2))
         xlabel('Time');
         ylabel('Frequency');
-        title(sprintf('%s (ntrials = %g)', cfg.channel{1}, cond_based_tfs(i).ntrials(hs)));
+        title(sprintf('%s (ntrials = %g)', cfg.channel{1}, cond_based_tfs(1).ntrials(hs)));
         line([0 0], ylim, 'color', 'k');
     end
     plottitle = ['Session: ', states_lfp(i).session ', Target = ' states_lfp(i).target ', '  ...
@@ -381,6 +515,81 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
     saveas(gca, fullfile(cond_tfs_folder, [states_lfp(i).session cond_label '.png']));
+    
+    
+    % plot average evoked LFP across sites for this session
+    figure;
+    
+    % loop through handspace
+    for hs = 1:size(cond_based_tfs(i).evoked_lfp_session, 2)
+        % concatenate states
+        concat_states_lfp = struct();
+        concat_states_lfp.mean = [];
+        concat_states_lfp.std = [];
+        concat_states_lfp.time = [];
+        
+        state_info = struct();
+        for st = 1:size(cond_based_tfs(i).evoked_lfp_session, 1)
+
+            concat_states_lfp.mean = [concat_states_lfp.mean, ...
+                cond_based_tfs(i).evoked_lfp_session{st, hs}.mean, nan(1, 100)];
+            concat_states_lfp.time = [concat_states_lfp.time, ...
+                cond_based_tfs(i).evoked_lfp_session{st, hs}.time, nan(1, 100)];
+            concat_states_lfp.std = [concat_states_lfp.std, ...
+                cond_based_tfs(i).evoked_lfp_session{st, hs}.std, nan(1, 100)];
+            
+            state_info(st).onset_s = find(cond_based_tfs(i).evoked_lfp_session{st, hs}.time <= 0, 1, 'last');
+            state_info(st).onset_t = 0;
+            state_info(st).start_s = 1;
+            state_info(st).start_t = cond_based_tfs(i).evoked_lfp_session{st, hs}.time(1);
+            state_info(st).finish_s = length(cond_based_tfs(i).evoked_lfp_session{st, hs}.time);
+            state_info(st).finish_t = cond_based_tfs(i).evoked_lfp_session{st, hs}.time(end);                    
+
+            if st > 1
+                state_info(st).start_s = length(cond_based_tfs(i).evoked_lfp_session{st-1, hs}.time) + ...
+                    state_info(st).start_s + (st-1)*100;
+                state_info(st).finish_s = length(cond_based_tfs(i).evoked_lfp_session{st-1, hs}.time) + ...
+                    state_info(st).finish_s + (st-1)*100;
+                state_info(st).onset_s = length(cond_based_tfs(i).evoked_lfp_session{st-1, hs}.time) + ...
+                    state_info(st).onset_s + (st-1)*100;
+            end
+
+        end
+        concat_states_tfs.time = 1:1:size(concat_states_lfp.time, 1);
+        state_onsets = find(concat_states_lfp.time(1:end-1) .* ...
+            concat_states_lfp.time(2:end) <= 0);
+        state_samples = sort([state_info.start_s, state_info.onset_s, ...
+            state_info.finish_s]);
+
+        % now plot
+        subplot(2,2,hs)
+        hold on;
+        plot(concat_states_lfp.mean, 'b');
+        plot(concat_states_lfp.mean + concat_states_lfp.std, 'r--');
+        plot(concat_states_lfp.mean - concat_states_lfp.std, 'r--');
+        legend('mean', 'mean +/- std');
+        % mark state onsets
+        set(gca,'xtick',state_samples)
+%                 xticklabels = [];
+        for so = state_onsets
+            line([so so], ylim); 
+        end
+        set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 2))
+        xlabel('Time');
+        ylabel('Frequency');
+        title(sprintf('%s (ntrials = %g)', hs_labels{hs}, cond_based_tfs(1).ntrials(hs)));
+        line([0 0], ylim, 'color', 'k');
+    end
+    plottitle = ['Session: ', states_lfp(i).session ', Target = ' states_lfp(i).target ', '  ...
+    'Block ' num2str(cfg_condition.blocks) ', '];
+    if cfg_condition.choice == 0
+        plottitle = [plottitle 'Instructed trials'];
+    else
+        plottitle = [plottitle 'Choice trials'];
+    end
+    ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
+        , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
+    saveas(gca, fullfile(cond_tfs_folder, ['Evoked_LFP_' states_lfp(i).session cond_label '.png']));
     
 end
         
