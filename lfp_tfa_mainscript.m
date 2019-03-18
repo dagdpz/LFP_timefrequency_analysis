@@ -83,9 +83,9 @@ analyse_states = {6, 62};
 % analyse choice or instructed trials
 cfg_condition.choice = 0; % 0 = instructed, 1 = choice, nan = both
 % analyse control or inactivation trials
-cfg_condition.perturbation = 3; % 1 = inactivation, 0 = control, nan = both
+cfg_condition.perturbation = 0; % 1 = inactivation, 0 = control, nan = both
 % blocks to be analysed, 
-cfg_condition.blocks = 3;
+cfg_condition.blocks = 1;
 % recorded hemispace
 cfg_condition.recorded_hemispace = 'L';
 
