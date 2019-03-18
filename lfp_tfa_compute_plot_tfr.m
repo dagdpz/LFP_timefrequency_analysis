@@ -288,7 +288,7 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                 line([0 0], ylim, 'color', 'k');
             end
             plottitle = ['Site ID: ', states_lfp(i).site_ID ', Target = ' states_lfp(i).target ', '  ...
-            '(blocks = ' num2str(cfg_condition.blocks) '), '];
+            '(block ' num2str(cfg_condition.blocks) '), '];
             if cfg_condition.choice == 0
                 plottitle = [plottitle 'Instructed trials'];
             else
@@ -372,7 +372,7 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
         line([0 0], ylim, 'color', 'k');
     end
     plottitle = ['Session: ', states_lfp(i).session ', Target = ' states_lfp(i).target ', '  ...
-    '(blocks = ' num2str(cfg_condition.blocks) '), '];
+    'Block ' num2str(cfg_condition.blocks) ', '];
     if cfg_condition.choice == 0
         plottitle = [plottitle 'Instructed trials'];
     else
