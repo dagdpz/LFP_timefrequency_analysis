@@ -31,8 +31,8 @@ function [filt_session_lfp, noisy_lfp_trials] = lfp_tfa_reject_noisy_trials( sta
 % See also lfp_tfa_read_LFP
     
     sessionName = states_lfp(1).session;
-    results_folder = fullfile(cfg_noise.results_folder, sessionName, date);
-    results_folder_noise = fullfile(cfg_noise.results_folder, date, sessionName, 'LFP_Noise_Rejection');
+    results_folder = fullfile(cfg_noise.results_folder, date, sessionName);
+    results_folder_noise = fullfile(results_folder, 'LFP_Noise_Rejection');
     if ~exist(results_folder_noise, 'dir')
         mkdir(results_folder_noise);
     end
@@ -145,7 +145,7 @@ function [filt_session_lfp, noisy_lfp_trials] = lfp_tfa_reject_noisy_trials( sta
                 if d < lfp_raw_minbound || d > lfp_raw_maxbound
                     n = n + 1;
                     if n >= cfg_noise.amp_N
-                        states_lfp(i).trial(t).noisy = 1;
+                        states_lfp(i).trials(t).noisy = 1;
                         noisy_trials_lfp_mean(t) = 1;
                         break;
                     end
@@ -167,7 +167,7 @@ function [filt_session_lfp, noisy_lfp_trials] = lfp_tfa_reject_noisy_trials( sta
                 if d > lfp_diff_maxbound || d < lfp_diff_minbound
                     n = n + 1; % increment counter
                     if n >= cfg_noise.diff_N
-                        states_lfp(i).trial(t).noisy = 1;
+                        states_lfp(i).trials(t).noisy = 1;
                         noisy_trials_lfp_diff(t) = 1; 
                         break;
                     end
@@ -178,11 +178,13 @@ function [filt_session_lfp, noisy_lfp_trials] = lfp_tfa_reject_noisy_trials( sta
                  
             % a trial is noisy if the spectral power for 50% of frequency bins at any time bin 
             % is greater than mean power + 2*std of all trials at that time bin
+%             pow_mean_f = nanmean(concat_site_lfp_pow{t}, 3);
+%             pow_std_f = nanstd(concat_site_lfp_pow{t}, 0, 3);
             for tbin = 1:size(concat_site_lfp_pow{t}, 3)
                 pow_t = concat_site_lfp_pow{t}(:,:,tbin);
                 noisyfbins = sum(pow_t > pow_mean_f + cfg_noise.pow_thr*pow_std_f);
                 if noisyfbins / size(concat_site_lfp_pow{t}, 2) > 0.5
-                    states_lfp(i).trial(t).noisy = 1;
+                    states_lfp(i).trials(t).noisy = 1;
                     noisy_trials_lfp_pow(t) = 1;
                     break;
                 end
@@ -240,16 +242,26 @@ function [filt_session_lfp, noisy_lfp_trials] = lfp_tfa_reject_noisy_trials( sta
                     % make a tfr struct compatible with FT
                     noisy_tfr = struct();
                     noisy_tfr.powspctrm = concat_site_lfp_pow{t};
+                    
                     noisy_tfr.freq = site.trials(t).tfs.freq;
                     noisy_tfr.time = linspace(concat_site_time{t} (1), ...
                         concat_site_time{t} (end), length(concat_site_lfp_pow{t}));
+                    % normalize
+                    noisy_tfr.powspctrm_norm = (noisy_tfr.powspctrm - ...
+                        repmat(pow_mean_f, 1, 1, size(noisy_tfr.powspctrm, 3))) ./ ...
+                        repmat(pow_std_f, 1, 1, size(noisy_tfr.powspctrm, 3));
+                    
                     text = strrep([site.site_ID, '_Trial_' num2str(t)], '_', '\_');
                     noisy_tfr.label = {text};
                     % plot TFR
                     cfg          = [];
                     cfg.zlim     = [0 3e-8];
                     cfg.channel  = noisy_tfr.label;
-                    ft_singleplotTFR(cfg, noisy_tfr);
+                    imagesc(noisy_tfr.time, [1:numel(noisy_tfr.freq)], squeeze(noisy_tfr.powspctrm_norm));
+                    axis xy; colorbar;
+                    set(gca, 'ytick', ([1:8:numel(noisy_tfr.freq)]));
+                    set(gca, 'YTickLabel', noisy_tfr.freq([1:8:numel(noisy_tfr.freq)]));
+                    %ft_singleplotTFR(cfg, noisy_tfr);
                     
                     % mark all states
                     %states_names = cell(1, length(concat_site_states{t}));

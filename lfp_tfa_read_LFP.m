@@ -121,7 +121,8 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
 %                 cfg.method       = 'mtmconvol';
 %                 cfg.taper        = 'hanning';
                 cfg.pad          = 'nextpow2';
-                cfg.foi          = 2:2:120;             % analysis 2 to 100 Hz in steps of 2 Hz
+                cfg.foi          = logspace(log10(2), log10(120), 60);   % analysis 2 to 100 Hz in steps of 2 Hz
+                %cfg.foi          = 2:2:120;
                 %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.2 sec
 %                 cfg.t_ftimwin    = 4./cfg.foi;                          % 4 cycles per time window
                 %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.5 sec
@@ -195,8 +196,8 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
     end
 
     % save data
-    results_mat = fullfile(results_fldr, '\states_lfp.mat');
-    save(results_mat, 'states_lfp');
+    results_mat = fullfile(results_fldr, 'states_lfp.mat');
+    save(results_mat, 'states_lfp', '-v7.3');
 
 end
 
