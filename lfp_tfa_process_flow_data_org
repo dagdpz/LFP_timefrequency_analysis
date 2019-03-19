@@ -1,0 +1,151 @@
+Main file: lfp_tfa_mainscript.m - read, process and analyse LFP data for one session using time frequency spectrograms for specified conditions and 4 hand-space tunings. 
+
+Process flow: 
+
+1. Select folder with LFP data (.mat file with processed LFP from Lukas' pipeline, example: Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170622.mat)
+2. A folder is created to save results in the same folder as the data file
+3. Info about states (all_states.mat) is loaded
+    - state_ID: unique identifier for the state
+    - name: name of state
+    - description: description of state
+    - tplus_onset: time period after state onset until which analysis should be done.
+    - tminus_onset: time period before state onset from which analysis should be done.
+4. Indicate the number of sites (maxsites). Set to inf to analyse all states. 
+
+Read processed LFP
+5.  lfp_tfa_read_LFP - function to read the processed LFP from the data folder and calculate trial-wise time frequency spectrograms. 
+    - Inputs: 
+      - path to folder containing LFP data (from step1)
+      - info about states (from step 3)
+      - maximum no:of sites to be analysed from the session (maxsites)
+      - folder to save results
+    - Outputs:
+      - states_lfp: (1xM, M=no:of sites analysed) mat file containing relevant LFP data from succesful trials
+        - session: name of session analysed
+        - site_ID: name of site
+        - target: recorded target
+        - recorded_hemispace: hemispace where electrodes are placed
+        - trials: (1xT, T=no:of trials) mat file with information about trials
+          - block: block number
+          - choice_trial: 0(instructed), 1(choice) trial
+          - lfp data: (1xN, N=number of samples) array containing LFP data
+          - time: (1xN, N=number of samples) array containing LFP timestamps
+          - fsample: samlping frequency of LFP data (Hz)
+          - tsample: sampling time of LFP data (s)
+          - reach_hand: hand used to reach the target
+          - reach_space: space (left or right) where the target appeared
+          - hndspc_lbl: hand-space tuning ('RH RS' - right hand right space, and so on)
+          - perturbation: 0(control), non-zero(inactivation) trial
+          - tfs: (struct) containing time frequency spectrogram data
+            - powspctrm: (1xN_fxN_t) array containing power spectrogram, N_f: no:of frequency bins, N_t: no:of time bins
+            - freq: (1xN_f) array containing frequency bins
+            - time (1xN_t) array containing time bins
+          - states: (1xS, S=no:of states in all_states) struct
+            - id: state identifier
+            - name: state name
+            - onset_t: time of state onset for this trial (s)
+            - start_t: time from which analysis of state should start (s)
+            - end_t: time at which analysis of state should end (s)
+            - onset_s: sample number corresponding to onset_t
+            - start_s: sample number corresponding to start_t
+            - end_s: sample number corresponing to end_t
+          - trial_period: (1x2), start and end time of trial (from start_t of first state to end_t of last state in states
+  
+  6. Reject noisy LFP trials
+    a. Configuration for noise rejection - cfg_noise
+      - cfg_noise.amp_thr: threshold for raw LFP amplitude (in no:of standard deviations from mean)
+      - cfg_noise.amp_N: number of consecutive raw LFP samples to be beyond the threshold to mark a trial as noisy. 
+      - cfg_noise.std_thr: threshold for trial-wise LFP standard deviation beyond which trial is marked noisy (in multiples of standard deviation of concatenated LFP trails)
+      - cfg_noise.diff_thr: threshold for LFP derivative (in no:of standard deviations from mean)
+      - cfg_noise.diff_N: number of consecutive LFP derivative samples to be beyond the threshold to mark a trial as noisy. 
+      - cfg_noise.pow_thr: threshold for lfp spectral power (in no:of standard deviations from mean)
+      - cfg_noise.results_folder: folder in which results should be stored
+      - cfg_noise.plottrials: (0/1) whether or not single LFP trials should be plotted
+    b. lfp_tfa_reject_noisy_trials - function to mark noisy LFP trails for all analysed sites in a session
+      Four different noise rejection criteria are used
+      1. Mean and standard deviation of all LFP trails in a site is calculated. A trial is marked noisy if 
+      cfg_noise.amp_N consecutive raw LFP amplitude samples are beyond the specified threshold (mean +/- cfg_noise.amp_thr*std)
+      2. A trial is marked noisy if the raw LFP standard deviation of the trial is beyond cfg_noise.std_thr 
+      times the standard deviation of all LFP trials
+      3. Mean and standard deviation of LFP derivative for all trials is calculated. A trial is marked noisy if cfg_noise.diff_N consecutive LFP derivative samples are beyond the specfied threshold (mean +/- cfg_noise.diff_thr*std)
+      4. Mean and standard deviation of LFP spectral power in each frequency bin across all trials is calculated. 
+      A trial is rejected if at any time bin, more than 50% of frequency bins have a power beyond the specified threshold (mean +/- cfg_noise.pow_thr * std)
+      - Inputs:
+        states_lfp: struct containing LFP data for all completed trials (output of lfp_tfa_read_LFP)
+        cfg_noise: configuration for noise rejection
+      - Outputs: 
+        states_lfp: same struct as input but with an added field 'noisy' under states_lfp.trials
+          - noisy: flag to indicate if the trial is noisy (1) or not noisy(0)
+        noisy_trials: (1xS, S=no:of sites analysed) struct containing information about noisy trials
+          - noisy_trials(s).cfg: configurtion used for noise rejection
+          - noisy_trials(s).lfp_mean: mean of raw LFP amplitude for site s.
+          - noisy_trials(s).lfp_std: standard deviation of raw LFP for site s. 
+          - noisy_trials(s).lfp_diff_mean: mean of LFP derivative
+          - noisy_trials(s).lfp_diff_std: standard deviation of LFP derivative
+          - noisy_trials(s).lfp_pow_mean: (1xN_f) array containing lfp spectral power mean for each frequency bin
+          - noisy_trials(s).lfp_pow_std: (1xN_f) array containing lfp spectral power standard deviation for each frequency bin
+          - noisy_trials(s).raw_amp: trials rejected using raw LFP amplitude criterion
+          - noisy_trials(s).raw_std: trials rejected using trial-wise LFP standard deviation criterion
+          - noisy_trials(s).raw_diff: trials rejected using LFP derivative criterion
+          - noisy_trials(s).lfp_pow: trials rejected using LFP spectral power criterion
+          - noisy_trials(s).all_noisy: all noisy trials in site s. 
+  
+  7. Compute LFP baseline for each site
+  
+    a. Configuration for baseline calculation
+      - cfg_tfs.baseline_ref_state: reference state for baseline computation, the time period of baseline should be referred to the onset of this state. 
+      Leave '' to consider entire trial period for baseline computation
+      - cfg_tfs.baseline_period: period [start_time(s), end_time(s)] (w.r.t. the onset of cfg_tfs.baseline_ref_state) to be considered for each trial for baseline computation. 
+      'trial' to consider the entire trial period for baseline computation
+      - cfg_tfs.baseline_block: blocks of LFP trials to be considered for baseline
+      - cfg_tfs.choice_trial: whether to consider choice trials (1) or instructed trials (0) for baseline computation. 
+      - cfg_tfs.results_folder: folder to save results
+      
+    b. lfp_tfa_compute_baseline - computes the LFP spectral power baseline based on the given configuration
+      - Inputs: 
+        states_lfp: struct containing LFP data for all completed trials along with information if the trial is noisy or not (output of lfp_tfa_reject_noisy_trials)
+        cfg_tfs: configuration structure for baseline 
+      - Ouputs: 
+        states_lfp: same struct as input but with added fields for baseline_mean and baseline_std for each site
+          - states_lfp(s).baseline_mean - (1xN_f) array containing mean LFP power for each frequency bin across baseline periods of all trials of a site s. 
+          - states_lfp(s).baseline_std - (1xN_f) array containing LFP power standard deviation for each frequency bin across baseline periods of all trials. 
+        baseline: struct containing baseline information for each analysed site
+          - baseline(s).baseline_mean - (1xN_f) array containing mean LFP power for each frequency bin across baseline periods of all trials of a site s. 
+          - baseline(s).baseline_std - 
+          - baseline(s).cfg - configuration used for calculating the baseline
+          
+8. Plot condition based TFR average per site and average across sites
+
+  a. Configuration for TFR averaging
+    - cfg_condition.choice: whether to consider only choice (1) or only instructed trials (0) for TFR averaging. Leave nan to ignore
+    - cfg_condition.perturbation: whether to consider only control (0) or only inactivation (non-zero, same as block number) trials for TFR averaging. Leave nan to ignore
+    - cfg_condition.blocks: blocks of LFP trails to be considered for TFR averaging (can specify more than one in an array)
+    - cfg_condition.recorded_hemispace: which sites to be considered for analysis ('L' for sites with electrode on left hemispace)
+    - analyse_states: states to be considered for TFR averaging
+    - cfg_baseline.method: method to be used for baseline normalization of TFR
+      'zscore' - P_n(f) = [P(f) - mean_P(f)]/std_P(f)
+      'subtraction' - P_n(f) = [P(f) - mean_P(f)]
+      'division' - P_n(f) = [P(f) ./ mean_P(f)]
+      'relchange' - P_n(f) = [P(f) - mean_P(f)] ./ mean_P(f)
+  
+  b. lfp_tfa_compute_plot_tfr - function to average the TFR for each site and across sites for different conditions (hemispace - control/inactivation - choice/instructed, block)
+    - Inputs:
+      states_lfp: struct containing LFP data for all completed trials and baseline power for each site (output of lfp_tfa_compute_baseline)
+      analyse_states: states to be analysed (cell array containing state ids)
+      cfg_condition: configuration structure to specify trial conditions for TFR averaging
+      cfg_baseline: configuration structure to specify baseline normalization of TFR
+      root_results_folder: root folder to save results
+    - Outputs:
+      cond_based_tfs: (1xS) struct containing condition based TFR average for each site and across sites
+        - cond_based_tfs(s).cfg - configuration structure with trial conditions used for TFR averaging
+        - cond_based_tfs(s).site_ID - site ID
+        - cond_based_tfs(s).tfr_avg_site - (Kx4 struct) Average TFR for site s for trials with specified conditions for K analysed states and four hand-space tunings 
+          - cond_based_tfs(s).tfr_avg_site(k,h).powspctrm - Average TFR for site s for state k and hand-space tuning h
+          - cond_based_tfs(s).tfr_avg_site(k,h).freq - frequency bins
+          - cond_based_tfs(s).tfr_avg_site(k,h).time - time bins
+          - cond_based_tfs(s).tfr_avg_site(k,h).label - label (hand-space tuning)
+        - cond_based_tfs(s).tfr_avg_session - (Kx4 struct) Average TFR across all analysed sites of the session for given condition for K = no:of analysed states and four hand-space tunings
+        - cond_based_tfs(s).ntrials - (1x4) array containing number of trials for each hand-space tuning for the given condition for site s. 
+    
+    
+    

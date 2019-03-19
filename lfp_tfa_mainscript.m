@@ -14,7 +14,8 @@ close all;
 [session_filename, pathname, ~] = uigetfile('*.mat', 'Select the mat file containing processed LFP data for the session to analyse', ...
     'MultiSelect', 'off');
 
-% folder to save figuresroot_fig_folder = [pathname '\Figures'];
+% folder to save figures
+root_fig_folder = [pathname '\Figures'];
 
 
 % folder to save results
