@@ -128,7 +128,7 @@ Read processed LFP
       'division' - P_n(f) = [P(f) ./ mean_P(f)]
       'relchange' - P_n(f) = [P(f) - mean_P(f)] ./ mean_P(f)
   
-  b. lfp_tfa_compute_plot_tfr - function to average the TFR for each site and across sites based on given condition
+  b. lfp_tfa_compute_plot_tfr - function to average the TFR for each site and across sites for different conditions (hemispace - control/inactivation - choice/instructed, block)
     - Inputs:
       states_lfp: struct containing LFP data for all completed trials and baseline power for each site (output of lfp_tfa_compute_baseline)
       analyse_states: states to be analysed (cell array containing state ids)
