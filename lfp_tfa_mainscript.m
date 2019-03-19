@@ -79,6 +79,8 @@ cfg_tfs.results_folder = root_results_folder;
 %[ft_data_sites, session_lfp] = prepareFTdatatype(sites(5:9), analyse_states, all_states, maxsites, choice, inactivation, blocks, baseline);
 
 %% Compute the TFR per site and average across sites
+cfg_condition = [];
+cfg_condition.blocks = 3;
 % define the peristates to analyse
 analyse_states = {6, 62};
 
