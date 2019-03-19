@@ -20,10 +20,12 @@ root_fig_folder = [pathname '\Figures'];
 
 % folder to save results
 root_results_folder = [pathname '\Results'];
+if ~exist(root_results_folder, 'dir')
+    mkdir(root_results_folder);
+end
 
 % first read in the information about states
-lfp_tfa_define_states;
-load('..\all_states.mat');
+all_states = lfp_tfa_define_states(root_results_folder);
 
 % load LFP data for the selected session
 load(fullfile(pathname, session_filename));
@@ -53,12 +55,12 @@ cfg_noise.diff_thr = 4;
 % number of consecutive samples beyond threshold to be considered
 cfg_noise.diff_N = 5;
 % threshold for lfp power in standard deviations
-cfg_noise.pow_thr = 2;
+cfg_noise.pow_thr = 3;
 % folder to save results
 cfg_noise.results_folder = root_results_folder;
 %cfg_noise.results_folder = [pathname '\Figures'];
 % whether single trials should be plotted
-cfg_noise.plottrials = 0;
+cfg_noise.plottrials = 1;
 
 [states_lfp, noisy_trials] = lfp_tfa_reject_noisy_trials(states_lfp, cfg_noise);
 %filt_session_lfp = rejectNoisyLFPTrials( session_lfp )
@@ -78,16 +80,9 @@ cfg_tfs.results_folder = root_results_folder;
 
 %% Compute the TFR per site and average across sites
 cfg_condition = [];
+cfg_condition.blocks = 3;
 % define the peristates to analyse
 analyse_states = {6, 62};
-% analyse choice or instructed trials
-cfg_condition.choice = 0; % 0 = instructed, 1 = choice, nan = both
-% analyse control or inactivation trials
-cfg_condition.perturbation = 0; % 1 = inactivation, 0 = control, nan = both
-% blocks to be analysed, 
-cfg_condition.blocks = 1;
-% recorded hemispace
-cfg_condition.recorded_hemispace = 'L';
 
 % baseline configuration
 cfg_baseline = [];
