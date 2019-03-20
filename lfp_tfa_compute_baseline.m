@@ -29,6 +29,14 @@ function [ states_lfp, baseline ] = lfp_tfa_compute_baseline( states_lfp, cfg_tf
     fprintf('=============================================================\n');
     fprintf('Computing baseline ...\n');
     
+    % folder for saving results
+    sessionName = states_lfp(1).session;
+    root_results_folder = cfg_tfs.results_folder;
+    results_folder = fullfile(root_results_folder, date, sessionName);
+    if ~exist(results_folder, 'dir')
+        mkdir(results_folder);
+    end
+    
     % loop through each site
     for i = 1:length( states_lfp )
         fprintf('Site %s \n', states_lfp(i).site_ID);
@@ -63,6 +71,10 @@ function [ states_lfp, baseline ] = lfp_tfa_compute_baseline( states_lfp, cfg_tf
         baseline.sites(i).mean = baseline_pow_mean;
         baseline.sites(i).std = baseline_pow_std;
     end
+    
+    % save results
+    %save(fullfile(results_folder, 'states_lfp.mat'), 'states_lfp');
+    save(fullfile(results_folder, 'baseline.mat'), 'baseline');
     fprintf(' done\n');
     fprintf('=============================================================\n');
 end

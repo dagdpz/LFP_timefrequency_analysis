@@ -197,7 +197,7 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
 
     % save data
     results_mat = fullfile(results_fldr, 'states_lfp.mat');
-    save(results_mat, 'states_lfp', '-v7.3');
+    %save(results_mat, 'states_lfp', '-v7.3');
 
 end
 

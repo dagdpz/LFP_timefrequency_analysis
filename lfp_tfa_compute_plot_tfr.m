@@ -38,7 +38,9 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
 %
 % See also lfp_tfa_compute_baseline, lfp_tfa_define_states
     
-    
+    % suppress warning for xticklabel
+    warning ('off', 'MATLAB:hg:willberemoved');
+
     % make a folder to save figures
     sessionName = states_lfp(1).session;
     results_folder_tfr = fullfile(root_results_folder, date, sessionName, 'Condition_based_TFS');
@@ -143,7 +145,7 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
             if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace) 
                 cond_based_tfs(cn).sites(i).site_ID = states_lfp(i).site_ID;
                 cond_based_tfs(cn).sites(i).session = states_lfp(i).session;
-                cond_based_tfs(cn).sites(i).target = states_lfp(i).target
+                cond_based_tfs(cn).sites(i).target = states_lfp(i).target;
                 % make a struct for concatenating TFR for all states
                 cond_based_tfs(cn).sites(i).tfs_avg_site = struct(); 
                 % struct to store evoked LFP
@@ -153,8 +155,6 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
 
                 for hs = 1:length(hs_labels)
                     cond_trials = ones(1, length(states_lfp(i).trials));
-                    % consider only non noisy trials
-                    cond_trials = cond_trials & ~[states_lfp(i).trials.noisy];
                     % get the trials for given condition and this hs label
                     if ~isnan(cfg_conditions(cn).perturbation)
                         cond_trials = cond_trials & [states_lfp(i).trials.perturbation] == cfg_conditions(cn).perturbation;
@@ -167,7 +167,17 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                     end
                     cond_trials = cond_trials & strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
                     cond_based_tfs(cn).sites(i).ntrials(hs) = sum(cond_trials);
-
+                                        
+                    fprintf('Condition: %s - %s\n', cfg_conditions(cn).label, hs_labels{hs});
+                    fprintf('Total number of trials %g\n', sum(cond_trials));
+                    
+                    cond_based_tfs(cn).sites(i).noisytrials(hs) = sum(cond_trials & [states_lfp(i).trials.noisy]); 
+                                        
+                    % consider only non noisy trials
+                    fprintf('Number of noisy trials %g\n', sum(cond_trials & [states_lfp(i).trials.noisy]));
+                    cond_trials = cond_trials & ~[states_lfp(i).trials.noisy];
+                    
+                                 
                     % loop through trials 
 
                     for st = 1:length(analyse_states)
@@ -215,7 +225,9 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                         % crop each tfs to the ntimebins
                         for k = 1:length(state_tfs.powscptrm)
                             state_tfs.powscptrm{k} = state_tfs.powscptrm{k}(1,:,1:ntimebins);
+                            state_tfs.time{k} = state_tfs.time{k}(1:ntimebins);
                         end
+                        
                         % average power spectrum for each state
                         arr_state_pow = zeros(1, nfreqbins, ntimebins);
 
@@ -465,7 +477,7 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                         end
 
                     end
-                    concat_states_tfs.time = 1:1:length(concat_states_lfp.time);
+                    %lfp_time = 1:1:length(concat_states_lfp.time);
                     state_onsets = find(concat_states_lfp.time(1:end-1) .* ...
                         concat_states_lfp.time(2:end) <= 0);
                     state_samples = sort([state_info.start_s, state_info.onset_s, ...
@@ -483,7 +495,7 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                     for so = state_onsets
                         line([so so], ylim); 
                     end
-                    set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 2))
+                    set(gca,'xticklabels', round(concat_states_lfp.time(state_samples), 2))
                     xlabel('Time');
                     ylabel('Frequency');
                     title(sprintf('%s (ntrials = %g)', hs_labels{hs}, ...
@@ -632,7 +644,7 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
                 end
 
             end
-            concat_states_tfs.time = 1:1:size(concat_states_lfp.time, 1);
+            %concat_states_lfp.time = 1:1:size(concat_states_lfp.time, 1);
             state_onsets = find(concat_states_lfp.time(1:end-1) .* ...
                 concat_states_lfp.time(2:end) <= 0);
             state_samples = sort([state_info.start_s, state_info.onset_s, ...
@@ -654,7 +666,7 @@ function [ cond_based_tfs ] = lfp_tfa_compute_plot_tfr( states_lfp, analyse_stat
             set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 2))
             xlabel('Time');
             ylabel('Frequency');
-            title(sprintf('%s (ntrials = %g)', hs_labels{hs}, cond_based_tfs(cn).sites(1).ntrials(hs)));
+            title(sprintf('%s', hs_labels{hs}));
             line([0 0], ylim, 'color', 'k');
         end
         plottitle = ['Session: ', cond_based_tfs(cn).sites(1).session ', Target = ' cond_based_tfs(cn).sites(1).target ', '  ...
