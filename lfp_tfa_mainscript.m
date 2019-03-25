@@ -39,16 +39,24 @@ lfp_tfa_cfg.all_states = all_states;
 % load LFP data for the selected session
 load(fullfile(pathname, session_filename));
 
-trialinfo = struct();
-trialinfo.start_state = 'fxa';
-trialinfo.end_state = 'trh';
+lfp_tfa_cfg.trialinfo = struct();
+lfp_tfa_cfg.trialinfo.start_state = 'fxa';
+lfp_tfa_cfg.trialinfo.end_state = 'trh';
 
 % maximum no:of sites to analyse
-maxsites = inf; % inf = analyse all sites
+maxsites = 4; % inf = analyse all sites
 lfp_tfa_cfg.maxsites = maxsites;
 
 %% Read the required fields from  the processed LFP data for the session
-states_lfp = lfp_tfa_read_LFP(fullfile(pathname, session_filename), all_states, maxsites, root_results_folder);
+% Configuration for calculating LFP time frequency spectrogram using
+% ft_freqanalysis function of the fieldtrip toolbox
+lfp_tfa_cfg.tfr.method          = 'wavelet'; % 
+lfp_tfa_cfg.tfr.taper           = [];
+lfp_tfa_cfg.tfr.width           = 4; % 4 cycles
+lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
+lfp_tfa_cfg.tfr.t_ftimwin       = [];
+
+states_lfp = lfp_tfa_read_LFP(lfp_tfa_cfg);
 
 %% Reject noisy trials
 % configuration for lfp noise rejection
@@ -89,16 +97,17 @@ lfp_tfa_cfg.results_folder = root_results_folder;
 %[ft_data_sites, session_lfp] = prepareFTdatatype(sites(5:9), analyse_states, all_states, maxsites, choice, inactivation, blocks, baseline);
 
 %% Compute the TFR per site and average across sites
-cfg_condition = [];
-cfg_condition.blocks = 3;
+lfp_tfa_cfg.trial_condition = [];
+lfp_tfa_cfg.trial_condition.blocks = []; % Fill in  block indices to analyze
+% Leave empty for block-wise analysis of all blocks
 % define the peristates to analyse
 analyse_states = {6, 62};
 
 % baseline configuration
 cfg_baseline = [];
-cfg_baseline.method = 'zscore';
+lfp_tfa_cfg.baseline_method = 'zscore';
 
-[cond_based_tfs] = lfp_tfa_compute_plot_tfr(states_lfp, analyse_states, cfg_condition, cfg_baseline, root_results_folder );
+[cond_based_tfs] = lfp_tfa_compute_plot_tfr(states_lfp, analyse_states, lfp_tfa_cfg );
 
 %% Evoked LFP analysis
 %evoked_lfp = evokedLFPAnalysis(ft_data_sites, root_fig_folder);
