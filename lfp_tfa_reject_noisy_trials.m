@@ -178,8 +178,8 @@ function [filt_session_lfp, noisy_lfp_trials] = lfp_tfa_reject_noisy_trials( sta
                  
             % a trial is noisy if the spectral power for 50% of frequency bins at any time bin 
             % is greater than mean power + 2*std of all trials at that time bin
-%             pow_mean_f = nanmean(concat_site_lfp_pow{t}, 3);
-%             pow_std_f = nanstd(concat_site_lfp_pow{t}, 0, 3);
+            pow_mean_f = nanmean(concat_site_lfp_pow{t}, 3);
+            pow_std_f = nanstd(concat_site_lfp_pow{t}, 0, 3);
             for tbin = 1:size(concat_site_lfp_pow{t}, 3)
                 pow_t = concat_site_lfp_pow{t}(:,:,tbin);
                 noisyfbins = sum(pow_t > pow_mean_f + cfg_noise.pow_thr*pow_std_f);
@@ -292,6 +292,64 @@ function [filt_session_lfp, noisy_lfp_trials] = lfp_tfa_reject_noisy_trials( sta
             
         end
         
+        % plot site-wise summary plots
+        unq_blocks = unique([states_lfp(i).trials.block]);
+        concat_blocks = [states_lfp(i).trials.block];
+        block_nsamples = zeros(1, length(unq_blocks));
+        for b = 1:length(unq_blocks)
+            block_trials_lfp = horzcat(concat_site_lfp{concat_blocks == unq_blocks(b)}) ;
+            block_nsamples(b) = length(block_trials_lfp);
+%             for t = 1:length(site.trials)
+%                 block_nsamples(b) = block_nsamples(b)...
+%                     + length(concat_site_lfp{t});
+%             end
+            %block_ntrials(b) = sum(concat_blocks == unq_blocks(b));
+            %block_nrejtrials(b) = sum(concat_blocks == unq_blocks(b) & ...
+            %    noisy_trials == 1);
+        end
+        figure;
+        % concatenated raw LFP and LFP derivative
+        subplot(221);
+        hold on
+        plot(arr_concat_site_lfp)
+        line(xlim, [site_lfp_mean site_lfp_mean], 'color', 'k');
+        line(xlim, [site_lfp_mean + cfg_noise.amp_thr*site_lfp_std site_lfp_mean + cfg_noise.amp_thr*site_lfp_std], 'color', 'r');
+        line(xlim, [site_lfp_mean - cfg_noise.amp_thr*site_lfp_std site_lfp_mean - cfg_noise.amp_thr*site_lfp_std], 'color', 'r');
+        title('LFP amplitude');
+        %title(sprintf('Site = %s, (ntrials = %g, naccepted = %g)', strrep(site.site_ID, '_', '\_'), t, length(site.trials) - states_lfp(i).noisytrails));
+        % divide blocks by drawing vertical lines
+        block_end_sample = 0;
+        for b = 1:length(unq_blocks)
+            
+            block_end_sample = block_end_sample + block_nsamples(b);
+            line([block_end_sample block_end_sample], ylim, 'color', 'k', ...
+                'linestyle', '--');
+            %block_ann = ['Block ', unq_blocks(b), ' ntrials = ' num2str(block_ntrials(b)), ' nrejected = ' num2str(block_nrejtrials(b))];
+            %annotation('textbox', [1 0.6 0.1 0.3], 'String', block_ann);
+        end
+        %saveas(gca, fullfile(results_folder_noise, [states_lfp(i).site_ID '_concat_LFP.png']));
+        subplot(223);
+        hold on
+        plot(arr_concat_diff_lfp)
+        line(xlim, [lfp_diff_mean lfp_diff_mean], 'color', 'k');
+        line(xlim, [lfp_diff_mean + cfg_noise.diff_thr*lfp_diff_std lfp_diff_mean + cfg_noise.diff_thr*lfp_diff_std], 'color', 'r');
+        line(xlim, [site_lfp_mean - cfg_noise.diff_thr*lfp_diff_std lfp_diff_mean - cfg_noise.diff_thr*lfp_diff_std], 'color', 'r');
+        % divide blocks by drawing vertical lines
+        block_end_sample = 0;
+        for b = 1:length(unq_blocks)
+            
+            block_end_sample = block_end_sample + block_nsamples(b);
+            line([block_end_sample block_end_sample], ylim, 'color', 'k', ...
+                'linestyle', '--');
+            %block_ann = ['Block ', unq_blocks(b), ' ntrials = ' num2str(block_ntrials(b)), ' nrejected = ' num2str(block_nrejtrials(b))];
+            %annotation('textbox', [1 0.6 0.1 0.3], 'String', block_ann);
+        end
+        subplot(222)
+        hold on;
+        h = histogram(arr_concat_site_lfp);
+        
+        saveas(gca, fullfile(results_folder_noise, [states_lfp(i).site_ID '_concat_raw_and_deriv_LFP.png']));
+                
         % print information
         fprintf('Total number trials: %g \n', length(site.trials));
         fprintf('No of rejected trials, raw LFP mean: %g \n', sum(noisy_trials_lfp_mean));
@@ -398,7 +456,7 @@ function [filt_session_lfp, noisy_lfp_trials] = lfp_tfa_reject_noisy_trials( sta
     
     filt_session_lfp = states_lfp;
     % save data
-    save (fullfile(results_folder, 'states_lfp'), 'states_lfp');
+    %save (fullfile(results_folder, 'states_lfp.mat'), 'states_lfp');
     save (results_folder_noise, 'noisy_lfp_trials');
     
     fprintf('Noise rejection in LFP done. \n');

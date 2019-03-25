@@ -1,4 +1,4 @@
-function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsites, root_results_fldr )
+function [ states_lfp ] = lfp_tfa_read_LFP( lfp_tfa_cfg )
 
 % lfp_tfa_read_LFP - function to read in the processed lfp and
 % compute the time frequency spectrogram for each trial
@@ -8,13 +8,22 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
 %       maxsites, root_results_fldr )
 %
 % INPUTS:
-%		session_filename 	- filename containing the LFP data ( in the
+%       lfp_tfa_cfg         - structure containing configurations for
+%       reading LFP data and calculating spectrograms
+%       Required fields: 
+%           datafile_path    	- filename containing the LFP data ( in the
 %                               format as the processed LFP from Lukas' pipeline)
-%       all_states          - structure containing information about all
+%           all_states          - structure containing information about all
 %                               states, see lfp_tfa_define_states
-%       maxsites            - maximum no:of sites to be analysed, set to inf to
+%           maxsites            - maximum no:of sites to be analysed, set to inf to
 %                               analyse all sites
-%       root_results_fldr   - path to save results
+%           root_results_fldr   - path to save results
+%           tfr.method          - method to be used for calculating
+%                               spectrogram
+%           tfr.width           - width of window in cycles for
+%                               multitapering the input data
+%           tfr.twin            - length of time windows in seconds
+%                               to be used for spectrogram calculations
 %
 % OUTPUTS:
 %		states_lfp      	- structure containing trial data (raw lfp,
@@ -33,18 +42,20 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
 
     % Read in LFP data for the session
     fprintf('Reading processed LFP data');
-    load(session_filename);
+    session = load(lfp_tfa_cfg.data_filepath);
+    
+    sites = session.sites;
     
     % prepare results folder
     sessionName = sites(1).site_ID(1:12);
-    results_fldr = fullfile(root_results_fldr, date, sessionName);
+    results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, date, sessionName);
     if ~exist(results_fldr, 'dir')
         mkdir(results_fldr);
     end
     
     % save data inside struct 
     % first loop through each site
-    for i = 1:min(length(sites), maxsites)
+    for i = 1:min(length(sites), lfp_tfa_cfg.maxsites)
         states_lfp(i).session = sites(1).site_ID(1:12);
         states_lfp(i).site_ID = sites(i).site_ID;
         states_lfp(i).target = sites(i).target;
@@ -75,6 +86,19 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
                 
                 
                 % assign hand-space for the trial
+%                 if strcmp(states_lfp(i).recorded_hemispace, reach_space)
+%                     if strcmp(states_lfp(i).recorded_hemispace, reach_hand)
+%                         hs_label = 'IH IS';
+%                     else
+%                         hs_label = 'CH IS';
+%                     end
+%                 else 
+%                     if strcmp(states_lfp(i).recorded_hemispace, reach_hand)
+%                         hs_label = 'IH CS';
+%                     else
+%                         hs_label = 'CH CS';
+%                     end
+%                 end
                 if reach_hand == 'R' && reach_space == 'R'
                     hs_label = 'RH RS';
                 elseif reach_hand == 'R' && reach_space == 'L'
@@ -84,18 +108,6 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
                 elseif reach_hand == 'L' && reach_space == 'L'
                     hs_label = 'LH LS';
                 end
-%                     if session_lfp(i).ipsilateral == reach_space
-%                         hs_label = 'IH IS';
-%                     else
-%                         hs_label = 'IH CS';
-%                     end
-%                 else 
-%                     if session_lfp(i).ipsilateral == reach_space
-%                         hs_label = 'CH IS';
-%                     else
-%                         hs_label = 'CH CS';
-%                     end
-%                 end
 
                 %states = trial(i).states;
                 start_time = (sites(i).trial(t).TDT_LFPx_tStart); % trial start time
@@ -116,15 +128,15 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
                 
                 % calculate the TFR
                 cfg              = [];
-                cfg.method       = 'wavelet';                
-                cfg.width        = 4;
+                cfg.method       = lfp_tfa_cfg.tfr.method;                
+                cfg.width        = lfp_tfa_cfg.tfr.width;
 %                 cfg.method       = 'mtmconvol';
-%                 cfg.taper        = 'hanning';
+                cfg.taper        = lfp_tfa_cfg.tfr.taper;
                 cfg.pad          = 'nextpow2';
-                cfg.foi          = logspace(log10(2), log10(120), 60);   % analysis 2 to 100 Hz in steps of 2 Hz
+                cfg.foi          = lfp_tfa_cfg.tfr.foi;   % analysis 2 to 100 Hz in steps of 2 Hz
                 %cfg.foi          = 2:2:120;
                 %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.2 sec
-%                 cfg.t_ftimwin    = 4./cfg.foi;                          % 4 cycles per time window
+                cfg.t_ftimwin    = lfp_tfa_cfg.tfr.t_ftimwin;           % 4 cycles per time window
                 %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.5 sec
                 cfg.toi          = timestamps(1):ts:timestamps(end);% time window "slides" from -0.5 to 1.5 sec in steps of 0.05 sec (50 ms)
                 cfg.channel      = ft_data_lfp.label;
@@ -150,25 +162,32 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
 
                 % get state onset times and onset samples
                 states_lfp(i).trials(comp_trial).states = struct();
-                for s = 1:length(all_states)
+                for s = 1:length(lfp_tfa_cfg.all_states)
                     % get state onset time
-                    state_onset = sites(i).trial(t).states_onset(sites(i).trial(t).states == all_states(s).state_ID);
+                    state_onset = sites(i).trial(t).states_onset(sites(i).trial(t).states == ...
+                        lfp_tfa_cfg.all_states(s).state_ID);
                     % get sample number of state onset time
-                    state_onset_sample = find(abs(timestamps - state_onset) == min(abs(timestamps - state_onset)));
+                    state_onset_sample = find(abs(timestamps - state_onset) == ...
+                        min(abs(timestamps - state_onset)));
                     % save into struct
-                    states_lfp(i).trials(comp_trial).states(s).id = all_states(s).state_ID;
-                    states_lfp(i).trials(comp_trial).states(s).name  = all_states(s).state_name;
+                    states_lfp(i).trials(comp_trial).states(s).id = ...
+                        lfp_tfa_cfg.all_states(s).state_ID;
+                    states_lfp(i).trials(comp_trial).states(s).name  = ...
+                        lfp_tfa_cfg.all_states(s).state_name;
                     states_lfp(i).trials(comp_trial).states(s).onset_t  = state_onset;
                     states_lfp(i).trials(comp_trial).states(s).start_t  = ...
-                        max(timestamps(1), state_onset - all_states(s).tminus_onset);
+                        max(timestamps(1), state_onset - ...
+                        lfp_tfa_cfg.all_states(s).tminus_onset);
                     states_lfp(i).trials(comp_trial).states(s).end_t = ...
-                        min(timestamps(end), state_onset + all_states(s).tplus_onset);
+                        min(timestamps(end), state_onset + ...
+                        lfp_tfa_cfg.all_states(s).tplus_onset);
                     states_lfp(i).trials(comp_trial).states(s).onset_s  = state_onset_sample;
                     states_lfp(i).trials(comp_trial).states(s).start_s  = ...
-                        max(1, state_onset_sample - round(all_states(s).tminus_onset / ts));
+                        max(1, state_onset_sample - ...
+                        round(lfp_tfa_cfg.all_states(s).tminus_onset / ts));
                     states_lfp(i).trials(comp_trial).states(s).end_s = ...
                         min(length(timestamps), state_onset_sample + ...
-                        round(all_states(s).tminus_onset / ts));
+                        round(lfp_tfa_cfg.all_states(s).tminus_onset / ts));
                     
                 end
                 
@@ -197,7 +216,7 @@ function [ states_lfp ] = lfp_tfa_read_LFP( session_filename, all_states, maxsit
 
     % save data
     results_mat = fullfile(results_fldr, 'states_lfp.mat');
-    save(results_mat, 'states_lfp', '-v7.3');
+    %save(results_mat, 'states_lfp', '-v7.3');
 
 end
 
