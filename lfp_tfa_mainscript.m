@@ -44,17 +44,18 @@ lfp_tfa_cfg.trialinfo.start_state = 'fxa';
 lfp_tfa_cfg.trialinfo.end_state = 'trh';
 
 % maximum no:of sites to analyse
-maxsites = 4; % inf = analyse all sites
+maxsites = 2; % inf = analyse all sites
 lfp_tfa_cfg.maxsites = maxsites;
 
 %% Read the required fields from  the processed LFP data for the session
 % Configuration for calculating LFP time frequency spectrogram using
 % ft_freqanalysis function of the fieldtrip toolbox
 lfp_tfa_cfg.tfr.method          = 'wavelet'; % 
-lfp_tfa_cfg.tfr.taper           = [];
 lfp_tfa_cfg.tfr.width           = 4; % 4 cycles
 lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
+lfp_tfa_cfg.tfr.taper           = [];
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
+lfp_tfa_cfg.tfr.tapsmofrq       = [];
 
 states_lfp = lfp_tfa_read_LFP(lfp_tfa_cfg);
 
@@ -74,7 +75,7 @@ lfp_tfa_cfg.noise.diff_thr = 4;
 % number of consecutive samples beyond threshold to be considered
 lfp_tfa_cfg.noise.diff_N = 5;
 % threshold for lfp power in standard deviations
-lfp_tfa_cfg.noise.pow_thr = 3;
+lfp_tfa_cfg.noise.pow_thr = 6;
 % folder to save results
 lfp_tfa_cfg.noise.results_folder = root_results_folder;
 %cfg_noise.results_folder = [pathname '\Figures'];
@@ -97,8 +98,8 @@ lfp_tfa_cfg.results_folder = root_results_folder;
 %[ft_data_sites, session_lfp] = prepareFTdatatype(sites(5:9), analyse_states, all_states, maxsites, choice, inactivation, blocks, baseline);
 
 %% Compute the TFR per site and average across sites
-lfp_tfa_cfg.trial_condition = [];
-lfp_tfa_cfg.trial_condition.blocks = []; % Fill in  block indices to analyze
+lfp_tfa_cfg.add_conditions = [];
+lfp_tfa_cfg.add_conditions(1).blocks = 'inactivation'; % Analyse all inactivation blocks together
 % Leave empty for block-wise analysis of all blocks
 % define the peristates to analyse
 analyse_states = {6, 62};
