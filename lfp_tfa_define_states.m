@@ -56,15 +56,15 @@ function all_states = lfp_tfa_define_states(results_fldr)
     all_states(3).state_ID = 6;
     all_states(3).state_name = 'cue';
     all_states(3).state_desc = 'Cue onset';
-    all_states(3).tminus_onset = 0.6; % time to be considered for analysis before state onset
-    all_states(3).tplus_onset = 0.6; % time to be considered for analysis after state onset
+    all_states(3).tminus_onset = 1.0; % time to be considered for analysis before state onset
+    all_states(3).tplus_onset = 0.5; % time to be considered for analysis after state onset
 
     % Reach start
     all_states(4).state_ID = 62;
     all_states(4).state_name = 'reach';
     all_states(4).state_desc = 'Reach start';
-    all_states(4).tminus_onset = 0.3; % time to be considered for analysis before state onset
-    all_states(4).tplus_onset = 0.6; % time to be considered for analysis after state onset
+    all_states(4).tminus_onset = 0.5; % time to be considered for analysis before state onset
+    all_states(4).tplus_onset = 0.5; % time to be considered for analysis after state onset
 
     % Target hold
     all_states(5).state_ID = 5;

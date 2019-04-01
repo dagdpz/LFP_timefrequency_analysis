@@ -27,10 +27,12 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                 concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
                     avg_tfr(st, hs).time];
                 % append nans to separate the states
-                concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
-                    nan(1, length(concat_states_tfs.freq), 100));
-                concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
-                    nan(1, 100)];
+                if st < size(avg_tfr, 1)
+                    concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
+                        nan(1, length(concat_states_tfs.freq), 100/25));
+                    concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
+                        nan(1, 100/25)];
+                end
 
                 state_info(st).onset_s = find(...
                     avg_tfr(st, hs).time <= 0, 1, 'last');
@@ -42,11 +44,11 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
 
                 if st > 1
                     state_info(st).start_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).start_s + (st-1)*100;
+                        state_info(st).start_s + (st-1)*(100/25);
                     state_info(st).finish_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).finish_s + (st-1)*100;
+                        state_info(st).finish_s + (st-1)*(100/25);
                     state_info(st).onset_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).onset_s + (st-1)*100;
+                        state_info(st).onset_s + (st-1)*(100/25);
                 end
 
 
@@ -84,15 +86,19 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                     == state).state_name;
                 text(so, 10, state_name);
             end
-            set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 2))
+            set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize',6)
             xlabel('Time (s)');
             ylabel('Frequency (Hz)');
             subplottitle = concat_states_tfs.label{1};
             if isfield(avg_tfr(1, hs), 'trials')
                 subplottitle = [subplottitle ' (ntrials = ' num2str(length(avg_tfr(1, hs).trials)) ')'];
+            elseif isfield(avg_tfr(1, hs), 'nsites')
+                subplottitle = [subplottitle ' (nsites = ' num2str(avg_tfr(1, hs).nsites) ')'];
             end
             title(subplottitle);
             line([0 0], ylim, 'color', 'k');
+            % horizontal lines to separate frequency bands
+            
         end
     end
     

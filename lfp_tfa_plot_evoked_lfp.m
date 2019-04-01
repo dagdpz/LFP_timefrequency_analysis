@@ -67,7 +67,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;
                 text(so, ypos, state_name);
             end
-            set(gca,'xticklabels', round(concat_states_lfp.time(state_samples), 2))
+            set(gca,'xticklabels', round(concat_states_lfp.time(state_samples), 2), 'fontsize',6)
             xlabel('Time');
             ylabel('Frequency');
             subplottitle = [concat_states_lfp.label{1}];
