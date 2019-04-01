@@ -60,7 +60,7 @@ function [ states_lfp ] = lfp_tfa_read_LFP( lfp_tfa_cfg )
         states_lfp(i).site_ID = sites(i).site_ID;
         states_lfp(i).target = sites(i).target;
         states_lfp(i).recorded_hemispace = sites(i).target(end);
-        %states_lfp(i).lesioned_hemispace = 
+        states_lfp(i).lesioned_hemispace = lfp_tfa_cfg.lesional_hemispace;
         % now loop through each trial for this site
         comp_trial = 0; % iterator for completed trials
         for t = 1:length(sites(i).trial)
@@ -86,28 +86,28 @@ function [ states_lfp ] = lfp_tfa_read_LFP( lfp_tfa_cfg )
                 
                 
                 % assign hand-space for the trial
-%                 if strcmp(states_lfp(i).recorded_hemispace, reach_space)
-%                     if strcmp(states_lfp(i).recorded_hemispace, reach_hand)
-%                         hs_label = 'IH IS';
-%                     else
-%                         hs_label = 'CH IS';
-%                     end
-%                 else 
-%                     if strcmp(states_lfp(i).recorded_hemispace, reach_hand)
-%                         hs_label = 'IH CS';
-%                     else
-%                         hs_label = 'CH CS';
-%                     end
-%                 end
-                if reach_hand == 'R' && reach_space == 'R'
-                    hs_label = 'RH RS';
-                elseif reach_hand == 'R' && reach_space == 'L'
-                    hs_label = 'RH LS';
-                elseif reach_hand == 'L' && reach_space == 'R'
-                    hs_label = 'LH RS';
-                elseif reach_hand == 'L' && reach_space == 'L'
-                    hs_label = 'LH LS';
+                if strcmp(states_lfp(i).lesioned_hemispace, reach_space)
+                    if strcmp(states_lfp(i).lesioned_hemispace, reach_hand)
+                        hs_label = 'IH IS';
+                    else
+                        hs_label = 'CH IS';
+                    end
+                else 
+                    if strcmp(states_lfp(i).lesioned_hemispace, reach_hand)
+                        hs_label = 'IH CS';
+                    else
+                        hs_label = 'CH CS';
+                    end
                 end
+%                 if reach_hand == 'R' && reach_space == 'R'
+%                     hs_label = 'RH RS';
+%                 elseif reach_hand == 'R' && reach_space == 'L'
+%                     hs_label = 'RH LS';
+%                 elseif reach_hand == 'L' && reach_space == 'R'
+%                     hs_label = 'LH RS';
+%                 elseif reach_hand == 'L' && reach_space == 'L'
+%                     hs_label = 'LH LS';
+%                 end
 
                 %states = trial(i).states;
                 start_time = (sites(i).trial(t).TDT_LFPx_tStart); % trial start time
@@ -138,7 +138,7 @@ function [ states_lfp ] = lfp_tfa_read_LFP( lfp_tfa_cfg )
                 %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.2 sec
                 cfg.t_ftimwin    = lfp_tfa_cfg.tfr.t_ftimwin;           % 4 cycles per time window
                 %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.5 sec
-                cfg.toi          = timestamps(1):ts:timestamps(end);% time window "slides" from -0.5 to 1.5 sec in steps of 0.05 sec (50 ms)
+                cfg.toi          = timestamps(1):25*ts:timestamps(end);% time window "slides" from -0.5 to 1.5 sec in steps of 0.05 sec (50 ms)
                 cfg.channel      = ft_data_lfp.label;
                 TFR_hann_fixed   = ft_freqanalysis(cfg, ft_data_lfp);
 
@@ -216,7 +216,7 @@ function [ states_lfp ] = lfp_tfa_read_LFP( lfp_tfa_cfg )
 
     % save data
     results_mat = fullfile(results_fldr, 'states_lfp.mat');
-    %save(results_mat, 'states_lfp', '-v7.3');
+    save(results_mat, 'states_lfp', '-v7.3');
 
 end
 

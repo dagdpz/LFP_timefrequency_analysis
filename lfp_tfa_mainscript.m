@@ -43,6 +43,8 @@ lfp_tfa_cfg.trialinfo = struct();
 lfp_tfa_cfg.trialinfo.start_state = 'fxa';
 lfp_tfa_cfg.trialinfo.end_state = 'trh';
 
+lfp_tfa_cfg.lesional_hemispace = 'R';
+
 % maximum no:of sites to analyse
 maxsites = 2; % inf = analyse all sites
 lfp_tfa_cfg.maxsites = maxsites;
@@ -51,7 +53,7 @@ lfp_tfa_cfg.maxsites = maxsites;
 % Configuration for calculating LFP time frequency spectrogram using
 % ft_freqanalysis function of the fieldtrip toolbox
 lfp_tfa_cfg.tfr.method          = 'wavelet'; % 
-lfp_tfa_cfg.tfr.width           = 4; % 4 cycles
+lfp_tfa_cfg.tfr.width           = 7; % 4 cycles
 lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
 lfp_tfa_cfg.tfr.taper           = [];
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
@@ -75,7 +77,7 @@ lfp_tfa_cfg.noise.diff_thr = 4;
 % number of consecutive samples beyond threshold to be considered
 lfp_tfa_cfg.noise.diff_N = 5;
 % threshold for lfp power in standard deviations
-lfp_tfa_cfg.noise.pow_thr = 6;
+lfp_tfa_cfg.noise.pow_thr = 4;
 % folder to save results
 lfp_tfa_cfg.noise.results_folder = root_results_folder;
 %cfg_noise.results_folder = [pathname '\Figures'];
