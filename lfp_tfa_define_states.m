@@ -1,4 +1,4 @@
-function all_states = lfp_tfa_define_states(results_fldr)
+function all_states = lfp_tfa_define_states()
 
 % lfp_tfa_define_states - function which defines configuration for states 
 %
@@ -79,8 +79,36 @@ function all_states = lfp_tfa_define_states(results_fldr)
     all_states(5).state_desc = 'Reward';
     all_states(5).tminus_onset = 0.4; % time to be considered for analysis before state onset
     all_states(5).tplus_onset = 0.6; % time to be considered for analysis after state onset
+    
+    % Success
+    all_states(6).state_ID = 20;
+    all_states(6).state_name = 'scs';
+    all_states(6).state_desc = 'Success';
+    all_states(6).tminus_onset = 0.4; % time to be considered for analysis before state onset
+    all_states(6).tplus_onset = 0.6; % time to be considered for analysis after state onset
+    
+    % Reward
+    all_states(7).state_ID = 4;
+    all_states(7).state_name = 'traq';
+    all_states(7).state_desc = 'Target Acquisition';
+    all_states(7).tminus_onset = 0.4; % time to be considered for analysis before state onset
+    all_states(7).tplus_onset = 0.6; % time to be considered for analysis after state onset
+    
+    % Reward
+    all_states(8).state_ID = 8;
+    all_states(8).state_name = 'del';
+    all_states(8).state_desc = 'Delay Period';
+    all_states(8).tminus_onset = 0.4; % time to be considered for analysis before state onset
+    all_states(8).tplus_onset = 0.6; % time to be considered for analysis after state onset
+    
+    % Reward
+    all_states(9).state_ID = 63;
+    all_states(9).state_name = 'reach_end';
+    all_states(9).state_desc = 'Reach End';
+    all_states(9).tminus_onset = 0.4; % time to be considered for analysis before state onset
+    all_states(9).tplus_onset = 0.6; % time to be considered for analysis after state onset
 
-    save(fullfile(results_fldr, 'all_states.mat'), 'all_states');
+    %save(fullfile(results_fldr, 'all_states.mat'), 'all_states');
     
 end
     

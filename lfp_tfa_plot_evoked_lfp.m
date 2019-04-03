@@ -18,11 +18,11 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 % concatenate mean, std and time of evoked LFP for
                 % different states
                 concat_states_lfp.mean = [concat_states_lfp.mean, ...
-                    evoked_lfp(st, hs).mean, nan(1, 100)];
+                    evoked_lfp(st, hs).mean, nan(1, 150)];
                 concat_states_lfp.std = [concat_states_lfp.std, ...
-                    evoked_lfp(st, hs).std, nan(1, 100)];
+                    evoked_lfp(st, hs).std, nan(1, 150)];
                 concat_states_lfp.time = [concat_states_lfp.time, ...
-                    evoked_lfp(st, hs).time, nan(1, 100)];
+                    evoked_lfp(st, hs).time, nan(1, 150)];
                 concat_states_lfp.label = evoked_lfp(st, hs).hs_label;                
 
                 state_info(st).onset_s = find(...
@@ -35,11 +35,11 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
 
                 if st > 1
                     state_info(st).start_s = length(evoked_lfp(st-1, hs).time) + ...
-                        state_info(st).start_s + (st-1)*100;
+                        state_info(st).start_s + (st-1)*150;
                     state_info(st).finish_s = length(evoked_lfp(st-1, hs).time) + ...
-                        state_info(st).finish_s + (st-1)*100;
+                        state_info(st).finish_s + (st-1)*150;
                     state_info(st).onset_s = length(evoked_lfp(st-1, hs).time) + ...
-                        state_info(st).onset_s + (st-1)*100;
+                        state_info(st).onset_s + (st-1)*150;
                 end
 
             end
@@ -67,13 +67,15 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;
                 text(so, ypos, state_name);
             end
-            set(gca,'xticklabels', round(concat_states_lfp.time(state_samples), 2), 'fontsize',6)
-            xlabel('Time');
-            ylabel('Frequency');
+            set(gca,'xticklabels', round(concat_states_lfp.time(state_samples), 2), 'fontsize', 8)
+            xlabel('Time(s)');
+            ylabel('LFP amplitude');
             subplottitle = [concat_states_lfp.label{1}];
             if isfield(evoked_lfp(1, hs), 'trials')
                 subplottitle = [subplottitle ' (ntrials = ' ...
                     num2str(length(evoked_lfp(1, hs).trials)) ')'];
+            elseif isfield(evoked_lfp(1, hs), 'nsites')
+                subplottitle = [subplottitle ' (nsites = ' num2str(evoked_lfp(1, hs).nsites) ')'];
             end
             title(subplottitle);
             %line([0 0], ylim, 'color', 'k');

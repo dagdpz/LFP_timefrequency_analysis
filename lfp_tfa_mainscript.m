@@ -25,7 +25,7 @@ root_fig_folder = [pathname '\Figures'];
 
 
 % folder to save results
-root_results_folder = [pathname '\Results'];
+root_results_folder = fullfile(pathname, '\Results', date);
 if ~exist(root_results_folder, 'dir')
     mkdir(root_results_folder);
 end
@@ -33,8 +33,11 @@ end
 lfp_tfa_cfg.root_results_fldr = root_results_folder;
 
 % first read in the information about states
-all_states = lfp_tfa_define_states(root_results_folder);
+all_states = lfp_tfa_define_states();
 lfp_tfa_cfg.all_states = all_states;
+
+% load epochs
+lfp_tfa_cfg.epochs = lfp_tfa_define_epochs();
 
 % load LFP data for the selected session
 load(fullfile(pathname, session_filename));
@@ -53,13 +56,12 @@ lfp_tfa_cfg.maxsites = maxsites;
 % Configuration for calculating LFP time frequency spectrogram using
 % ft_freqanalysis function of the fieldtrip toolbox
 lfp_tfa_cfg.tfr.method          = 'wavelet'; % 
-lfp_tfa_cfg.tfr.width           = 7; % 4 cycles
+lfp_tfa_cfg.tfr.width           = 6; % no:of cycles
 lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
 lfp_tfa_cfg.tfr.taper           = [];
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
 lfp_tfa_cfg.tfr.tapsmofrq       = [];
-
-states_lfp = lfp_tfa_read_LFP(lfp_tfa_cfg);
+lfp_tfa_cfg.tfr.timestep        = 25; % x sampling time
 
 %% Reject noisy trials
 % configuration for lfp noise rejection
@@ -84,20 +86,14 @@ lfp_tfa_cfg.noise.results_folder = root_results_folder;
 % whether single trials should be plotted
 lfp_tfa_cfg.noise.plottrials = 0;
 
-[states_lfp, noisy_trials] = lfp_tfa_reject_noisy_trials(states_lfp, lfp_tfa_cfg.noise);
 %filt_session_lfp = rejectNoisyLFPTrials( session_lfp )
 
 %% Compute baseline
 lfp_tfa_cfg.baseline_ref_state = ''; % reference state around which baseline should be considered, leave empty to consider complete trial
 lfp_tfa_cfg.baseline_period = 'trial'; % period of interest for baseline calculation, trial = complete trial period
 lfp_tfa_cfg.baseline_block = 1; % consider only block 1 (control) for baseline calculation
-lfp_tfa_cfg.choice_trial = 0; % whether to consider choice or instructed trials
+lfp_tfa_cfg.use_choice_trial = 0; % whether to consider choice or instructed trials
 lfp_tfa_cfg.results_folder = root_results_folder;
-
-[states_lfp, baseline] = lfp_tfa_compute_baseline(states_lfp, lfp_tfa_cfg);
-
-%% Prepare FT datatype fpr TFR analysis
-%[ft_data_sites, session_lfp] = prepareFTdatatype(sites(5:9), analyse_states, all_states, maxsites, choice, inactivation, blocks, baseline);
 
 %% Compute the TFR per site and average across sites
 lfp_tfa_cfg.add_conditions = [];
@@ -110,12 +106,24 @@ analyse_states = {6, 62};
 cfg_baseline = [];
 lfp_tfa_cfg.baseline_method = 'zscore';
 
-[cond_based_tfs] = lfp_tfa_compute_plot_tfr(states_lfp, analyse_states, lfp_tfa_cfg );
+%% Function calls
 
-%% Evoked LFP analysis
-%evoked_lfp = evokedLFPAnalysis(ft_data_sites, root_fig_folder);
+% Read and process LFP data
+sites_lfp_folder = lfp_tfa_process_LFP(lfp_tfa_cfg);
 
-%% LFP power spectrum
-%lfp_spectrum = plotLFPPowerSpectrum(ft_data_sites, pathname);
+% Detect noisy trials
+[noisy_trials] = lfp_tfa_reject_noisy_lfp(sites_lfp_folder, lfp_tfa_cfg.noise);
+
+% Compute baseline power
+[sites_lfp_folder, baseline] = lfp_tfa_compute_baseline_power(sites_lfp_folder, lfp_tfa_cfg);
+
+% Average TFR
+[cond_based_tfs] = lfp_tfa_plot_average_tfr(sites_lfp_folder, analyse_states, lfp_tfa_cfg );
+
+% Evoked LFP analysis
+[ cond_based_evoked ] = lfp_tfa_plot_average_evoked_LFP( sites_lfp_folder, analyse_states, lfp_tfa_cfg ) ;
+
+% LFP power spectrum
+[ cond_based_psd ] = lfp_tfa_plot_average_powspctrum( sites_lfp_folder, lfp_tfa_cfg);
 
 

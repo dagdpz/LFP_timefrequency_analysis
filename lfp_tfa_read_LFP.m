@@ -138,7 +138,7 @@ function [ states_lfp ] = lfp_tfa_read_LFP( lfp_tfa_cfg )
                 %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.2 sec
                 cfg.t_ftimwin    = lfp_tfa_cfg.tfr.t_ftimwin;           % 4 cycles per time window
                 %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.5 sec
-                cfg.toi          = timestamps(1):25*ts:timestamps(end);% time window "slides" from -0.5 to 1.5 sec in steps of 0.05 sec (50 ms)
+                cfg.toi          = timestamps(1):lfp_tfa_cfg.tfr.timestep:timestamps(end);% time window "slides" from -0.5 to 1.5 sec in steps of 0.05 sec (50 ms)
                 cfg.channel      = ft_data_lfp.label;
                 TFR_hann_fixed   = ft_freqanalysis(cfg, ft_data_lfp);
 

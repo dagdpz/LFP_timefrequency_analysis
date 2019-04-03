@@ -6,7 +6,17 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
     cm = colormap('jet');
     cm(1,:,:) = [1,1,1];
     colormap(cm);
-
+    
+    % colorbar title
+    if strcmp(lfp_tfa_cfg.baseline_method, 'zscore')
+        cbtitle = 'Z-score';
+    elseif strcmp(lfp_tfa_cfg.baseline_method, 'division')
+        cbtitle = 'P / \mu';
+    elseif strcmp(lfp_tfa_cfg.baseline_method, 'subraction')
+        cbtitle = 'P - \mu';
+    elseif strcmp(lfp_tfa_cfg.baseline_method, 'subraction')
+        cbtitle = '(P - \mu) / \mu';
+    end
     % loop through handspace
     for hs = 1:size(avg_tfr, 2)
         % check if no trials exist for this condition and HS
@@ -29,9 +39,9 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                 % append nans to separate the states
                 if st < size(avg_tfr, 1)
                     concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
-                        nan(1, length(concat_states_tfs.freq), 100/25));
+                        nan(1, length(concat_states_tfs.freq), 300/25));
                     concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
-                        nan(1, 100/25)];
+                        nan(1, 300/25)];
                 end
 
                 state_info(st).onset_s = find(...
@@ -44,11 +54,11 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
 
                 if st > 1
                     state_info(st).start_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).start_s + (st-1)*(100/25);
+                        state_info(st).start_s + (st-1)*(300/25);
                     state_info(st).finish_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).finish_s + (st-1)*(100/25);
+                        state_info(st).finish_s + (st-1)*(300/25);
                     state_info(st).onset_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).onset_s + (st-1)*(100/25);
+                        state_info(st).onset_s + (st-1)*(300/25);
                 end
 
 
@@ -72,6 +82,7 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
             %Z = zeros(size(squeeze(concat_states_tfs.powspctrm)));
             imagesc(concat_states_tfs.time, [1:numel(concat_states_tfs.freq)], squeeze(concat_states_tfs.powspctrm), [-1 1]);
             axis xy, cb = colorbar;
+            set(get(cb,'title'),'string', cbtitle, 'fontsize',6);
             % log y axis ticks
             set(gca, 'ytick', ([1:8:numel(concat_states_tfs.freq)]));
             set(gca, 'yticklabel', ...
@@ -86,7 +97,7 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                     == state).state_name;
                 text(so, 10, state_name);
             end
-            set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize',6)
+            set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 8)
             xlabel('Time (s)');
             ylabel('Frequency (Hz)');
             subplottitle = concat_states_tfs.label{1};
@@ -98,7 +109,11 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
             title(subplottitle);
             line([0 0], ylim, 'color', 'k');
             % horizontal lines to separate frequency bands
-            
+            for f = [2, 4, 8, 12, 18, 32, 80]
+                f_idx = find(abs(concat_states_tfs.freq - f) == ...
+                    min(abs(concat_states_tfs.freq - f)), 1, 'first');
+                line(xlim, [f_idx f_idx], 'color', 'k', 'linestyle', '--');
+            end
         end
     end
     
