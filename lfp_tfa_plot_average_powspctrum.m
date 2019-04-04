@@ -1,16 +1,13 @@
 function [ cond_based_psd ] = lfp_tfa_plot_average_powspctrum( sites_lfp_folder, lfp_tfa_cfg ) 
 
-% lfp_tfa_compute_plot_tfr  - plots lfp time freq response for
+% lfp_tfa_plot_average_powspctrum  - plots lfp power spectrum for
 % different hand-space tuning conditions for each site and across sites
 %
 % USAGE:
-%	[ cond_based_tfs ] = computeAndPlotTFR( states_lfp, analyse_states, cfg_condition, cfg_baseline, root_results_folder )
+%	[ cond_based_psd ] = lfp_tfa_plot_average_powspctrum( sites_lfp_folder, lfp_tfa_cfg )
 %
 % INPUTS:
-%		states_lfp  	- struct containing lfp data per trial, output from
-%		lfp_tfa_compute_baseline
-%       analyse_states  - cell array containing ids of states to be
-%       analysed
+%		sites_lfp_folder  	- folder containing lfp data
 %       lfp_tfa_cfg     - struct containing configuration for TFR 
 %           Required fields:
 %           trial_condition.blocks              - blocks to be analysed, 
@@ -19,29 +16,15 @@ function [ cond_based_psd ] = lfp_tfa_plot_average_powspctrum( sites_lfp_folder,
 %           baseline normalization ('zscore', 'subtraction', 'division',
 %           'relchange')
 %           results_folder                      - folder to save results
-%		cfg_condition   - configuration structure to specify the conditions
-%		for selecting trials for analysis
-%           choice          : whether instructed (0) or choice (1) trials to be
-%           selected
-%           perturbation    : whether control or inactivation trials to be
-%           selected
-%           blocks          : blocks to be selected
-%           recorded_hemispace : hemispace from which LFP is recorded that
-%           has to be analysed
-%       cfg_baseline    - configuration structure for baseline corection
-%           method          : method to be used for baseline correction
-%           ('subtraction', 'division', 'relchange', 'zscore')
-%       root_results_folder     - folder to save results
-% 
+%
 % OUTPUTS:
-%		cond_based_tfs	- output structure which saves the average tfs for  
+%		cond_based_psd	- output structure which saves the average power spectrum for  
 %                         trials of a given condition for different handspace 
 %                         tunings and periods around the states analysed
 %                         same datastructure as input ft_data_sites, but
 %                         with additional field to store condition-wise lfp
 %                         time freq response		
-%       TFR_avg         - condition-wise lfp time freq response across all
-%                         sites
+%
 %
 %
 % See also lfp_tfa_compute_baseline, lfp_tfa_define_states
@@ -288,6 +271,8 @@ function [ cond_based_psd ] = lfp_tfa_plot_average_powspctrum( sites_lfp_folder,
                     end
 
                 end
+            else
+                continue;
 
             end
 

@@ -1,4 +1,4 @@
-function results_fldr = lfp_tfa_process_LFP( lfp_tfa_cfg )
+function lfp_tfa_process_LFP( data_filepath, lfp_tfa_cfg )
 
 % lfp_tfa_read_LFP - function to read in the processed lfp and
 % compute the time frequency spectrogram for each trial
@@ -39,7 +39,7 @@ function results_fldr = lfp_tfa_process_LFP( lfp_tfa_cfg )
     
     % Read in LFP data for the session
     fprintf('Reading processed LFP data \n');
-    session = load(lfp_tfa_cfg.data_filepath);
+    session = load(data_filepath);
     
     sites = session.sites;
     
@@ -245,7 +245,13 @@ function results_fldr = lfp_tfa_process_LFP( lfp_tfa_cfg )
                 
             end
         end
-        %sites_lfp(i).lfp_data.fsample = fs;
+        
+        % call function for rejeting noisy trials for this site
+        state_lfp(i) = lfp_tfa_reject_noisy_lfp( site_lfp, cfg_noise );
+        
+        % call function for calculating the baseline for this site
+                
+        
         % save data
         results_mat = fullfile(results_fldr, [state_lfp(i).site_ID '.mat']);
         site_lfp = state_lfp(i);

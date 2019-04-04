@@ -1,4 +1,4 @@
-function [ cond_based_tfs ] = lfp_tfa_plot_average_tfr( sites_lfp_folder, analyse_states, lfp_tfa_cfg ) 
+function cond_based_tfs = lfp_tfa_plot_site_average_tfr( sites_lfp_folder, analyse_states, lfp_tfa_cfg ) 
 
 % lfp_tfa_compute_plot_tfr  - plots lfp time freq response for
 % different hand-space tuning conditions for each site and across sites
@@ -91,10 +91,10 @@ function [ cond_based_tfs ] = lfp_tfa_plot_average_tfr( sites_lfp_folder, analys
                 cfg_conditions(i).label = cond_label;
                 
                 % create a folder for storing results for this condition
-                cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
-                if ~exist(cfg_conditions(i).results_folder, 'dir')
-                    mkdir(cfg_conditions(i).results_folder)
-                end
+%                 cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
+%                 if ~exist(cfg_conditions(i).results_folder, 'dir')
+%                     mkdir(cfg_conditions(i).results_folder)
+%                 end
                                 
             end
         end
@@ -141,10 +141,10 @@ function [ cond_based_tfs ] = lfp_tfa_plot_average_tfr( sites_lfp_folder, analys
                             cfg_conditions(i).label = cond_label;
                             
                             % create a folder for storing results for this condition
-                            cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
-                            if ~exist(cfg_conditions(i).results_folder, 'dir')
-                                mkdir(cfg_conditions(i).results_folder)
-                            end
+%                             cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
+%                             if ~exist(cfg_conditions(i).results_folder, 'dir')
+%                                 mkdir(cfg_conditions(i).results_folder)
+%                             end
                         end
                     end
                 end
@@ -155,46 +155,40 @@ function [ cond_based_tfs ] = lfp_tfa_plot_average_tfr( sites_lfp_folder, analys
        
     % condition based TFS
     cond_based_tfs = struct();
-    for cn = 1:length(cfg_conditions)
+    for i = 1:length(states_lfp)
         
-        cond_based_tfs(cn).label = cfg_conditions(cn).label;
-        cond_based_tfs(cn).cfg_cond = cfg_conditions(cn);
-        
-        % states to be analysed
-    %     analyse_states = {states_lfp(1).states.name};
+        states_lfp(i).cond_based_tfs = struct();
+        for cn = 1:length(cfg_conditions)
+            states_lfp(i).cond_based_tfs(cn).label = cfg_conditions(cn).label;
+            states_lfp(i).cond_based_tfs(cn).cfg_cond = cfg_conditions(cn);
 
-        % hand-space tuning of LFP
-        hs_labels = unique({states_lfp(1).trials.hndspc_lbl});
-        
-        % current trial condition analysed
-        cfg_condition = cfg_conditions(cn);
-        
-        
-        % cell array to store time frequency average across sites
-        TFR_avg = cell(length(analyse_states),length(hs_labels));
+            % states to be analysed
+        %     analyse_states = {states_lfp(1).states.name};
+
+            % hand-space tuning of LFP
+            hs_labels = unique({states_lfp(i).trials.hndspc_lbl});
+
+            % current trial condition analysed
+            cfg_condition = cfg_conditions(cn);
+
+
+            % cell array to store time frequency average across sites
+            TFR_avg = cell(length(analyse_states),length(hs_labels));
+
+            % loop through each site
+            nsites = length(states_lfp);
+
+            %cond_based_tfs(cn).sites = struct();
 
         % loop through each site
-        nsites = length(states_lfp);
-        
-        cond_based_tfs(cn).sites = struct();
-
-        % loop through each site
-        for i = 1:length(states_lfp)            
+        %for cn = 1:length(cfg_conditions)            
             
             %cond_based_tfs(cn).sites(i) = struct();
             % consider site based on recorded hemispace
-            if ~strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace) 
-                continue;
-            else
-                cond_based_tfs(cn).sites(i).site_ID = states_lfp(i).site_ID;
-                cond_based_tfs(cn).sites(i).session = states_lfp(i).session;
-                cond_based_tfs(cn).sites(i).target = states_lfp(i).target;
+            if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace) 
+                
                 % make a struct for concatenating TFR for all states
-                cond_based_tfs(cn).sites(i).tfs_avg_site = struct(); 
-                % struct to store evoked LFP
-                cond_based_tfs(cn).sites(i).site_evoked_lfp = struct();
-                % struct to store LFP power spectrum
-                cond_based_tfs(cn).sites(i).site_lfp_psd = struct();
+                states_lfp(i).cond_based_tfs(cn).tfs_avg_site = struct(); 
                 %cond_based_tfs(i).tfs_avg_site.powspctrm = cell(length(analyse_states),length(hs_labels));
                 cond_based_tfs(cn).sites(i).ntrials = zeros(1,length(hs_labels));
 
@@ -219,12 +213,12 @@ function [ cond_based_tfs ] = lfp_tfa_plot_average_tfr( sites_lfp_folder, analys
                     end
                     cond_trials = cond_trials & ...
                         strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
-                    cond_based_tfs(cn).sites(i).ntrials(hs) = sum(cond_trials);
+                    states_lfp(i).cond_based_tfs(cn).ntrials(hs) = sum(cond_trials);
                                         
                     fprintf('Condition %s - %s\n', cfg_conditions(cn).label, hs_labels{hs});
                     fprintf('Total number of trials %g\n', sum(cond_trials));
                     
-                    cond_based_tfs(cn).sites(i).noisytrials(hs) = ...
+                    states_lfp(i).cond_based_tfs(cn).noisytrials(hs) = ...
                         sum(cond_trials & [states_lfp(i).trials.noisy]); 
                                         
                     % consider only non noisy trials
@@ -296,121 +290,144 @@ function [ cond_based_tfs ] = lfp_tfa_plot_average_tfr( sites_lfp_folder, analys
                                 state_tfs.powspctrm_rawmean, cfg_baseline); 
                         
                             % save average tfs
-                            cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).powspctrm = state_tfs.powspctrm_normmean;
-                            cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).time = state_tfs.time{1};
-                            cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).freq = state_tfs.freq{1}; 
-                            cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).cfg = state_tfs.cfg;
-                            cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).hs_label = hs_labels(hs);
-                            cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).state = analyse_states{st};
-                            cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).trials = find(cond_trials);
+                            states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).powspctrm = state_tfs.powspctrm_normmean;
+                            states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).time = state_tfs.time{1};
+                            states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).freq = state_tfs.freq{1}; 
+                            states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).cfg = state_tfs.cfg;
+                            states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).hs_label = hs_labels(hs);
+                            states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).state = analyse_states{st};
+                            states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).trials = find(cond_trials);
                         end
                             
                     end
 
                 end
-
+            else
+                continue;                
             end
-
-        end
-        
-    
-    
-        % calculate the average across sites for this condition 
-        if isfield(cond_based_tfs(cn).sites, 'tfs_avg_site')
-            % struct to store average tfr across sites
-            cond_based_tfs(cn).tfs_avg_session = struct();
-            %cell(length(analyse_states),length(hs_labels));
-
-            for i = 1:length(cond_based_tfs(cn).sites)
-
-                for hs = 1:length(hs_labels)
-                    for st = 1:length(analyse_states)                        
-                        if ~isempty(cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).powspctrm)
-                            if i == 1
-                                cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm = ...
-                                    (1/length(cond_based_tfs(cn).sites))*...
-                                    cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).powspctrm ;
-
-                            else
-                                ntimebins = size(cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm, 3);
-                                % average same number of time bins
-                                if ntimebins > length(cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).time)
-                                    ntimebins = length(cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).time);
-                                    cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm = ...
-                                            cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm(1,:,1:ntimebins) + ...
-                                            (1/length(cond_based_tfs(cn).sites)) * cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).powspctrm(1,:,1:ntimebins) ;
-                                else
-                                    if ~isempty(cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm)
-                                        cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm = ...
-                                                cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm + ...
-                                                (1/length(cond_based_tfs(cn).sites)) * cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).powspctrm(1,:,1:ntimebins) ;
-                                    else
-                                        cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm = ...
-                                            (1/length(cond_based_tfs(cn).sites)) * ...
-                                            cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).powspctrm(1,:,1:ntimebins) ;
-                                    end
-                                end
-                            end
-                            cond_based_tfs(cn).tfs_avg_session(st, hs).time = cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).time;
-                            cond_based_tfs(cn).tfs_avg_session(st, hs).freq = cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).freq;
-                            cond_based_tfs(cn).tfs_avg_session(st, hs).hs_label = cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).hs_label;
-                            cond_based_tfs(cn).tfs_avg_session(st, hs).state = cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).state;
-                            cond_based_tfs(cn).tfs_avg_session(st, hs).cfg = cond_based_tfs(cn).sites(i).tfs_avg_site(st, hs).cfg;
-                            cond_based_tfs(cn).tfs_avg_session(st, hs).nsites = length(cond_based_tfs(cn).sites);
-                        end
-                    end
-                end
-            end
-        end
-
-        
-        % plots
-
-        % site averages
-        for i = 1:length(cond_based_tfs(cn).sites) 
+            
             % TFR
-            if isfield(cond_based_tfs(cn).sites, 'tfs_avg_site')
+            if isfield(states_lfp(i).cond_based_tfs(cn), 'tfs_avg_site')
 
-                plottitle = ['Site ID: ', cond_based_tfs(cn).sites(i).site_ID ', Target = ' cond_based_tfs(cn).sites(i).target ', '  ...
+                plottitle = ['Site ID: ', states_lfp(i).site_ID ', Target = ' states_lfp(i).target ', '  ...
                 '(block ' num2str(cfg_conditions(cn).block) '), '];
                 if cfg_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
                 else
                     plottitle = [plottitle 'Choice trials'];
                 end
-                result_folder = fullfile(cfg_conditions(cn).results_folder, cond_based_tfs(cn).sites(i).site_ID);
+                result_folder = fullfile(results_folder_tfr, states_lfp(i).site_ID);
                 if ~exist(result_folder, 'dir')
                     mkdir(result_folder);
                 end
-                result_file = fullfile(cfg_conditions(cn).results_folder, cond_based_tfs(cn).sites(i).site_ID, ...
-                    ['Avg_Spectrogram_' cond_based_tfs(cn).sites(i).site_ID '_' cfg_conditions(cn).label '.png']);
-                lfp_tfa_plot_hs_tuned_tfr(cond_based_tfs(cn).sites(i).tfs_avg_site, ...
+                result_file = fullfile(result_folder, ...
+                    ['Avg_Spectrogram_' states_lfp(i).site_ID '_' cfg_conditions(cn).label '.png']);
+                lfp_tfa_plot_hs_tuned_tfr(states_lfp(i).cond_based_tfs(cn).tfs_avg_site, ...
                     lfp_tfa_cfg, plottitle, result_file);
             end
-            
+
         end
+        % save mat file for each site
+        site_lfp = states_lfp(i);
+        save(fullfile(sites_lfp_folder, site_lfp_files(i).name), 'site_lfp');
+    end
         
-        % plot average TFR across sites for this session
-        plottitle = ['Session: ', cond_based_tfs(cn).sites(1).session ', Target = ' cond_based_tfs(cn).sites(1).target ', '  ...
-        'Block ' num2str(cfg_conditions(cn).block) ', '];
-        if cfg_conditions(cn).choice == 0
-            plottitle = [plottitle 'Instructed trials'];
-        else
-            plottitle = [plottitle 'Choice trials'];
+    
+    for i = 1:length(states_lfp)
+        
+        for cn = 1:length(cfg_conditions)
+            % calculate the average across sites for this condition 
+            if ~isempty(states_lfp(i).cond_based_tfs(cn).tfs_avg_site) 
+                % struct to store average tfr across sites
+                cond_based_tfs(cn).tfs_avg_session = struct();
+                %cell(length(analyse_states),length(hs_labels));
+
+                %for i = 1:length(cond_based_tfs(cn).sites)
+
+                for hs = 1:length(hs_labels)
+                    for st = 1:length(analyse_states)                        
+                        if ~isempty(states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).powspctrm)
+                            if ~isfield(cond_based_tfs(cn).tfs_avg_session(st, hs), 'powspctrm')
+                                cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm = ...
+                                    (1/length(states_lfp))*...
+                                    states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).powspctrm ;
+
+                            else
+                                ntimebins = size(cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm, 3);
+                                % average same number of time bins
+                                if ntimebins > length(states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).time)
+                                    ntimebins = length(states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).time);
+                                    cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm = ...
+                                            cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm(1,:,1:ntimebins) + ...
+                                            (1/length(states_lfp)) * ...
+                                            states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).powspctrm(1,:,1:ntimebins) ;
+                                else
+                                    if ~isempty(cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm)
+                                        cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm = ...
+                                                cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm + ...
+                                                (1/length(states_lfp)) * ...
+                                                states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).powspctrm(1,:,1:ntimebins) ;
+                                    else
+                                        cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm = ...
+                                            (1/length(states_lfp)) * ...
+                                            states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).powspctrm(1,:,1:ntimebins) ;
+                                    end
+                                end
+                            end
+                            cond_based_tfs(cn).tfs_avg_session(st, hs).time = states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).time;
+                            cond_based_tfs(cn).tfs_avg_session(st, hs).freq = states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).freq;
+                            cond_based_tfs(cn).tfs_avg_session(st, hs).hs_label = states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).hs_label;
+                            cond_based_tfs(cn).tfs_avg_session(st, hs).state = states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).state;
+                            cond_based_tfs(cn).tfs_avg_session(st, hs).cfg = states_lfp(i).cond_based_tfs(cn).tfs_avg_site(st, hs).cfg;
+                            cond_based_tfs(cn).tfs_avg_session(st, hs).nsites = length(states_lfp);
+                        end
+                    end
+                end
+            end            
         end
-        results_file = fullfile(cfg_conditions(cn).results_folder, ...
-            ['AvgSpectrogram_' cond_based_tfs(cn).sites(1).session '_' cfg_conditions(cn).label '.png']);
-        lfp_tfa_plot_hs_tuned_tfr(cond_based_tfs(cn).tfs_avg_session, ...
-                    lfp_tfa_cfg, plottitle, results_file);
+    end
+        
+        % plots
+
+        % site averages
+        
+    % plot average TFR across sites for this session
+    plottitle = ['Target = ' cond_based_tfs(cn).sites(1).target ', '  ...
+    'Block ' num2str(cfg_conditions(cn).block) ', '];
+    if cfg_conditions(cn).choice == 0
+        plottitle = [plottitle 'Instructed trials'];
+    else
+        plottitle = [plottitle 'Choice trials'];
+    end
+    result_file = fullfile(result_folder, ...
+                    ['Avg_Spectrogram_' states_lfp(i).session '_' cfg_conditions(cn).label '.png']);
+    lfp_tfa_plot_hs_tuned_tfr(cond_based_tfs(cn).tfs_avg_session, ...
+                lfp_tfa_cfg, plottitle, result_file);
+            
+    % save session average tfs
+    save(fullfile(sites_lfp_folder, 'session_average_tfs.mat'), 'cond_based_tfs');
+
+%         % plot average TFR across sites for this session
+%         plottitle = ['Session: ', cond_based_tfs(cn).sites(1).session ', Target = ' cond_based_tfs(cn).sites(1).target ', '  ...
+%         'Block ' num2str(cfg_conditions(cn).block) ', '];
+%         if cfg_conditions(cn).choice == 0
+%             plottitle = [plottitle 'Instructed trials'];
+%         else
+%             plottitle = [plottitle 'Choice trials'];
+%         end
+%         results_file = fullfile(cfg_conditions(cn).results_folder, ...
+%             ['AvgSpectrogram_' cond_based_tfs(cn).sites(1).session '_' cfg_conditions(cn).label '.png']);
+%         lfp_tfa_plot_hs_tuned_tfr(cond_based_tfs(cn).tfs_avg_session, ...
+%                     lfp_tfa_cfg, plottitle, results_file);
       
         
-    end
+    %end
     
     close all;
     % save mat files
-    save(fullfile(results_folder_tfr, 'cfg_conditions.mat'), 'cfg_conditions');
-    save(fullfile(results_folder_tfr, 'cond_based_tfs.mat'), 'cond_based_tfs');
-    save(fullfile(results_folder_tfr, 'lfp_tfa_cfg.mat'), 'lfp_tfa_cfg');
+%     save(fullfile(results_folder_tfr, 'cfg_conditions.mat'), 'cfg_conditions');
+%     save(fullfile(results_folder_tfr, 'cond_based_tfs.mat'), 'cond_based_tfs');
+%     save(fullfile(results_folder_tfr, 'lfp_tfa_cfg.mat'), 'lfp_tfa_cfg');
 end
         
 %         % read baseline tfs from all trials

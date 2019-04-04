@@ -4,21 +4,22 @@ function [ sites_lfp_folder, baseline ] = lfp_tfa_compute_baseline_power( sites_
 % the given configuration
 %
 % USAGE:
-%	[ states_lfp, baseline ] = lfp_tfa_compute_baseline(states_lfp, cfg_tfs)
+%	[ sites_lfp_folder, baseline ] = lfp_tfa_compute_baseline_power( sites_lfp_folder, cfg_tfs )
 %
 % INPUTS:
-%		states_lfp      - struct containing lfp power spectrogram per trial
+%		sites_lfp_folder      - folder containing LFP data strcture for all
+%		sites
 %       cfg_tfs         - configuration structure for baseline computation
 %           baseline_refstate   : reference state for baseline
 %           baseline_period     : period around the reference state to be
 %           considered for baseline computation
 %           baseline_block      : block to be considered for baseline
 %           calculation
-%           choice_trial        : 1/0 whether to consider choice trials (1)
+%           use_choice_trial    : 1/0 whether to consider choice trials (1)
 %           or instructed trials (0) for baseline computation
 % OUTPUTS:
-%		states_lfp      - input struct with added fields for baseline mean
-%		and stddev for each site
+%		sites_lfp_folder      - folder to which the results are updated,
+%		same as input data folder
 %       baseline        - struct which saves the baseline mean and stddev for each site and 
 %       configuration used for baseline calculation
 % See also lfp_tfa_reject_noisy_trials
@@ -70,8 +71,8 @@ function [ sites_lfp_folder, baseline ] = lfp_tfa_compute_baseline_power( sites_
         site_lfp.baseline_mean = baseline_pow_mean;
         site_lfp.baseline_std = baseline_pow_std;
         
-        baseline.sites(i).mean = baseline_pow_mean;
-        baseline.sites(i).std = baseline_pow_std;
+%         baseline.sites(i).mean = baseline_pow_mean;
+%         baseline.sites(i).std = baseline_pow_std;
         
         % save data
         save(fullfile(sites_lfp_folder, site_lfp_files(i).name), 'site_lfp');

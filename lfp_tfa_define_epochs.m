@@ -1,21 +1,18 @@
 function epochs = lfp_tfa_define_epochs()
 
-% lfp_tfa_define_states - function which defines configuration for states 
+% lfp_tfa_define_epochs - function which defines configuration for epochs 
+% of interest 
 %
 % USAGE: 
-%   all_states = lfp_tfa_define_states(results_fldr)
+%   epochs = lfp_tfa_define_epochs
 %
-% INPUTS:
-%   results_fldr - folder to save the .mat file containing state info
 % OUTPUTS:
-%   all_states - structure containing information about states
-%       state_ID: state identifier (integer) - required
-%       state_name: name of the state - required
+%   epochs - structure containing information about epochs of interest
+%       name: (string) Name of the epoch of interest
+%       ref_state_ID: (int) ID of the state to refer to
 %       state_desc: description of the state (optional)
-%       tminus_onset: time in seconds before the state onset where LFP 
-%       analysis should start
-%       tplus_onset: time in seconds up to which the LFP analysis should be 
-%       done from the state onset
+%       ref_period: (1x2 double) start and end time of epoch period with respect the the reference state onset
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     epochs = struct();
