@@ -12,25 +12,7 @@ close all;
 
 version = 1;
 
-lfp_tfa_cfg = lfp_tfa_define_settings;
-
-% Select the folder containing LFP data
-lfp_tfa_cfg.data_folder = 'C:\Data\MIP_timefreq_analysis\Lin_20170622';
-
-% folder to save figures
-root_fig_folder = [lfp_tfa_cfg.data_folder '\Figures'];
-
-% folder to save results
-root_results_folder = fullfile(lfp_tfa_cfg.data_folder, '\Results', date, ['ver' num2str(version)]);
-if ~exist(root_results_folder, 'dir')
-    mkdir(root_results_folder);
-end
-
-lfp_tfa_cfg.root_results_fldr = root_results_folder;
-
-% save settings file
-save(fullfile(lfp_tfa_cfg.root_results_fldr, ['settings_ver' num2str(version) '.mat']), ...
-    'lfp_tfa_cfg');
+lfp_tfa_cfg = lfp_tfa_define_settings(version);
 
 %% Function calls
 

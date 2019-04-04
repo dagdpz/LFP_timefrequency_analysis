@@ -1,8 +1,28 @@
-function lfp_tfa_cfg = lfp_tfa_define_settings
+function lfp_tfa_cfg = lfp_tfa_define_settings(version)
 %lfp_tfa_define_settings - Function to define LFP TFA settings 
 %   Detailed explanation goes here
     % configuration structure
-    lfp_tfa_cfg = [];    
+    lfp_tfa_cfg = [];
+
+    % select the session folder
+    %[session_filename, pathname, ~] = uigetfile('*.mat', 'Select the mat file containing processed LFP data for the session to analyse', ...
+    %    'MultiSelect', 'off');
+
+    lfp_tfa_cfg.data_folder = 'C:\Data\MIP_timefreq_analysis\Lin_20170622';
+    session_filename = 'sites_Linus_20170622.mat';
+    lfp_tfa_cfg.data_filepath = fullfile(lfp_tfa_cfg.data_folder, session_filename);
+
+    % folder to save figures
+    root_fig_folder = [lfp_tfa_cfg.data_folder '\Figures'];
+
+
+    % folder to save results
+    root_results_folder = fullfile(lfp_tfa_cfg.data_folder, '\Results', date, ['ver' num2str(version)]);
+    if ~exist(root_results_folder, 'dir')
+        mkdir(root_results_folder);
+    end
+
+    lfp_tfa_cfg.root_results_fldr = root_results_folder;
 
     % first read in the information about states
     all_states = lfp_tfa_define_states();
@@ -76,8 +96,11 @@ function lfp_tfa_cfg = lfp_tfa_define_settings
 
     % baseline configuration
     cfg_baseline = [];
-    lfp_tfa_cfg.baseline_method = 'zscore';   
+    lfp_tfa_cfg.baseline_method = 'zscore';
     
+    % save struct
+    save(fullfile(lfp_tfa_cfg.root_results_fldr, ['settings_ver' num2str(version) '.mat']), ...
+        'lfp_tfa_cfg');
 
 end
 
