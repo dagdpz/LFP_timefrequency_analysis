@@ -1,4 +1,4 @@
-function [ sites_lfp_folder, baseline ] = lfp_tfa_compute_baseline_power( sites_lfp_folder, cfg_tfs )
+function [ session_proc_lfp_out ] = lfp_tfa_compute_baseline_power( session_lfp_in, cfg_tfs )
 
 % computeBaseline - Computes mean and stddev of baseline power according to
 % the given configuration
@@ -25,8 +25,8 @@ function [ sites_lfp_folder, baseline ] = lfp_tfa_compute_baseline_power( sites_
 % See also lfp_tfa_reject_noisy_trials
 
     % struct for storing results
-    baseline = struct();
-    baseline.cfg = cfg_tfs;
+    session_proc_lfp_out = session_lfp_in;
+    %baseline.cfg = cfg_tfs;
     fprintf('=============================================================\n');
     fprintf('Computing baseline ...\n');
     
@@ -39,10 +39,9 @@ function [ sites_lfp_folder, baseline ] = lfp_tfa_compute_baseline_power( sites_
     end
     
     % loop through each site
-    site_lfp_files = dir([sites_lfp_folder, '\*.mat']);
-    for i = 1:length( site_lfp_files )
-        load(fullfile(sites_lfp_folder, site_lfp_files(i).name)); 
-        fprintf('Processing site (%g/%g): %s \n', i, length(site_lfp_files), site_lfp.site_ID);
+    for i = 1:length( session_lfp_in )
+        site_lfp = session_lfp_in(i);
+        fprintf('Processing site (%g/%g): %s \n', i, length(session_lfp_in), site_lfp.site_ID);
         % struct to store lfp power during baseline period for each trial
         baseline_pow = cell(1, length(site_lfp.trials));
         % loop through trial
@@ -68,19 +67,22 @@ function [ sites_lfp_folder, baseline ] = lfp_tfa_compute_baseline_power( sites_
         arr_baseline_pow = cat(3, baseline_pow{:});
         baseline_pow_mean = nanmean(arr_baseline_pow, 3);
         baseline_pow_std = nanstd(arr_baseline_pow, 0, 3);
-        site_lfp.baseline_mean = baseline_pow_mean;
-        site_lfp.baseline_std = baseline_pow_std;
+        session_proc_lfp_out(i).baseline_mean = baseline_pow_mean;
+        session_proc_lfp_out(i).baseline_std = baseline_pow_std;
         
 %         baseline.sites(i).mean = baseline_pow_mean;
 %         baseline.sites(i).std = baseline_pow_std;
         
         % save data
-        save(fullfile(sites_lfp_folder, site_lfp_files(i).name), 'site_lfp');
+        site_lfp = session_proc_lfp_out(i);
+        save(fullfile(cfg_tfs.session_results_fldr, ...
+            [site_lfp.site_ID, '.mat']), 'site_lfp');
     end
     
     % save results
     %save(fullfile(results_folder, 'states_lfp.mat'), 'states_lfp');
     %save(fullfile(results_folder, 'baseline.mat'), 'baseline');
+    session_proc_lfp_out(i) = site_lfp;
     fprintf(' done\n');
     fprintf('=============================================================\n');
 end

@@ -1,4 +1,4 @@
-function [ cond_based_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp_folder, analyse_states, lfp_tfa_cfg ) 
+function [ states_lfp, cond_based_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_states, lfp_tfa_cfg ) 
 
 % lfp_tfa_plot_average_evoked_LFP  - plots average evoked LFP for
 % different hand-space tuning conditions for each site and across sites
@@ -34,23 +34,11 @@ function [ cond_based_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp_folder,
 
     % make a folder to save figures
     %sessionName = states_lfp(1).session;
-    results_folder_evoked = fullfile(lfp_tfa_cfg.results_folder, 'Condition_based_Evoked_LFP');
+    results_folder_evoked = fullfile(lfp_tfa_cfg.session_results_fldr, 'Condition_based_Evoked_LFP');
     if ~exist(results_folder_evoked, 'dir')
         mkdir(results_folder_evoked);
     end
-    
-    states_lfp = struct();
-    % load site lfps
-    site_lfp_files = dir([sites_lfp_folder, '\*.mat']);
-    for i = 1:length( site_lfp_files )
-        load(fullfile(sites_lfp_folder, site_lfp_files(i).name));
-        if i == 1
-            states_lfp = site_lfp;
-        else
-            states_lfp = [states_lfp, site_lfp];
-        end
-    end
-    
+        
     recorded_hemispace = unique([states_lfp.recorded_hemispace]);
     choice = unique([states_lfp(1).trials.choice_trial]);
     perturbation = unique([states_lfp(1).trials.perturbation]);
@@ -151,7 +139,8 @@ function [ cond_based_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp_folder,
     end
     
        
-    % condition based TFS
+    % condition based Evoked
+    cond_based_evoked = struct();
     % loop through each site
     for i = 1:length(states_lfp) 
     
@@ -177,7 +166,7 @@ function [ cond_based_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp_folder,
             % loop through each site
             nsites = length(states_lfp);
 
-            states_lfp(i).cond_based_evoked(cn).sites = struct();
+            %states_lfp(i).cond_based_evoked(cn) = struct();
                   
             
             %cond_based_tfs(cn).sites(i) = struct();
@@ -308,53 +297,61 @@ function [ cond_based_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp_folder,
             end
 
         end
+        site_lfp = states_lfp(i);
+        % save mat file for site
+        save(fullfile(lfp_tfa_cfg.session_results_fldr, [states_lfp(i).site_ID '.mat']), 'site_lfp');
     end
         
-      
-        % calculate the average evoked LFP across sites for this condition 
-%         if isfield(cond_based_evoked(cn).sites, 'site_evoked_lfp')
-%             % struct to store average evoked LFP across sites
-%             cond_based_evoked(cn).evoked_lfp_session = struct();%cell(length(analyse_states),length(hs_labels));
-%             
-%             
-%             for i = 1:length(cond_based_evoked(cn).sites)
-% 
-%                 for hs = 1:length(hs_labels)
-%                     for st = 1:length(analyse_states)
-%                         if ~isempty(cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs))
-%                             
-%                             if i == 1
-%                                 cond_based_evoked(cn).evoked_lfp_session(st, hs).mean = ...
-%                                     (1/length(cond_based_evoked(cn).sites))*cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs).mean ;
-%                                 cond_based_evoked(cn).evoked_lfp_session(st, hs).std = ...
-%                                     (1/length(cond_based_evoked(cn).sites))*cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs).std ;
-%                                 cond_based_evoked(cn).evoked_lfp_session(st, hs).time = ...
-%                                     cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs).time;
-%                             else
-%                                 nsamples = length(cond_based_evoked(cn).evoked_lfp_session(st, hs).time);
-%                                 if nsamples > length(cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs).time)
-%                                     nsamples = length(cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs).time);
-%                                 end
-%                                 cond_based_evoked(cn).evoked_lfp_session(st, hs).mean = ...
-%                                     cond_based_evoked(cn).evoked_lfp_session(st, hs).mean(1:nsamples) + ...
-%                                     (1/length(cond_based_evoked(cn).sites)) * cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs).mean(1:nsamples) ;
-%                                 cond_based_evoked(cn).evoked_lfp_session(st, hs).std = ...
-%                                     cond_based_evoked(cn).evoked_lfp_session(st, hs).std(1:nsamples) + ...
-%                                     (1/length(cond_based_evoked(cn).sites)) * cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs).std(1:nsamples) ;
-%                                 
-%                             end
-%                             cond_based_evoked(cn).evoked_lfp_session(st, hs).hs_label = ...
-%                                 cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs).hs_label;
-%                             cond_based_evoked(cn).evoked_lfp_session(st, hs).state = ...
-%                                 cond_based_evoked(cn).sites(i).site_evoked_lfp(st, hs).state;
-%                             cond_based_evoked(cn).evoked_lfp_session(st, hs).nsites = ...
-%                                 length(cond_based_evoked(cn).sites);
-%                         end
-%                         
-%                     end
-%                 end
-%             end
-%         end
+    
+    for i = 1:length(states_lfp)
+        for cn = 1:length(cfg_conditions)
+            % calculate the average evoked LFP across sites for this condition 
+            if isfield(states_lfp(i).cond_based_evoked(cn), 'site_evoked_lfp')
+                % struct to store average evoked LFP across sites
+                %cond_based_evoked(cn).evoked_lfp_session = struct();%cell(length(analyse_states),length(hs_labels));
+                
+                for hs = 1:length(hs_labels)
+                    for st = 1:length(analyse_states)
+                        if ~isempty(states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).mean)
+
+                            if i == 1
+                                cond_based_evoked(cn).evoked_lfp_session(st, hs).mean = ...
+                                    (1/length(states_lfp))*...
+                                    states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).mean ;
+                                cond_based_evoked(cn).evoked_lfp_session(st, hs).std = ...
+                                    (1/length(states_lfp))*...
+                                    states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).std ;
+                                cond_based_evoked(cn).evoked_lfp_session(st, hs).time = ...
+                                    states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).time;
+                            else
+                                nsamples = length(cond_based_evoked(cn).evoked_lfp_session(st, hs).time);
+                                if nsamples > length(states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).time)
+                                    nsamples = length(states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).time);
+                                end
+                                cond_based_evoked(cn).evoked_lfp_session(st, hs).mean = ...
+                                    cond_based_evoked(cn).evoked_lfp_session(st, hs).mean(1:nsamples) + ...
+                                    (1/length(states_lfp)) * ...
+                                    states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).mean(1:nsamples) ;
+                                cond_based_evoked(cn).evoked_lfp_session(st, hs).std = ...
+                                    cond_based_evoked(cn).evoked_lfp_session(st, hs).std(1:nsamples) + ...
+                                    (1/length(states_lfp)) * ...
+                                    states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).std(1:nsamples) ;
+
+                            end
+                            cond_based_evoked(cn).evoked_lfp_session(st, hs).hs_label = ...
+                                states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).hs_label;
+                            cond_based_evoked(cn).evoked_lfp_session(st, hs).state = ...
+                                states_lfp(i).cond_based_evoked(cn).site_evoked_lfp(st, hs).state;
+                            cond_based_evoked(cn).evoked_lfp_session(st, hs).nsites = ...
+                                length(states_lfp);
+                            cond_based_evoked(cn).condition = cfg_conditions(cn);
+                        end
+
+                    end
+                end
+            end
+        end
+    end
                
     
         % plots
@@ -385,25 +382,27 @@ function [ cond_based_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp_folder,
 %         end
 %     end        
         
-%         % plot average evoked LFP across sites for this session
-%         plottitle = ['Session: ', cond_based_evoked(cn).sites(1).session ', Target = ' cond_based_evoked(cn).sites(1).target ', '  ...
-%         'Block ' num2str(cfg_conditions(cn).block) ', '];
-%         if cfg_conditions(cn).choice == 0
-%             plottitle = [plottitle 'Instructed trials'];
-%         else
-%             plottitle = [plottitle 'Choice trials'];
-%         end
-%         result_file = fullfile(cfg_conditions(cn).results_folder, ['Evoked_LFP_' ...
-%             cond_based_evoked(cn).sites(1).session '_' cfg_conditions(cn).label '.png']);
-%         lfp_tfa_plot_evoked_lfp (cond_based_evoked(cn).evoked_lfp_session, lfp_tfa_cfg, ...
-%             plottitle, result_file);
-        
+    % plot average evoked LFP across sites for this session
+    for cn = 1:length(cfg_conditions)
+        plottitle = ['Session: ', states_lfp(i).session ', Target = ' states_lfp(i).target ', '  ...
+        'Block ' num2str(cfg_conditions(cn).block) ', '];
+        if cfg_conditions(cn).choice == 0
+            plottitle = [plottitle 'Instructed trials'];
+        else
+            plottitle = [plottitle 'Choice trials'];
+        end
+        result_file = fullfile(results_folder_evoked, ['Evoked_LFP_' ...
+            states_lfp(i).session '_' cfg_conditions(cn).label '.png']);
+        lfp_tfa_plot_evoked_lfp (cond_based_evoked(cn).evoked_lfp_session, lfp_tfa_cfg, ...
+            plottitle, result_file);
+    end
+    
     %end
     
     close all;
     % save mat files
-%     save(fullfile(results_folder_tfr, 'cfg_conditions.mat'), 'cfg_conditions');
-%     save(fullfile(results_folder_tfr, 'cond_based_evoked.mat'), 'cond_based_evoked');
+    save(fullfile(results_folder_evoked, 'cfg_conditions.mat'), 'cfg_conditions');
+    save(fullfile(results_folder_evoked, 'cond_based_evoked.mat'), 'cond_based_evoked');
 %     save(fullfile(results_folder_tfr, 'lfp_tfa_cfg.mat'), 'lfp_tfa_cfg');
 end
         

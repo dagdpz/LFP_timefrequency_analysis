@@ -1,4 +1,4 @@
-function lfp_tfa_process_LFP( data_filepath, lfp_tfa_cfg )
+function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
 
 % lfp_tfa_read_LFP - function to read in the processed lfp and
 % compute the time frequency spectrogram for each trial
@@ -37,21 +37,23 @@ function lfp_tfa_process_LFP( data_filepath, lfp_tfa_cfg )
     
     close all; 
     
-    % Read in LFP data for the session
-    fprintf('Reading processed LFP data \n');
-    session = load(data_filepath);
+%     % Read in LFP data for the session
+%     fprintf('Reading processed LFP data \n');
+%     session = load(lfp_tfa_cfg.data_filepath);
     
-    sites = session.sites;
+    sites = session_lfp.sites;
     
     % prepare results folder
     %sessionName = sites(1).site_ID(1:12);
-    results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr);
+    results_fldr = fullfile(lfp_tfa_cfg.session_results_fldr);
     if ~exist(results_fldr, 'dir')
         mkdir(results_fldr);
     end
     
     % struct to save data
     state_lfp = struct();
+    % struct to save noise rejected data
+    state_filt_lfp = struct();
     
     % save data inside struct 
     % first loop through each site
@@ -157,7 +159,9 @@ function lfp_tfa_process_LFP( data_filepath, lfp_tfa_cfg )
                 state_lfp(i).trials(comp_trial).hndspc_lbl  = hs_label;
                 state_lfp(i).trials(comp_trial).perturbation  = perturbation;
                 state_lfp(i).trials(comp_trial).tfs = TFR_wavelet;
-
+                % flag to mark noisy trials, default False, filled in by
+                % lfp_tfa_reject_noisy_lfp.m
+                state_lfp(i).trials(comp_trial).noisy = 0;
     
                 % get state onset times and onset samples
                 state_lfp(i).trials(comp_trial).states = struct();
@@ -246,11 +250,8 @@ function lfp_tfa_process_LFP( data_filepath, lfp_tfa_cfg )
             end
         end
         
-        % call function for rejeting noisy trials for this site
-        state_lfp(i) = lfp_tfa_reject_noisy_lfp( site_lfp, cfg_noise );
-        
-        % call function for calculating the baseline for this site
-                
+        %%% Noise rejection %%%
+        %state_filt_lfp(i) = lfp_tfa_reject_noisy_lfp( state_lfp(i), lfp_tfa_cfg.noise );
         
         % save data
         results_mat = fullfile(results_fldr, [state_lfp(i).site_ID '.mat']);

@@ -3,21 +3,23 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(version)
 %   Detailed explanation goes here
     % configuration structure
     lfp_tfa_cfg = [];
+    
+    lfp_tfa_cfg.version = version;
 
     % select the session folder
     %[session_filename, pathname, ~] = uigetfile('*.mat', 'Select the mat file containing processed LFP data for the session to analyse', ...
     %    'MultiSelect', 'off');
 
     lfp_tfa_cfg.data_folder = 'C:\Data\MIP_timefreq_analysis\Lin_20170622';
-    session_filename = 'sites_Linus_20170622.mat';
-    lfp_tfa_cfg.data_filepath = fullfile(lfp_tfa_cfg.data_folder, session_filename);
+%     session_filename = 'sites_Linus_20170622.mat';
+%     lfp_tfa_cfg.data_filepath = fullfile(lfp_tfa_cfg.data_folder, session_filename);
 
     % folder to save figures
     root_fig_folder = [lfp_tfa_cfg.data_folder '\Figures'];
 
 
     % folder to save results
-    root_results_folder = fullfile(lfp_tfa_cfg.data_folder, '\Results', date, ['ver' num2str(version)]);
+    root_results_folder = fullfile(lfp_tfa_cfg.data_folder, '\LFP_TFA_Results', date, ['ver' num2str(version)]);
     if ~exist(root_results_folder, 'dir')
         mkdir(root_results_folder);
     end
@@ -32,7 +34,7 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(version)
     lfp_tfa_cfg.epochs = lfp_tfa_define_epochs();
 
     % load LFP data for the selected session
-    load(fullfile(lfp_tfa_cfg.data_folder, session_filename));
+    %load(fullfile(lfp_tfa_cfg.data_folder, session_filename));
 
     lfp_tfa_cfg.trialinfo = struct();
     lfp_tfa_cfg.trialinfo.start_state = 'fxa';
@@ -41,7 +43,7 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(version)
     lfp_tfa_cfg.lesional_hemispace = 'R';
 
     % maximum no:of sites to analyse
-    maxsites = inf; % inf = analyse all sites
+    maxsites = 2; % inf = analyse all sites
     lfp_tfa_cfg.maxsites = maxsites;
 
     %% Read the required fields from  the processed LFP data for the session
