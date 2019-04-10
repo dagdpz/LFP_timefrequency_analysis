@@ -10,7 +10,7 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(version)
     %[session_filename, pathname, ~] = uigetfile('*.mat', 'Select the mat file containing processed LFP data for the session to analyse', ...
     %    'MultiSelect', 'off');
 
-    lfp_tfa_cfg.data_folder = 'C:\Data\MIP_timefreq_analysis\Lin_20170622';
+    lfp_tfa_cfg.data_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data';
 %     session_filename = 'sites_Linus_20170622.mat';
 %     lfp_tfa_cfg.data_filepath = fullfile(lfp_tfa_cfg.data_folder, session_filename);
 
@@ -91,7 +91,8 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(version)
 
     %% Compute the TFR per site and average across sites
     lfp_tfa_cfg.add_conditions = [];
-    lfp_tfa_cfg.add_conditions(1).blocks = 'inactivation'; % Analyse all inactivation blocks together
+    lfp_tfa_cfg.add_conditions(1).blocks = 'control'; % Analyse all inactivation blocks together
+    lfp_tfa_cfg.add_conditions(2).blocks = 'inactivation'; % Analyse all inactivation blocks together
     % Leave empty for block-wise analysis of all blocks
     % define the peristates to analyse
     lfp_tfa_cfg.analyse_states = {6, 62};
@@ -103,6 +104,9 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(version)
     % save struct
     save(fullfile(lfp_tfa_cfg.root_results_fldr, ['settings_ver' num2str(version) '.mat']), ...
         'lfp_tfa_cfg');
+    
+    %% Settings for average across sessions
+    lfp_tfa_cfg.compute_avg_across = 'sessions'; % 'sites'
 
 end
 

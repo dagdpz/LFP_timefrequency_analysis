@@ -21,6 +21,9 @@ lfp_datafiles = dir(fullfile(lfp_tfa_cfg.data_folder, 'sites_*.mat'));
 
 session_lfp = struct();
 session_proc_lfp = struct();
+lfp_tfr = struct();
+lfp_evoked = struct();
+lfp_pow = struct();
 try
     % loop through each session
     for i = 1:length(lfp_datafiles)
@@ -34,35 +37,94 @@ try
         session_proc_lfp(i).sites = lfp_tfa_process_LFP(session_lfp(i).sites, lfp_tfa_cfg);
         session_proc_lfp(i).sites = lfp_tfa_reject_noisy_lfp(session_proc_lfp(i).sites, lfp_tfa_cfg.noise);
         session_proc_lfp(i).sites = lfp_tfa_compute_baseline_power(session_proc_lfp(i).sites, lfp_tfa_cfg);
-        [session_proc_lfp(i).sites, session_proc_lfp(i).cond_based_tfs] = ...
+    end
+    for i = 1:length(session_proc_lfp)
+        lfp_tfr.session(i) = ...
             lfp_tfa_plot_site_average_tfr( session_proc_lfp(i).sites, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
-        [ session_proc_lfp(i).sites, session_proc_lfp(i).cond_based_evoked ] = ...
+        lfp_evoked.session(i) = ...
             lfp_tfa_plot_site_evoked_LFP( session_proc_lfp(i).sites, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
-        [ session_proc_lfp(i).sites, session_proc_lfp(i).cond_based_psd ] = ...
+        lfp_pow.session(i) = ...
             lfp_tfa_plot_site_powspctrum( session_proc_lfp(i).sites, lfp_tfa_cfg ) ;
     end
 catch e
-    error(e.msg());%save session_proc_lfp session_proc_lfp;
+    error(e.message());%save session_proc_lfp session_proc_lfp;
 end
 
 %% Average across sessions
-%for i = 1:length(session_proc_lfp)
-    
+lfp_tfr.sessions_avg = lfp_tfa_avg_tfr_per_session(lfp_tfr, lfp_tfa_cfg);%struct();
+lfp_evoked.sessions_avg = lfp_tfa_avg_evoked_LFP_per_session(lfp_evoked, lfp_tfa_cfg);
+lfp_pow.sessions_avg = lfp_tfa_avg_pow_per_session(lfp_pow, lfp_tfa_cfg);%struct();
 
-% Detect noisy trials
-%[noisy_trials] = lfp_tfa_reject_noisy_lfp(sites_lfp_folder,
-%lfp_tfa_cfg.noise);
-
-% Compute baseline power
-%[sites_lfp_folder, baseline] = lfp_tfa_compute_baseline_power(sites_lfp_folder, lfp_tfa_cfg);
-
-% Average TFR
-%[cond_based_tfs] = lfp_tfa_plot_average_tfr(sites_lfp_folder, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
-
-% Evoked LFP analysis
-%[ cond_based_evoked ] = lfp_tfa_plot_average_evoked_LFP( sites_lfp_folder, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg ) ;
-
-% LFP power spectrum
-%[ cond_based_psd ] = lfp_tfa_plot_average_powspctrum( lfp_tfa_cfg.session_results_folder, lfp_tfa_cfg);
-
-
+% nsessions = length(session_proc_lfp);
+% for cn = 1:length(session_proc_lfp(1).cond_based_tfs)
+%     fprintf('Condition %s\n', session_proc_lfp(1).cond_based_tfs(cn).label);
+%     %sessions_avg.cond_based_tfs(cn).tfs_across_sessions = struct();
+%     for i = 1:length(session_proc_lfp)    
+%         sessions_avg.cond_based_tfs(cn).tfs_across_sessions = struct();
+%         for st = 1:size(session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session, 1)
+%             for hs = 1:size(session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session, 2)
+%                 if i == 1 
+%                     if isfield(session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session(st, hs), 'powspctrm') ...
+%                         && ~isempty(session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm)
+%                         sessions_avg.cond_based_tfs(cn).tfs_across_sessions(st,hs).powspctrm ...
+%                             = (1/nsessions) * ...
+%                             session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm;
+%                         sessions_avg.cond_based_tfs(cn).tfs_across_sessions(st,hs).nsites ...
+%                             = session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session(st, hs).nsites;
+%                         sessions_avg.cond_based_tfs(cn).tfs_across_sessions(st,hs).nsessions = nsessions;
+%                     end
+%                 else
+%                     if isequaln(session_proc_lfp(i).cond_based_tfs(cn).cfg_condition, ...
+%                             session_proc_lfp(i-1).cond_based_tfs(cn).cfg_condition)
+%                         if isfield(session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session(st, hs), 'powspctrm') ...
+%                             && ~isempty(session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm)
+%                             sessions_avg.cond_based_tfs(cn).tfs_across_sessions(st,hs).powspctrm ...
+%                                 = ((1/nsessions) * ...
+%                                 session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session(st, hs).powspctrm) + ...
+%                                 sessions_avg.cond_based_tfs(cn).tfs_across_sessions(st,hs).powspctrm;
+%                             if isfield(sessions_avg.cond_based_tfs(cn).tfs_across_sessions(st,hs), 'nsites')
+%                                 sessions_avg.cond_based_tfs(cn).tfs_across_sessions(st,hs).nsites ...
+%                                     = session_proc_lfp(i).cond_based_tfs(cn).tfs_avg_session(st, hs).nsites + ...
+%                                     sessions_avg.cond_based_tfs(cn).tfs_across_sessions(st,hs).nsites;
+%                             end
+%                         end
+%                     end
+%                 end
+%             end
+%         end
+%     end
+%     % plot
+% %     plottitle = ['Target = ' session_proc_lfp(i).sites(1).target ', Block ' ...
+% %         num2str(cfg_conditions(cn).block) ', '];
+% %     if cfg_conditions(cn).choice == 0
+% %         plottitle = [plottitle 'Instructed trials'];
+% %     else
+% %         plottitle = [plottitle 'Choice trials'];
+% %     end
+%     plottitle = session_proc_lfp(1).cond_based_tfs(cn).label;
+%     result_file = fullfile(lfp_tfa_cfg.root_results_fldr, ...
+%                     ['Avg_Spectrogram_' session_proc_lfp(1).cond_based_tfs(cn).label '.png']);
+%     lfp_tfa_plot_hs_tuned_tfr(sessions_avg.cond_based_tfs(cn).tfs_across_sessions, ...
+%                 lfp_tfa_cfg, plottitle, result_file);
+% 
+%     % save session average tfs
+%     %save(fullfile(lfp_tfa_cfg.root_results_fldr, 'session_average_tfs.mat'), 'cond_based_tfs');
+% end
+% 
+% % Detect noisy trials
+% %[noisy_trials] = lfp_tfa_reject_noisy_lfp(sites_lfp_folder,
+% %lfp_tfa_cfg.noise);
+% 
+% % Compute baseline power
+% %[sites_lfp_folder, baseline] = lfp_tfa_compute_baseline_power(sites_lfp_folder, lfp_tfa_cfg);
+% 
+% % Average TFR
+% %[cond_based_tfs] = lfp_tfa_plot_average_tfr(sites_lfp_folder, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
+% 
+% % Evoked LFP analysis
+% %[ cond_based_evoked ] = lfp_tfa_plot_average_evoked_LFP( sites_lfp_folder, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg ) ;
+% 
+% % LFP power spectrum
+% %[ cond_based_psd ] = lfp_tfa_plot_average_powspctrum( lfp_tfa_cfg.session_results_folder, lfp_tfa_cfg);
+% 
+% 
