@@ -14,7 +14,7 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
         cbtitle = 'P / \mu';
     elseif strcmp(lfp_tfa_cfg.baseline_method, 'subraction')
         cbtitle = 'P - \mu';
-    elseif strcmp(lfp_tfa_cfg.baseline_method, 'subraction')
+    elseif strcmp(lfp_tfa_cfg.baseline_method, 'relchange')
         cbtitle = '(P - \mu) / \mu';
     end
     % loop through handspace
@@ -101,10 +101,12 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
             xlabel('Time (s)');
             ylabel('Frequency (Hz)');
             subplottitle = concat_states_tfs.label{1};
-            if isfield(avg_tfr(1, hs), 'trials')
-                subplottitle = [subplottitle ' (ntrials = ' num2str(length(avg_tfr(1, hs).trials)) ')'];
+            if isfield(avg_tfr(1, hs), 'nsessions')
+                subplottitle = [subplottitle ' (nsessions = ' num2str(avg_tfr(1, hs).nsessions) ')'];
             elseif isfield(avg_tfr(1, hs), 'nsites')
                 subplottitle = [subplottitle ' (nsites = ' num2str(avg_tfr(1, hs).nsites) ')'];
+            elseif isfield(avg_tfr(1, hs), 'trials')
+                subplottitle = [subplottitle ' (ntrials = ' num2str(length(avg_tfr(1, hs).trials)) ')'];            
             end
             title(subplottitle);
             line([0 0], ylim, 'color', 'k');

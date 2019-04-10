@@ -71,11 +71,13 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             xlabel('Time(s)');
             ylabel('LFP amplitude');
             subplottitle = [concat_states_lfp.label{1}];
-            if isfield(evoked_lfp(1, hs), 'trials')
-                subplottitle = [subplottitle ' (ntrials = ' ...
-                    num2str(length(evoked_lfp(1, hs).trials)) ')'];
+            if isfield(evoked_lfp(1, hs), 'nsessions')
+                subplottitle = [subplottitle ' (nsessions = ' num2str(evoked_lfp(1, hs).nsessions) ')'];
             elseif isfield(evoked_lfp(1, hs), 'nsites')
                 subplottitle = [subplottitle ' (nsites = ' num2str(evoked_lfp(1, hs).nsites) ')'];
+            elseif isfield(evoked_lfp(1, hs), 'trials')
+                subplottitle = [subplottitle ' (ntrials = ' ...
+                    num2str(length(evoked_lfp(1, hs).trials)) ')'];            
             end
             title(subplottitle);
             %line([0 0], ylim, 'color', 'k');
