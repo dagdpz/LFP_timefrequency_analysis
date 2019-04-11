@@ -1,4 +1,4 @@
-function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_states, lfp_tfa_cfg ) 
+function [session_tfs] = lfp_tfa_plot_site_average_tfr_changed( states_lfp, analyse_states, lfp_tfa_cfg ) 
 
 % lfp_tfa_compute_plot_tfr  - plots lfp time freq response for
 % different hand-space tuning conditions for each site and across sites
@@ -150,177 +150,201 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         if ~exist(site_results_folder, 'dir')
             mkdir(site_results_folder);
         end
-        sites_tfr(i).condition = struct();
-        for cn = 1:length(cfg_conditions)
-            
-            % states to be analysed
-        %     analyse_states = {states_lfp(1).states.name};
-
-            % hand-space tuning of LFP
-            hs_labels = unique({states_lfp(i).trials.hndspc_lbl});
-
-            % current trial condition analysed
-            cfg_condition = cfg_conditions(cn);
-
-
-            % cell array to store time frequency average across sites
-            TFR_avg = cell(length(analyse_states),length(hs_labels));
-
-            % loop through each site
-            nsites = length(states_lfp);
-
-            %cond_based_tfs(cn).sites = struct();
-
-        % loop through each site
-        %for cn = 1:length(cfg_conditions)            
-            
-            %cond_based_tfs(cn).sites(i) = struct();
-            % consider site based on recorded hemispace
-            sites_tfr(i).condition(cn).label = cfg_conditions(cn).label;
-            sites_tfr(i).condition(cn).cfg_cond = cfg_conditions(cn);
-            if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace) 
-                sites_tfr(i).site_ID = states_lfp(i).site_ID;
-                sites_tfr(i).session = states_lfp(i).session;
-                sites_tfr(i).target = states_lfp(i).target;
-                % make a struct for concatenating TFR for all states
-                sites_tfr(i).condition(cn).hs_tuned_tfs = struct(); 
-                %cond_based_tfs(i).tfs_avg_site.powspctrm = cell(length(analyse_states),length(hs_labels));
-                sites_tfr(i).condition(cn).ntrials = zeros(1,length(hs_labels));
-
-                for hs = 1:length(hs_labels)
-                    cond_trials = zeros(1, length(states_lfp(i).trials));
-                    % get the trials for given condition and this hs label
-%                     if ~isnan(cfg_conditions(cn).perturbation)
-%                         cond_trials = cond_trials & ...
-%                             ([states_lfp(i).trials.perturbation]) == ...
-%                             (cfg_conditions(cn).perturbation);
-%                     end
-                    if ~isnan(cfg_conditions(cn).block)
-                        for b = cfg_conditions(cn).block
-                            cond_trials = cond_trials | ...
-                                ([states_lfp(i).trials.block] == b);
-                        end
-                    end
-                    if ~isnan(cfg_conditions(cn).choice)
-                        cond_trials = cond_trials & ...
-                            ([states_lfp(i).trials.choice_trial] == ...
-                            cfg_conditions(cn).choice);
-                    end
-                    cond_trials = cond_trials & ...
-                        strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
-                    sites_tfr(i).condition(cn).ntrials(hs) = sum(cond_trials);
-                                        
-                    fprintf('Condition %s - %s\n', cfg_conditions(cn).label, hs_labels{hs});
-                    fprintf('Total number of trials %g\n', sum(cond_trials));
-                    
-                    sites_tfr(i).condition(cn).noisytrials(hs) = ...
-                        sum(cond_trials & [states_lfp(i).trials.noisy]); 
-                                        
-                    % consider only non noisy trials
-                    fprintf('Number of noisy trials %g\n', sum(cond_trials ...
-                        & [states_lfp(i).trials.noisy]));
-                    cond_trials = cond_trials & ~[states_lfp(i).trials.noisy];
-                    
-                                 
-                    % loop through trials 
-
-                    for st = 1:length(analyse_states)
-                        state_tfs.powspctrm = {}; % power spectrogram
-                        state_tfs.time = {}; % timebins fo spectrogram
-                        state_tfs.freq = {}; % freq bins
-                        
-                        for t = find(cond_trials)
-
-                            states          = states_lfp(i).trials(t).states;
-                            state_onset_t   = states([states(:).id] == ...
-                                analyse_states{st}).onset_t;
-                            state_start_t   = states([states(:).id] == ...
-                                analyse_states{st}).start_t;
-                            state_end_t     = states([states(:).id] == ...
-                                analyse_states{st}).end_t;
-                            % sampling frequency
-                            fs = states_lfp(i).trials(t).fsample;
-
-                            % crop the tfs for this state
-                            state_tfs.powspctrm = [state_tfs.powspctrm, ...
-                                states_lfp(i).trials(t).tfs.powspctrm(1, :, ...
-                                (states_lfp(i).trials(t).tfs.time >= state_start_t & ...
-                                states_lfp(i).trials(t).tfs.time <= state_end_t))];
-        %                     if sum (states_lfp(i).trials(t).tfs.time >= state_start_t & ...
-        %                         states_lfp(i).trials(t).tfs.time <= state_end_t) < ntimebins
-                            state_tfs.time = [state_tfs.time, ...
-                                states_lfp(i).trials(t).tfs.time(1, ...
-                                (states_lfp(i).trials(t).tfs.time >= state_start_t & ...
-                                states_lfp(i).trials(t).tfs.time <= state_end_t)) - state_onset_t];
-                            state_tfs.freq = [state_tfs.freq states_lfp(i).trials(t).tfs.freq]; 
-                            state_tfs.cfg = states_lfp(i).trials(t).tfs.cfg;
-        %                     end
-                            
-                        end
-
-                        % find number of time bins in power
-                        % spectrogram
-                        ntimebins = min(cellfun('length', state_tfs.time));
-                        nfreqbins = numel(state_tfs.freq);
-                        % crop each tfs to the ntimebins
-                        for k = 1:length(state_tfs.powspctrm)
-                            state_tfs.powspctrm{k} = state_tfs.powspctrm{k}(1,:,1:ntimebins);
-                            state_tfs.time{k} = state_tfs.time{k}(1:ntimebins);
-                        end
-                        
-                        % average power spectrum for each state
-                        arr_state_pow = zeros(1, nfreqbins, ntimebins);
-
-                        if ~isempty(state_tfs.powspctrm)
-                        
-                            % find the average TFS for each state
-                            arr_state_pow = cat(1, state_tfs.powspctrm{:});
-                            state_tfs.powspctrm_rawmean = nanmean(arr_state_pow, 1);
-                        
-                            % baseline normalization
-                            cfg_baseline.method = lfp_tfa_cfg.baseline_method;
-                            cfg_baseline.mean = states_lfp(i).baseline_mean;
-                            cfg_baseline.std = states_lfp(i).baseline_std;
-                            state_tfs.powspctrm_normmean = lfp_tfa_baseline_normalization(...
-                                state_tfs.powspctrm_rawmean, cfg_baseline); 
-                        
-                            % save average tfs
-                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm = state_tfs.powspctrm_normmean;
-                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time = state_tfs.time{1};
-                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq = state_tfs.freq{1}; 
-                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).cfg = state_tfs.cfg;
-                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).hs_label = hs_labels(hs);
-                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state = analyse_states{st};
-                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).trials = find(cond_trials);
-                        end
-                            
-                    end
-
+        perturbation = sign(unique([states_lfp(i).trials.perturbation]));
+        blocks = unique([states_lfp(i).trials.block]);
+        % number of preinjection blocks 
+        n_preinj_blocks = sum(perturbation == 0);
+        n_postinj_blocks = sum(perturbation ~= 0);
+        sites_tfr.perturbation = struct();
+        for t = 1:length(unique(perturbation))
+            % get blocks for control/inactivation
+            if t == 1
+                use_blocks_idx = lfp_tfa_cfg.control_blocks;
+                if strcmp(use_blocks_idx, 'control')
+                    use_blocks_idx = blocks(perturbation == 0);
                 end
             else
-                continue;                
+                use_blocks_idx = lfp_tfa_cfg.inactivation_blocks;
+                if strcmp(use_blocks_idx, 'inactivation')
+                    use_blocks_idx = blocks(perturbation ~= 0);
+                end
             end
+            use_blocks = blocks(use_blocks_idx);
             
-            % TFR
-            if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs)
+            sites_tfr(i).perturbation(t).condition = struct();
+            for cn = 1:length(cfg_conditions)
 
-                plottitle = ['Site ID: ', sites_tfr(i).site_ID ', Target = ' sites_tfr(i).target ', '  ...
-                '(block ' num2str(cfg_conditions(cn).block) '), '];
-                if cfg_conditions(cn).choice == 0
-                    plottitle = [plottitle 'Instructed trials'];
+                % states to be analysed
+            %     analyse_states = {states_lfp(1).states.name};
+
+                % hand-space tuning of LFP
+                hs_labels = unique({states_lfp(i).trials.hndspc_lbl});
+
+                % current trial condition analysed
+                cfg_condition = cfg_conditions(cn);
+
+
+                % cell array to store time frequency average across sites
+                TFR_avg = cell(length(analyse_states),length(hs_labels));
+
+                % loop through each site
+                nsites = length(states_lfp);
+
+                %cond_based_tfs(cn).sites = struct();
+
+            % loop through each site
+            %for cn = 1:length(cfg_conditions)            
+
+                %cond_based_tfs(cn).sites(i) = struct();
+                % consider site based on recorded hemispace
+                sites_tfr(i).perturbation(t).condition(cn).label = cfg_conditions(cn).label;
+                sites_tfr(i).perturbation(t).condition(cn).cfg_cond = cfg_conditions(cn);
+                if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace) 
+                    sites_tfr(i).site_ID = states_lfp(i).site_ID;
+                    sites_tfr(i).session = states_lfp(i).session;
+                    sites_tfr(i).target = states_lfp(i).target;
+                    % make a struct for concatenating TFR for all states
+                    sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs = struct(); 
+                    %cond_based_tfs(i).tfs_avg_site.powspctrm = cell(length(analyse_states),length(hs_labels));
+                    sites_tfr(i).perturbation(t).condition(cn).ntrials = zeros(1,length(hs_labels));
+
+                    for hs = 1:length(hs_labels)
+                        cond_trials = zeros(1, length(states_lfp(i).trials));
+                        % get the trials for given condition and this hs label
+    %                     if ~isnan(cfg_conditions(cn).perturbation)
+    %                         cond_trials = cond_trials & ...
+    %                             ([states_lfp(i).trials.perturbation]) == ...
+    %                             (cfg_conditions(cn).perturbation);
+    %                     end
+                        if ~isempty(use_blocks)
+                            for b = use_blocks
+                                cond_trials = cond_trials | ...
+                                    ([states_lfp(i).trials.block] == b);
+                            end
+                        end
+                        if ~isnan(cfg_conditions(cn).choice)
+                            cond_trials = cond_trials & ...
+                                ([states_lfp(i).trials.choice_trial] == ...
+                                cfg_conditions(cn).choice);
+                        end
+                        cond_trials = cond_trials & ...
+                            strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
+                        sites_tfr(i).perturbation(t).condition(cn).ntrials(hs) = sum(cond_trials);
+
+                        fprintf('Condition %s - %s\n', cfg_conditions(cn).label, hs_labels{hs});
+                        fprintf('Total number of trials %g\n', sum(cond_trials));
+
+                        sites_tfr(i).perturbation(t).condition(cn).noisytrials(hs) = ...
+                            sum(cond_trials & [states_lfp(i).trials.noisy]); 
+
+                        % consider only non noisy trials
+                        fprintf('Number of noisy trials %g\n', sum(cond_trials ...
+                            & [states_lfp(i).trials.noisy]));
+                        cond_trials = cond_trials & ~[states_lfp(i).trials.noisy];
+
+
+                        % loop through trials 
+
+                        for st = 1:length(analyse_states)
+                            state_tfs.powspctrm = {}; % power spectrogram
+                            state_tfs.time = {}; % timebins fo spectrogram
+                            state_tfs.freq = {}; % freq bins
+
+                            for t = find(cond_trials)
+
+                                states          = states_lfp(i).trials(t).states;
+                                state_onset_t   = states([states(:).id] == ...
+                                    analyse_states{st}).onset_t;
+                                state_start_t   = states([states(:).id] == ...
+                                    analyse_states{st}).start_t;
+                                state_end_t     = states([states(:).id] == ...
+                                    analyse_states{st}).end_t;
+                                % sampling frequency
+                                fs = states_lfp(i).trials(t).fsample;
+
+                                % crop the tfs for this state
+                                state_tfs.powspctrm = [state_tfs.powspctrm, ...
+                                    states_lfp(i).trials(t).tfs.powspctrm(1, :, ...
+                                    (states_lfp(i).trials(t).tfs.time >= state_start_t & ...
+                                    states_lfp(i).trials(t).tfs.time <= state_end_t))];
+            %                     if sum (states_lfp(i).trials(t).tfs.time >= state_start_t & ...
+            %                         states_lfp(i).trials(t).tfs.time <= state_end_t) < ntimebins
+                                state_tfs.time = [state_tfs.time, ...
+                                    states_lfp(i).trials(t).tfs.time(1, ...
+                                    (states_lfp(i).trials(t).tfs.time >= state_start_t & ...
+                                    states_lfp(i).trials(t).tfs.time <= state_end_t)) - state_onset_t];
+                                state_tfs.freq = [state_tfs.freq states_lfp(i).trials(t).tfs.freq]; 
+                                state_tfs.cfg = states_lfp(i).trials(t).tfs.cfg;
+            %                     end
+
+                            end
+
+                            % find number of time bins in power
+                            % spectrogram
+                            ntimebins = min(cellfun('length', state_tfs.time));
+                            nfreqbins = numel(state_tfs.freq);
+                            % crop each tfs to the ntimebins
+                            for k = 1:length(state_tfs.powspctrm)
+                                state_tfs.powspctrm{k} = state_tfs.powspctrm{k}(1,:,1:ntimebins);
+                                state_tfs.time{k} = state_tfs.time{k}(1:ntimebins);
+                            end
+
+                            % average power spectrum for each state
+                            arr_state_pow = zeros(1, nfreqbins, ntimebins);
+
+                            if ~isempty(state_tfs.powspctrm)
+
+                                % find the average TFS for each state
+                                arr_state_pow = cat(1, state_tfs.powspctrm{:});
+                                state_tfs.powspctrm_rawmean = nanmean(arr_state_pow, 1);
+
+                                % baseline normalization
+                                cfg_baseline.method = lfp_tfa_cfg.baseline_method;
+                                cfg_baseline.mean = states_lfp(i).baseline_mean;
+                                cfg_baseline.std = states_lfp(i).baseline_std;
+                                state_tfs.powspctrm_normmean = lfp_tfa_baseline_normalization(...
+                                    state_tfs.powspctrm_rawmean, cfg_baseline); 
+
+                                % save average tfs
+                                sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm = state_tfs.powspctrm_normmean;
+                                sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).time = state_tfs.time{1};
+                                sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).freq = state_tfs.freq{1}; 
+                                sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).cfg = state_tfs.cfg;
+                                sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).hs_label = hs_labels(hs);
+                                sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).state = analyse_states{st};
+                                sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).trials = find(cond_trials);
+                            end
+
+                        end
+
+                    end
                 else
-                    plottitle = [plottitle 'Choice trials'];
+                    continue;                
                 end
-                result_folder = fullfile(results_folder_tfr, sites_tfr(i).site_ID);
-                if ~exist(result_folder, 'dir')
-                    mkdir(result_folder);
-                end
-                result_file = fullfile(site_results_folder, ...
-                    ['LFP_tfr_' sites_tfr(i).site_ID '_' cfg_conditions(cn).label '.png']);
-                lfp_tfa_plot_hs_tuned_tfr(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
-                    lfp_tfa_cfg, plottitle, result_file);
-            end
 
+                % calculate the differnce between
+
+                % TFR
+                if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs)
+
+                    plottitle = ['Site ID: ', sites_tfr(i).site_ID ', Target = ' sites_tfr(i).target ', '  ...
+                    '(block ' num2str(cfg_conditions(cn).block) '), '];
+                    if cfg_conditions(cn).choice == 0
+                        plottitle = [plottitle 'Instructed trials'];
+                    else
+                        plottitle = [plottitle 'Choice trials'];
+                    end
+                    result_folder = fullfile(results_folder_tfr, sites_tfr(i).site_ID);
+                    if ~exist(result_folder, 'dir')
+                        mkdir(result_folder);
+                    end
+                    result_file = fullfile(site_results_folder, ...
+                        ['LFP_tfr_' sites_tfr(i).site_ID '_' cfg_conditions(cn).label '.png']);
+                    lfp_tfa_plot_hs_tuned_tfr(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
+                        lfp_tfa_cfg, plottitle, result_file);
+                end
+
+            end
         end
         % save mat file for each site
         site_tfr = sites_tfr(i);

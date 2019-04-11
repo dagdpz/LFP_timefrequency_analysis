@@ -157,6 +157,10 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     % loop through each site
     for i = 1:length(states_lfp)  
         sites_pow(i).condition = struct();
+        site_results_folder = fullfile(results_folder_psd, 'sites', states_lfp(i).site_ID);
+        if ~exist(site_results_folder, 'dir')
+            mkdir(site_results_folder);
+        end
         
         for cn = 1:length(cfg_conditions)
 
@@ -188,9 +192,11 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
 %                 cond_based_psd(cn).sites(i).target = states_lfp(i).target;
                 % make a struct for concatenating TFR for all states
                 % struct to store LFP power spectrum
-                sites_pow(i).condition(cn).site_lfp_psd = struct();
+                sites_pow(i).condition(cn).hs_tuned_power = struct();
                 %cond_based_tfs(i).tfs_avg_site.powspctrm = cell(length(analyse_states),length(hs_labels));
                 sites_pow(i).condition(cn).ntrials = zeros(1,length(hs_labels));
+                sites_pow(i).site_ID = states_lfp(i).site_ID;
+                sites_pow(i).target = states_lfp(i).target;
 
                 for hs = 1:length(hs_labels)
                     cond_trials = zeros(1, length(states_lfp(i).trials));
@@ -258,11 +264,11 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                             epoch_psd_mean = nanmean(arr_state_psd, 1);
                             
                             % save LFP power spectrum
-                            sites_pow(i).condition(cn).site_lfp_psd(ep, hs).mean = epoch_psd_mean;
-                            sites_pow(i).condition(cn).site_lfp_psd(ep, hs).freq = epoch_tfs.psd_f;
-                            sites_pow(i).condition(cn).site_lfp_psd(ep, hs).trials = find(cond_trials);
-                            sites_pow(i).condition(cn).site_lfp_psd(ep, hs).hs_label = hs_labels(hs);
-                            sites_pow(i).condition(cn).site_lfp_psd(ep, hs).epoch_name = lfp_tfa_cfg.epochs(ep).name;
+                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean = epoch_psd_mean;
+                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq = epoch_tfs.psd_f;
+                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).trials = find(cond_trials);
+                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).hs_label = hs_labels(hs);
+                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).epoch_name = lfp_tfa_cfg.epochs(ep).name;
                             
                         end
 
@@ -275,31 +281,32 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             end
             
             % TFR
-            if isfield(sites_pow(i).condition(cn), 'site_lfp_psd')
+            if ~isempty(sites_pow(i).condition(cn).hs_tuned_power)
 
-                plottitle = ['Site ID: ', states_lfp(i).site_ID ...
-                    ', Target = ' states_lfp(i).target ', '  ...
+                plottitle = ['Site ID: ', sites_pow(i).site_ID ...
+                    ', Target = ' sites_pow(i).target ', '  ...
                 '(block ' num2str(cfg_conditions(cn).block) '), '];
                 if cfg_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
                 else
                     plottitle = [plottitle 'Choice trials'];
                 end
-                result_folder = fullfile(results_folder_psd, states_lfp(i).site_ID);
-                if ~exist(result_folder, 'dir')
-                    mkdir(result_folder);
+                site_results_folder = fullfile(results_folder_psd, 'sites', sites_pow(i).site_ID);
+                if ~exist(site_results_folder, 'dir')
+                    mkdir(site_results_folder);
                 end
-                result_file = fullfile(results_folder_psd, states_lfp(i).site_ID, ...
-                    ['Avg_Pow_Spctrum_' states_lfp(i).site_ID '_' cfg_conditions(cn).label '.png']);
-                lfp_tfa_plot_hs_tuned_psd(sites_pow(i).condition(cn).site_lfp_psd, ...
+                result_file = fullfile(site_results_folder, ...
+                    ['LFP_Power_' states_lfp(i).site_ID '_' cfg_conditions(cn).label '.png']);
+                lfp_tfa_plot_hs_tuned_psd(sites_pow(i).condition(cn).hs_tuned_power, ...
                     lfp_tfa_cfg, plottitle, result_file);
             end
 
         end
         % save mat file for site
         site_pow = sites_pow(i);
-        save(fullfile(lfp_tfa_cfg.session_results_fldr, ...
-            [site_pow.site_ID '.mat']), 'site_pow');
+        save(fullfile(site_results_folder, ...
+            ['LFP_Power_' site_pow.site_ID '.mat']), 'site_pow');
+
         session_pow.sites(i) = site_pow;
     end
         
@@ -317,44 +324,44 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 continue;
             end
             % calculate the average LFP power spectrum across sites for this condition 
-            if ~isempty(sites_pow(i).condition(cn).site_lfp_psd) && ...
-                    isfield(sites_pow(i).condition(cn).site_lfp_psd, 'mean')
+            if ~isempty(sites_pow(i).condition(cn).hs_tuned_power) && ...
+                    isfield(sites_pow(i).condition(cn).hs_tuned_power, 'mean')
                 isite = isite + 1;
                 % struct to store average evoked LFP across sites
-                %cond_based_psd(cn).session_lfp_psd = struct();%cell(length(analyse_states),length(hs_labels));            
+                %cond_based_psd(cn).hs_tuned_power = struct();%cell(length(analyse_states),length(hs_labels));            
             
 
                 for hs = 1:length(hs_labels)
                     for ep = 1:length(lfp_tfa_cfg.epochs)
-                        if ~isempty(sites_pow(i).condition(cn).site_lfp_psd(ep, hs).mean)
+                        if ~isempty(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean)
                             
                             if isite == 1
-                                session_pow.condition(cn).session_lfp_psd(ep, hs).mean = ...
+                                session_pow.condition(cn).hs_tuned_power(ep, hs).mean = ...
                                     (1/nsites)*...
-                                    sites_pow(i).condition(cn).site_lfp_psd(ep, hs).mean ;
-                                session_pow.condition(cn).session_lfp_psd(ep, hs).freq = ...
-                                    sites_pow(i).condition(cn).site_lfp_psd(ep, hs).freq;
+                                    sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean ;
+                                session_pow.condition(cn).hs_tuned_power(ep, hs).freq = ...
+                                    sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq;
                             else
-                                if ~isempty(cond_based_psd(cn).session_lfp_psd(ep, hs).mean)
-                                    nfreqs = length(cond_based_psd(cn).session_lfp_psd(ep, hs).freq);
-                                    if nfreqs > length(sites_pow(i).condition(cn).site_lfp_psd(ep, hs).freq)
-                                        nfreqs = length(sites_pow(i).condition(cn).site_lfp_psd(ep, hs).freq);
+                                if ~isempty(session_pow.condition(cn).hs_tuned_power(ep, hs).mean)
+                                    nfreqs = length(session_pow.condition(cn).hs_tuned_power(ep, hs).freq);
+                                    if nfreqs > length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq)
+                                        nfreqs = length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq);
                                     end                               
-                                    session_pow.condition(cn).session_lfp_psd(ep, hs).mean = ...
-                                        cond_based_psd(cn).session_lfp_psd(ep, hs).mean(1:nfreqs) + ...
+                                    session_pow.condition(cn).hs_tuned_power(ep, hs).mean = ...
+                                        session_pow.condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs) + ...
                                         (1/nsites) * ...
-                                        sites_pow(i).condition(cn).site_lfp_psd(ep, hs).mean(1:nfreqs) ;
+                                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs) ;
                                 else
-                                    session_pow.condition(cn).session_lfp_psd(ep, hs).mean = ...
+                                    session_pow.condition(cn).hs_tuned_power(ep, hs).mean = ...
                                         (1/nsites)*...
-                                        sites_pow(i).condition(cn).site_lfp_psd(ep, hs).mean ;
+                                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean ;
                                 end
                             end
-                            session_pow.condition(cn).session_lfp_psd(ep, hs).hs_label = ...
-                                sites_pow(i).condition(cn).site_lfp_psd(ep, hs).hs_label;
-                            session_pow.condition(cn).session_lfp_psd(ep, hs).epoch_name = ...
-                                sites_pow(i).condition(cn).site_lfp_psd(ep, hs).epoch_name;
-                            session_pow.condition(cn).session_lfp_psd(ep, hs).nsites = ...
+                            session_pow.condition(cn).hs_tuned_power(ep, hs).hs_label = ...
+                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).hs_label;
+                            session_pow.condition(cn).hs_tuned_power(ep, hs).epoch_name = ...
+                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).epoch_name;
+                            session_pow.condition(cn).hs_tuned_power(ep, hs).nsites = ...
                                 isite;
                             session_pow.condition(cn).condition = cfg_conditions(cn);
                             session_pow.condition(cn).session = states_lfp(i).session;
@@ -372,18 +379,20 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     % plots
     % plot average power spectrum across sites for this session
     for cn = 1:length(cfg_conditions)
-        plottitle = ['Session: ', session_pow.condition(cn).session ...
-            ', Target = ' session_pow.condition(cn).target ', '  ...
-            'Block ' num2str(cfg_conditions(cn).block) ', '];
-        if cfg_conditions(cn).choice == 0
-            plottitle = [plottitle 'Instructed trials'];
-        else
-            plottitle = [plottitle 'Choice trials'];
+        if ~isempty(session_pow.condition(cn).hs_tuned_power)
+            plottitle = ['Session: ', session_pow.condition(cn).session ...
+                ', Target = ' session_pow.condition(cn).target ', '  ...
+                'Block ' num2str(cfg_conditions(cn).block) ', '];
+            if cfg_conditions(cn).choice == 0
+                plottitle = [plottitle 'Instructed trials'];
+            else
+                plottitle = [plottitle 'Choice trials'];
+            end
+            results_file = fullfile(results_folder_psd, ...
+                ['LFP_Power_' session_pow.condition(cn).session '_' cfg_conditions(cn).label '.png']);
+            lfp_tfa_plot_hs_tuned_psd(session_pow.condition(cn).hs_tuned_power, ...
+                        lfp_tfa_cfg, plottitle, results_file);
         end
-        results_file = fullfile(results_folder_psd, ...
-            ['Avg_Power_' session_pow.condition(cn).session '_' cfg_conditions(cn).label '.png']);
-        lfp_tfa_plot_hs_tuned_psd(session_pow.condition(cn).session_lfp_psd, ...
-                    lfp_tfa_cfg, plottitle, results_file);
     end
 
     %end
@@ -391,7 +400,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     close all;
     % save mat files
     %save(fullfile(results_folder_psd, 'cfg_conditions.mat'), 'cfg_conditions');
-    save(fullfile(results_folder_psd, 'session_average_pow.mat'), 'session_pow');
-    save(fullfile(results_folder_psd, 'lfp_tfa_cfg.mat'), 'lfp_tfa_cfg');
+    save(fullfile(results_folder_psd, ['LFP_Power_' session_pow.condition(cn).session '.mat']), 'session_pow');
+    %save(fullfile(results_folder_psd, 'lfp_tfa_cfg.mat'), 'lfp_tfa_cfg');
 end
         

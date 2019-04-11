@@ -10,7 +10,7 @@ clear;
 
 close all; 
 
-version = 1;
+version = 2;
 
 lfp_tfa_cfg = lfp_tfa_define_settings(version);
 
@@ -39,6 +39,12 @@ try
         session_proc_lfp(i).sites = lfp_tfa_compute_baseline_power(session_proc_lfp(i).sites, lfp_tfa_cfg);
     end
     for i = 1:length(session_proc_lfp)
+        session_name = lfp_datafiles(i).name(7:end-4);
+        fprintf('Processing LFP for session %s\n', session_name);
+        lfp_tfa_cfg.session = session_name;
+        lfp_tfa_cfg.session_results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, session_name);
+        lfp_tfa_cfg.data_filepath = fullfile(lfp_tfa_cfg.data_folder, lfp_datafiles(i).name);
+        
         lfp_tfr.session(i) = ...
             lfp_tfa_plot_site_average_tfr( session_proc_lfp(i).sites, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
         lfp_evoked.session(i) = ...
@@ -51,9 +57,18 @@ catch e
 end
 
 %% Average across sessions
-lfp_tfr.sessions_avg = lfp_tfa_avg_tfr_per_session(lfp_tfr, lfp_tfa_cfg);%struct();
-lfp_evoked.sessions_avg = lfp_tfa_avg_evoked_LFP_per_session(lfp_evoked, lfp_tfa_cfg);
-lfp_pow.sessions_avg = lfp_tfa_avg_pow_per_session(lfp_pow, lfp_tfa_cfg);%struct();
+if length(session_proc_lfp) > 1
+    if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
+    lfp_tfr.sessions_avg = lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg);%struct();
+    lfp_evoked.sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg);
+    lfp_pow.sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg);%struct();    
+    end
+    if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sites'))
+        lfp_tfr.sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg);%struct();
+        lfp_evoked.sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg);
+        lfp_pow.sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg);
+    end
+end
 
 % nsessions = length(session_proc_lfp);
 % for cn = 1:length(session_proc_lfp(1).cond_based_tfs)
