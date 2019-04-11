@@ -1,7 +1,7 @@
-function sessions_avg = lfp_tfa_avg_tfr_per_session(lfp_tfr, lfp_tfa_cfg)
+function sessions_avg = lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg)
 
     % results folder
-    results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Average_TFR');
+    results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sessions', 'LFP_TFR');
     if ~exist(results_fldr, 'dir')
         mkdir(results_fldr);
     end
@@ -61,11 +61,15 @@ function sessions_avg = lfp_tfa_avg_tfr_per_session(lfp_tfr, lfp_tfa_cfg)
         end
         
         % compute average
-        for st = 1:size(sessions_avg.condition(cn).tfs_across_sessions, 1)
-            for hs = 1:size(sessions_avg.condition(cn).tfs_across_sessions, 2)
-                sessions_avg.condition(cn).tfs_across_sessions(st,hs).nsessions = nsessions;                                
-                sessions_avg.condition(cn).tfs_across_sessions(st,hs).powspctrm = ...
-                    (1/nsessions) * sessions_avg.condition(cn).tfs_across_sessions(st,hs).powspctrm;
+        if isfield(sessions_avg.condition(cn).tfs_across_sessions, 'powspctrm')
+            for st = 1:size(sessions_avg.condition(cn).tfs_across_sessions, 1)
+                for hs = 1:size(sessions_avg.condition(cn).tfs_across_sessions, 2)
+                    if ~isempty(sessions_avg.condition(cn).tfs_across_sessions(st,hs).powspctrm)
+                        sessions_avg.condition(cn).tfs_across_sessions(st,hs).nsessions = nsessions;                                
+                        sessions_avg.condition(cn).tfs_across_sessions(st,hs).powspctrm = ...
+                            (1/nsessions) * sessions_avg.condition(cn).tfs_across_sessions(st,hs).powspctrm;
+                    end
+                end
             end
         end
         
@@ -75,12 +79,12 @@ function sessions_avg = lfp_tfa_avg_tfr_per_session(lfp_tfr, lfp_tfa_cfg)
                     'powspctrm')
                 plottitle = lfp_tfr.session(1).condition(cn).label;
                 result_file = fullfile(results_fldr, ...
-                                ['Avg_Spectrogram_' lfp_tfr.session(1).condition(cn).label '.png']);
+                                ['LFP_Evoked_' lfp_tfr.session(1).condition(cn).label '.png']);
                 lfp_tfa_plot_hs_tuned_tfr(sessions_avg.condition(cn).tfs_across_sessions, ...
                             lfp_tfa_cfg, plottitle, result_file);
             end
         end
         % save session average tfs
-        save(fullfile(results_fldr, 'sessions_average_tfs.mat'), 'sessions_avg');
+        save(fullfile(results_fldr, 'LFP_Evoked_sessions_avg.mat'), 'sessions_avg');
     end
 end

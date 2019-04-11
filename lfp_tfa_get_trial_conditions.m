@@ -62,7 +62,7 @@ function [ cfg_conditions ] = lfp_tfa_get_trial_conditions( states_lfp, lfp_tfa_
                                 cfg_conditions(i).perturbation = 1;
                             else
                                 cfg_conditions(i).block = blocks(lfp_tfa_cfg.add_conditions(c).blocks);
-                                cfg_conditions(i).perturbation = perturbation(blocks == blocks(lfp_tfa_cfg.add_conditions(c).blocks(1)));
+                                cfg_conditions(i).perturbation = sign(perturbation(blocks == blocks(lfp_tfa_cfg.add_conditions(c).blocks(1))));
                                 
                             end                    
                             cfg_conditions(i).choice = ch;
@@ -72,19 +72,19 @@ function [ cfg_conditions ] = lfp_tfa_get_trial_conditions( states_lfp, lfp_tfa_
                             cfg_conditions(i).recorded_hemispace = rec_hem;
                             cond_label = [];
                             if cfg_conditions(i).recorded_hemispace == 'L'
-                                cond_label = [cond_label 'Left_hemispace_'];
+                                cond_label = [cond_label 'Left hemisphere_'];
                             else
-                                cond_label = [cond_label 'Right_hemispace_'];
+                                cond_label = [cond_label 'Right hemisphere_'];
                             end
                             if cfg_conditions(i).choice == 0
-                                cond_label = [cond_label 'Instructed_'];
+                                cond_label = [cond_label 'Instructed Trials_'];
                             else
-                                cond_label = [cond_label 'Choice_'];
+                                cond_label = [cond_label 'Choice Trials_'];
                             end
                             if cfg_conditions(i).perturbation == 0
-                                cond_label = [cond_label 'Control_'];
+                                cond_label = [cond_label 'Pre-Injection_'];
                             else
-                                cond_label = [cond_label 'Inactivation_'];
+                                cond_label = [cond_label 'Post-Injection_'];
                             end
                             cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
                             cfg_conditions(i).label = cond_label;
