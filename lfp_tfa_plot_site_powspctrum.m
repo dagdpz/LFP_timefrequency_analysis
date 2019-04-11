@@ -306,6 +306,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
         site_pow = sites_pow(i);
         save(fullfile(site_results_folder, ...
             ['LFP_Power_' site_pow.site_ID '.mat']), 'site_pow');
+
         session_pow.sites(i) = site_pow;
     end
         
