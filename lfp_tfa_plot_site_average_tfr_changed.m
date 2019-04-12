@@ -144,6 +144,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr_changed( states_lfp, anal
        
     % condition based TFS
     sites_tfr = struct();
+    session_tfs = struct();
     for i = 1:length(states_lfp)
         % folder to save sitewise results
         site_results_folder = fullfile(results_folder_tfr, 'sites', states_lfp(i).site_ID);
@@ -325,7 +326,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr_changed( states_lfp, anal
                 % calculate the differnce between
 
                 % TFR
-                if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs)
+                if ~isempty(sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs)
 
                     plottitle = ['Site ID: ', sites_tfr(i).site_ID ', Target = ' sites_tfr(i).target ', '  ...
                     '(block ' num2str(cfg_conditions(cn).block) '), '];
@@ -340,7 +341,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr_changed( states_lfp, anal
                     end
                     result_file = fullfile(site_results_folder, ...
                         ['LFP_tfr_' sites_tfr(i).site_ID '_' cfg_conditions(cn).label '.png']);
-                    lfp_tfa_plot_hs_tuned_tfr(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
+                    lfp_tfa_plot_hs_tuned_tfr(sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs, ...
                         lfp_tfa_cfg, plottitle, result_file);
                 end
 
@@ -356,7 +357,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr_changed( states_lfp, anal
        
     
     % Calculate average TFR across all sites
-    session_tfs.condition = struct();
+    session_tfs.perturbation(t).condition = struct();
     for cn = 1:length(cfg_conditions) 
         nsites = sum([states_lfp.recorded_hemispace] == cfg_conditions(cn).recorded_hemispace);
         %cond_based_tfs(cn).tfs_avg_session = struct();
@@ -364,8 +365,8 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr_changed( states_lfp, anal
         for i = 1:length(states_lfp)
             if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace)
                 % calculate the average across sites for this condition 
-                if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs) && ... 
-                    isfield(sites_tfr(i).condition(cn).hs_tuned_tfs, 'powspctrm')
+                if ~isempty(sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs) && ... 
+                    isfield(sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs, 'powspctrm')
                     isite = isite + 1;                                
                     % struct to store average tfr across sites
                     %cond_based_tfs(cn).tfs_avg_session = struct();
@@ -375,41 +376,41 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr_changed( states_lfp, anal
 
                     for hs = 1:length(hs_labels)
                         for st = 1:length(analyse_states)                        
-                            if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm)
+                            if ~isempty(sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm)
                                 if isite == 1%~isfield(cond_based_tfs(cn).tfs_avg_session(st, hs), 'powspctrm')
-                                    session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
-                                    (1/nsites) * sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm ;
+                                    session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
+                                    (1/nsites) * sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm ;
 
                                 else
-                                    ntimebins = size(session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm, 3);
+                                    ntimebins = size(session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm, 3);
                                     % average same number of time bins
-                                    if ntimebins > length(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time)
-                                        ntimebins = length(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time);
-                                        session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
-                                                session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) + ...
+                                    if ntimebins > length(sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).time)
+                                        ntimebins = length(sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).time);
+                                        session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
+                                                session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) + ...
                                                 (1/nsites) * ...
-                                                sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
+                                                sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
                                     else
-                                        if ~isempty(session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm)
-                                            session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
-                                                    session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm + ...
-                                                    (1/nsites) * sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
+                                        if ~isempty(session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm)
+                                            session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
+                                                    session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm + ...
+                                                    (1/nsites) * sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
                                         else
-                                            session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
-                                                (1/nsites) * sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
+                                            session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
+                                                (1/nsites) * sites_tfr(i).perturbation(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
                                         end
                                     end
                                 end
-                                session_tfs.condition(cn).hs_tuned_tfs(st, hs).time = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time;
-                                session_tfs.condition(cn).hs_tuned_tfs(st, hs).freq = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq;
-                                session_tfs.condition(cn).hs_tuned_tfs(st, hs).hs_label = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).hs_label;
-                                session_tfs.condition(cn).hs_tuned_tfs(st, hs).state = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state;
-                                session_tfs.condition(cn).hs_tuned_tfs(st, hs).cfg = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).cfg;
-                                session_tfs.condition(cn).hs_tuned_tfs(st, hs).nsites = nsites;
-                                session_tfs.condition(cn).cfg_condition = cfg_conditions(cn);
-                                session_tfs.condition(cn).label = cfg_conditions(cn).label;
-                                session_tfs.condition(cn).session = states_lfp(i).session;
-                                session_tfs.condition(cn).target = states_lfp(i).target;
+                                session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).time = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time;
+                                session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).freq = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq;
+                                session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).hs_label = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).hs_label;
+                                session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).state = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state;
+                                session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).cfg = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).cfg;
+                                session_tfs.perturbation(t).condition(cn).hs_tuned_tfs(st, hs).nsites = nsites;
+                                session_tfs.perturbation(t).condition(cn).cfg_condition = cfg_conditions(cn);
+                                session_tfs.perturbation(t).condition(cn).label = cfg_conditions(cn).label;
+                                session_tfs.perturbation(t).condition(cn).session = states_lfp(i).session;
+                                session_tfs.perturbation(t).condition(cn).target = states_lfp(i).target;
                             end
                         end
                     end
@@ -423,24 +424,24 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr_changed( states_lfp, anal
     
     % plot average TFR across sites for this session
     for cn = 1:length(cfg_conditions)
-        if ~isempty(session_tfs.condition(cn).hs_tuned_tfs)
-            plottitle = ['Target = ' session_tfs.condition(cn).target ', '  ...
-            'Session ', session_tfs.condition(cn).session, 'Block ' num2str(cfg_conditions(cn).block) ', '];
+        if ~isempty(session_tfs.perturbation(t).condition(cn).hs_tuned_tfs)
+            plottitle = ['Target = ' session_tfs.perturbation(t).condition(cn).target ', '  ...
+            'Session ', session_tfs.perturbation(t).condition(cn).session, 'Block ' num2str(cfg_conditions(cn).block) ', '];
             if cfg_conditions(cn).choice == 0
                 plottitle = [plottitle 'Instructed trials'];
             else
                 plottitle = [plottitle 'Choice trials'];
             end
             result_file = fullfile(results_folder_tfr, ...
-                            ['LFP_TFR_' session_tfs.condition(cn).target '_'...
-                            session_tfs.condition(cn).session '_' cfg_conditions(cn).label '.png']);
-            lfp_tfa_plot_hs_tuned_tfr(session_tfs.condition(cn).hs_tuned_tfs, ...
+                            ['LFP_TFR_' session_tfs.perturbation(t).condition(cn).target '_'...
+                            session_tfs.perturbation(t).condition(cn).session '_' cfg_conditions(cn).label '.png']);
+            lfp_tfa_plot_hs_tuned_tfr(session_tfs.perturbation(t).condition(cn).hs_tuned_tfs, ...
                         lfp_tfa_cfg, plottitle, result_file);
 
         end
     end
     % save session average tfs
-    save(fullfile(results_folder_tfr, ['LFP_TFR_' session_tfs.condition(cn).session '.mat']), 'session_tfs');
+    save(fullfile(results_folder_tfr, ['LFP_TFR_' session_tfs.perturbation(t).condition(cn).session '.mat']), 'session_tfs');
 
         % plots
 
