@@ -429,7 +429,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
     % plot average TFR across sites for this session
     for cn = 1:length(cfg_conditions)
         if ~isempty(session_tfs.condition(cn).hs_tuned_tfs)
-            if cfg_condition(cn).perturbation == 0
+            if cfg_conditions(cn).perturbation == 0
                 injection = 'Pre-injection';
             else
                 injection = 'Post-injection';
