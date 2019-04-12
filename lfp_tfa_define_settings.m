@@ -12,9 +12,9 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(version)
     lfp_tfa_cfg.data_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data';
 
     % folder to save results, automatically created
-    lfp_tfa_cfg.root_results_folder = fullfile(lfp_tfa_cfg.data_folder, '\LFP_TFA_Results', date, ['ver' num2str(version)]);
-    if ~exist(lfp_tfa_cfg.root_results_folder, 'dir')
-        mkdir(lfp_tfa_cfg.root_results_folder);
+    lfp_tfa_cfg.root_results_fldr = fullfile(lfp_tfa_cfg.data_folder, '\LFP_TFA_Results', date, ['ver' num2str(version)]);
+    if ~exist(lfp_tfa_cfg.root_results_fldr, 'dir')
+        mkdir(lfp_tfa_cfg.root_results_fldr);
     end
 
     % first read in the information about states
@@ -65,7 +65,7 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(version)
     % threshold for lfp power in number of standard deviations from mean
     lfp_tfa_cfg.noise.pow_thr = 4;
     % folder to save results
-    lfp_tfa_cfg.noise.results_folder = root_results_folder;
+    lfp_tfa_cfg.noise.results_folder = lfp_tfa_cfg.root_results_fldr;
     %cfg_noise.results_folder = [pathname '\Figures'];
     % whether single trials should be plotted
     lfp_tfa_cfg.noise.plottrials = 0;
@@ -79,7 +79,7 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(version)
     lfp_tfa_cfg.baseline_block = 1; 
     % whether to consider choice or instructed trials
     lfp_tfa_cfg.use_choice_trial = 0; 
-    %lfp_tfa_cfg.results_folder = root_results_folder;
+    lfp_tfa_cfg.results_folder = lfp_tfa_cfg.root_results_fldr;
 
     %% Settings for averaging TFR and evoked LFP based on conditions
     lfp_tfa_cfg.add_conditions = [];
