@@ -303,8 +303,12 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             
             % TFR
             if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs)
-
-                plottitle = ['Site ID: ', sites_tfr(i).site_ID ', Target = ' sites_tfr(i).target ', '  ...
+                if cfg_condition(cn).perturbation == 0
+                    injection = 'Pre-injection';
+                else
+                    injection = 'Post-injection';
+                end
+                plottitle = ['LFP TFR (' injection '): Site ' sites_tfr(i).site_ID ', Target ' sites_tfr(i).target ', '  ...
                 '(block ' num2str(cfg_conditions(cn).block) '), '];
                 if cfg_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
@@ -316,18 +320,43 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                     mkdir(result_folder);
                 end
                 result_file = fullfile(site_results_folder, ...
-                    ['LFP_tfr_' sites_tfr(i).site_ID '_' cfg_conditions(cn).label '.png']);
+                    ['LFP_TFR_' sites_tfr(i).site_ID '_' cfg_conditions(cn).label '.png']);
                 lfp_tfa_plot_hs_tuned_tfr(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
                     lfp_tfa_cfg, plottitle, result_file);
             end
 
         end
+        
+        % difference between pre- and post-injection
+        sites_tfr(i).difference = lfp_tfa_compute_diff_tfr(sites_tfr(i), lfp_tfa_cfg);
+        % Plot TFR difference
+        for dcn = 1:length(sites_tfr(i).difference)
+            if ~isempty(sites_tfr(i).difference(dcn).hs_tuned_tfs)
+                plottitle = ['LFP TFR(Post - Pre): Target ' sites_tfr(i).target, ', Site ', sites_tfr(i).site_ID ];% ', '  ...
+                    %'(block ' num2str(cfg_conditions(cn).block) '), '];
+                if cfg_conditions(dcn).choice == 0
+                    plottitle = [plottitle ', Instructed trials'];
+                else
+                    plottitle = [plottitle ', Choice trials'];
+                end
+                result_folder = fullfile(results_folder_tfr, sites_tfr(i).site_ID);
+                if ~exist(result_folder, 'dir')
+                    mkdir(result_folder);
+                end
+                result_file = fullfile(site_results_folder, ...
+                    ['LFP_DiffTFR_' sites_tfr(i).site_ID '_' sites_tfr(i).difference(dcn).label '.png']);
+                lfp_tfa_plot_hs_tuned_tfr(sites_tfr(i).difference(dcn).hs_tuned_tfs, ...
+                    lfp_tfa_cfg, plottitle, result_file);
+            end
+        end
+        
         % save mat file for each site
         site_tfr = sites_tfr(i);
         save(fullfile(site_results_folder, ...
-            ['LFP_tfr_' site_tfr.site_ID '.mat']), 'site_tfr');
+            ['LFP_TFR_' site_tfr.site_ID '.mat']), 'site_tfr');
         % save into a mother struct
-        session_tfs.sites(i) = site_tfr;
+        session_tfs.sites(i) = site_tfr;       
+        
     end
        
     
@@ -400,7 +429,12 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
     % plot average TFR across sites for this session
     for cn = 1:length(cfg_conditions)
         if ~isempty(session_tfs.condition(cn).hs_tuned_tfs)
-            plottitle = ['Target = ' session_tfs.condition(cn).target ', '  ...
+            if cfg_condition(cn).perturbation == 0
+                injection = 'Pre-injection';
+            else
+                injection = 'Post-injection';
+            end
+            plottitle = ['LFP TFR (' injection '): Target = ' session_tfs.condition(cn).target ', '  ...
             'Session ', session_tfs.condition(cn).session, 'Block ' num2str(cfg_conditions(cn).block) ', '];
             if cfg_conditions(cn).choice == 0
                 plottitle = [plottitle 'Instructed trials'];
@@ -415,6 +449,28 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 
         end
     end
+    
+    % Difference TFR for session
+    session_tfs.difference = lfp_tfa_compute_diff_tfr(session_tfs, lfp_tfa_cfg);
+    % plot average TFR difference across sites for this session
+    for dcn = 1:length(session_tfs.difference)
+        if ~isempty(session_tfs.difference(dcn).hs_tuned_tfs)
+            plottitle = ['LFP TFR (Post - Pre): Target ' session_tfs.difference(dcn).target ', '  ...
+            'Session ', session_tfs.difference(dcn).session, 'Block ' num2str(cfg_conditions(cn).block) ', '];
+            if cfg_conditions(cn).choice == 0
+                plottitle = [plottitle 'Instructed trials'];
+            else
+                plottitle = [plottitle 'Choice trials'];
+            end
+            result_file = fullfile(results_folder_tfr, ...
+                            ['LFP_DiffTFR_' session_tfs.difference(dcn).target '_'...
+                            session_tfs.difference(dcn).session '_' session_tfs.difference(dcn).label '.png']);
+            lfp_tfa_plot_hs_tuned_tfr(session_tfs.difference(dcn).hs_tuned_tfs, ...
+                        lfp_tfa_cfg, plottitle, result_file);
+
+        end
+    end
+    
     % save session average tfs
     save(fullfile(results_folder_tfr, ['LFP_TFR_' session_tfs.condition(cn).session '.mat']), 'session_tfs');
 
