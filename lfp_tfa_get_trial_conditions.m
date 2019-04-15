@@ -3,7 +3,8 @@ function [ cfg_conditions ] = lfp_tfa_get_trial_conditions( states_lfp, lfp_tfa_
 %   Detailed explanation goes here
     recorded_hemispace = ['R', 'L'];
     %unique([states_lfp.recorded_hemispace]);
-    choice = unique([states_lfp(1).trials.choice_trial]);
+    choice = lfp_tfa_cfg.analyze_choice_trials;
+    %unique([states_lfp(1).trials.choice_trial]);
     perturbation = unique([states_lfp(1).trials.perturbation]);
     blocks = unique([states_lfp(1).trials.block]);
     

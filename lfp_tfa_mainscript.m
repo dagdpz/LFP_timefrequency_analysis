@@ -3,16 +3,19 @@
 % Runs functions for reading processed LFP data, rejection of noise trials
 % and task specific analysis using TFR
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+clear; 
+
+% file containing settings for LFP analysis
+settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
+% folder containing LFP data for analysis
+data_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data';
+% maxsites 
+maxsites = 2;
 
 %% INITIALIZATION
+close all;
 
-clear;
-
-close all; 
-
-version = 2;
-
-lfp_tfa_cfg = lfp_tfa_define_settings(version);
+lfp_tfa_cfg = lfp_tfa_define_settings(data_folder, settings_filepath, maxsites);
 
 %% Function calls for LFP TFA per site and per session
 
