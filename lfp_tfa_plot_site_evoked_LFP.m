@@ -138,7 +138,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
         end
     end
     
-    cfg_conditions = lfp_tfa_get_trial_conditions(states_lfp, lfp_tfa_cfg);
+    cfg_conditions = lfp_tfa_compare_conditions(states_lfp, lfp_tfa_cfg);
        
     % condition based Evoked
     sites_evoked = struct();
@@ -176,7 +176,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
             
             %cond_based_tfs(cn).sites(i) = struct();
             % consider site based on recorded hemispace
-            if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace) 
+            if strcmp(states_lfp(i).target, cfg_conditions(cn).target) 
                 
                 % struct to store evoked LFP
                 sites_evoked(i).condition(cn).hs_tuned_evoked = struct();
@@ -185,24 +185,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
                 sites_evoked(i).condition(cn).ntrials = zeros(1,length(hs_labels));
 
                 for hs = 1:length(hs_labels)
-                    cond_trials = zeros(1, length(states_lfp(i).trials));
-                    % get the trials for given condition and this hs label
-%                     if ~isnan(cfg_conditions(cn).perturbation)
-%                         cond_trials = cond_trials & ...
-%                             ([states_lfp(i).trials.perturbation]) == ...
-%                             (cfg_conditions(cn).perturbation);
-%                     end
-                    if ~isnan(cfg_conditions(cn).block)
-                        for b = cfg_conditions(cn).block
-                            cond_trials = cond_trials | ...
-                                ([states_lfp(i).trials.block] == b);
-                        end
-                    end
-                    if ~isnan(cfg_conditions(cn).choice)
-                        cond_trials = cond_trials & ...
-                            ([states_lfp(i).trials.choice_trial] == ...
-                            cfg_conditions(cn).choice);
-                    end
+                    cond_trials = lfp_tfa_get_condition_trials(states_lfp(i), cfg_conditions(cn));
                     cond_trials = cond_trials & ...
                         strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
                     sites_evoked(i).condition(cn).ntrials(hs) = sum(cond_trials);
@@ -284,7 +267,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
             if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked)
                 plottitle = ['Site ID: ', sites_evoked(i).site_ID ', Target = ' ...
                     sites_evoked(i).target ', '  ...
-                    '(block ' num2str(cfg_conditions(cn).block) '), '];
+                    '(Perturb ' num2str(cfg_conditions(cn).perturbation_group{1}) '), '];
                 if cfg_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
                 else
@@ -308,11 +291,11 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
     % Average across sites for a session
     session_evoked.condition = struct();
     for cn = 1:length(cfg_conditions)
-        nsites = sum([states_lfp.recorded_hemispace] == cfg_conditions(cn).recorded_hemispace);
-        %cond_based_tfs(cn).tfs_avg_session = struct();
+        nsites = sum(contains({states_lfp.target}, cfg_conditions(cn).target));
+        session_evoked.condition(cn).hs_tuned_evoked = [];
         isite = 0;
         for i = 1:length(sites_evoked)      
-            if ~strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace)
+            if ~strcmp(states_lfp(i).target, cfg_conditions(cn).target)
                 continue;
             end
             % calculate the average evoked LFP across sites for this condition 
@@ -363,6 +346,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
                             session_evoked.condition(cn).label = cfg_conditions(cn).label;
                             session_evoked.condition(cn).session = states_lfp(i).session;
                             session_evoked.condition(cn).target = states_lfp(i).target;
+                            session_evoked.condition(cn).nsites = nsites;
                         end
 
                     end
@@ -376,7 +360,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
         if ~isempty(session_evoked.condition(cn).hs_tuned_evoked)
             plottitle = ['Session: ', session_evoked.condition(cn).session ', Target = ' ...
                 session_evoked.condition(cn).target ', '  ...
-                'Block ' num2str(cfg_conditions(cn).block) ', '];
+                'Perturb ' num2str(cfg_conditions(cn).perturbation_group{1}) ', '];
             if cfg_conditions(cn).choice == 0
                 plottitle = [plottitle 'Instructed trials'];
             else

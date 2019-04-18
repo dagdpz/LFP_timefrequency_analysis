@@ -140,11 +140,18 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         end
     end
     
-    cfg_conditions = lfp_tfa_get_trial_conditions(states_lfp, lfp_tfa_cfg);    
+    cfg_conditions = lfp_tfa_compare_conditions(states_lfp, lfp_tfa_cfg);
+    
+    usable_sites_table = lfp_tfa_cfg.sites_info;
        
     % condition based TFS
     sites_tfr = struct();
     for i = 1:length(states_lfp)
+        % check if site is usable
+        if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
+                states_lfp(i).site_ID)))
+            continue;
+        end
         % folder to save sitewise results
         site_results_folder = fullfile(results_folder_tfr, 'sites', states_lfp(i).site_ID);
         if ~exist(site_results_folder, 'dir')
@@ -178,7 +185,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             % consider site based on recorded hemispace
             sites_tfr(i).condition(cn).label = cfg_conditions(cn).label;
             sites_tfr(i).condition(cn).cfg_cond = cfg_conditions(cn);
-            if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace) 
+            if strcmp(states_lfp(i).target, cfg_conditions(cn).target) 
                 sites_tfr(i).site_ID = states_lfp(i).site_ID;
                 sites_tfr(i).session = states_lfp(i).session;
                 sites_tfr(i).target = states_lfp(i).target;
@@ -188,24 +195,9 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 sites_tfr(i).condition(cn).ntrials = zeros(1,length(hs_labels));
 
                 for hs = 1:length(hs_labels)
-                    cond_trials = zeros(1, length(states_lfp(i).trials));
-                    % get the trials for given condition and this hs label
-%                     if ~isnan(cfg_conditions(cn).perturbation)
-%                         cond_trials = cond_trials & ...
-%                             ([states_lfp(i).trials.perturbation]) == ...
-%                             (cfg_conditions(cn).perturbation);
-%                     end
-                    if ~isnan(cfg_conditions(cn).block)
-                        for b = cfg_conditions(cn).block
-                            cond_trials = cond_trials | ...
-                                ([states_lfp(i).trials.block] == b);
-                        end
-                    end
-                    if ~isnan(cfg_conditions(cn).choice)
-                        cond_trials = cond_trials & ...
-                            ([states_lfp(i).trials.choice_trial] == ...
-                            cfg_conditions(cn).choice);
-                    end
+                    
+                    cond_trials = lfp_tfa_get_condition_trials(states_lfp(i), cfg_conditions(cn));
+                    
                     cond_trials = cond_trials & ...
                         strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
                     sites_tfr(i).condition(cn).ntrials(hs) = sum(cond_trials);
@@ -292,6 +284,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                             sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).hs_label = hs_labels(hs);
                             sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state = analyse_states{st};
                             sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).trials = find(cond_trials);
+                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).ntrials = length(find(cond_trials));
                         end
                             
                     end
@@ -304,12 +297,12 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             % TFR
             if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs)
                 if cfg_conditions(cn).perturbation == 0
-                    injection = 'Pre-injection';
+                    injection = 'Pre';
                 else
-                    injection = 'Post-injection';
+                    injection = 'Post';
                 end
                 plottitle = ['LFP TFR (' injection '): Site ' sites_tfr(i).site_ID ', Target ' sites_tfr(i).target ', '  ...
-                '(block ' num2str(cfg_conditions(cn).block) '), '];
+                '(Perturbation ' num2str(cfg_conditions(cn).perturbation_group{1}) ')'];
                 if cfg_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
                 else
@@ -357,11 +350,11 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
     % Calculate average TFR across all sites
     session_tfs.condition = struct();
     for cn = 1:length(cfg_conditions) 
-        nsites = sum([states_lfp.recorded_hemispace] == cfg_conditions(cn).recorded_hemispace);
-        %cond_based_tfs(cn).tfs_avg_session = struct();
+        nsites = sum(contains({states_lfp.target}, cfg_conditions(cn).target));
+        session_tfs.condition(cn).hs_tuned_tfs = [];
         isite = 0;
         for i = 1:length(states_lfp)
-            if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace)
+            if strcmp(states_lfp(i).target, cfg_conditions(cn).target)
                 % calculate the average across sites for this condition 
                 if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs) && ... 
                     isfield(sites_tfr(i).condition(cn).hs_tuned_tfs, 'powspctrm')
@@ -377,8 +370,9 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                             if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm)
                                 if isite == 1%~isfield(cond_based_tfs(cn).tfs_avg_session(st, hs), 'powspctrm')
                                     session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
-                                    (1/nsites) * sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm ;
-
+                                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm ;
+                                    session_tfs.condition(cn).hs_tuned_tfs(st, hs).time = ...
+                                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time;
                                 else
                                     ntimebins = size(session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm, 3);
                                     % average same number of time bins
@@ -386,20 +380,21 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                                         ntimebins = length(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time);
                                         session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
                                                 session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) + ...
-                                                (1/nsites) * ...
                                                 sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
                                     else
                                         if ~isempty(session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm)
                                             session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
                                                     session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm + ...
-                                                    (1/nsites) * sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
+                                                    sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
                                         else
                                             session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
-                                                (1/nsites) * sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
+                                                sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) ;
                                         end
                                     end
+                                    session_tfs.condition(cn).hs_tuned_tfs(st, hs).time = ...
+                                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time(1:ntimebins);
                                 end
-                                session_tfs.condition(cn).hs_tuned_tfs(st, hs).time = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time;
+                                
                                 session_tfs.condition(cn).hs_tuned_tfs(st, hs).freq = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq;
                                 session_tfs.condition(cn).hs_tuned_tfs(st, hs).hs_label = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).hs_label;
                                 session_tfs.condition(cn).hs_tuned_tfs(st, hs).state = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state;
@@ -415,21 +410,30 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 end 
             else
                 continue;
+            end            
+        end
+        % average TFR across sites for a session
+        if isfield(session_tfs.condition(cn).hs_tuned_tfs, 'powspctrm') 
+            for hs = 1:length(hs_labels)
+                for st = 1:length(analyse_states)
+                    session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
+                        session_tfs.condition(cn).hs_tuned_tfs(st, hs).powspctrm / nsites;
+                end
             end
-            
-        end        
+        end
+                        
     end
     
     % plot average TFR across sites for this session
     for cn = 1:length(cfg_conditions)
         if ~isempty(session_tfs.condition(cn).hs_tuned_tfs)
             if cfg_conditions(cn).perturbation == 0
-                injection = 'Pre-injection';
+                injection = 'Pre';
             else
-                injection = 'Post-injection';
+                injection = 'Post';
             end
             plottitle = ['LFP TFR (' injection '): Target = ' session_tfs.condition(cn).target ', '  ...
-            'Session ', session_tfs.condition(cn).session, 'Block ' num2str(cfg_conditions(cn).block) ', '];
+            'Session ', session_tfs.condition(cn).session, 'Perturbation ' num2str(cfg_conditions(cn).perturbation_group{1}) ', '];
             if cfg_conditions(cn).choice == 0
                 plottitle = [plottitle 'Instructed trials'];
             else
@@ -450,7 +454,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
     for dcn = 1:length(session_tfs.difference)
         if ~isempty(session_tfs.difference(dcn).hs_tuned_tfs)
             plottitle = ['LFP Diff TFR (Post - Pre): Target ' session_tfs.difference(dcn).target ', '  ...
-            'Session ', session_tfs.difference(dcn).session, 'Block ' num2str(cfg_conditions(cn).block) ', '];
+            'Session ', session_tfs.difference(dcn).session];
             if cfg_conditions(dcn).choice == 0
                 plottitle = [plottitle 'Instructed trials'];
             else

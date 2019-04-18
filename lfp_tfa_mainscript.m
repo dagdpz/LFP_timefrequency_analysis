@@ -8,19 +8,20 @@ clear;
 % file containing settings for LFP analysis
 settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
 % folder containing LFP data for analysis
-data_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data';
+%data_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data';
 % maxsites 
-maxsites = 2;
+maxsites = inf;
 
 %% INITIALIZATION
 close all;
 
-lfp_tfa_cfg = lfp_tfa_define_settings(data_folder, settings_filepath, maxsites);
+lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites);
 
 %% Function calls for LFP TFA per site and per session
 
-% Read and process LFP data
-lfp_datafiles = dir(fullfile(lfp_tfa_cfg.data_folder, 'sites_*.mat'));
+% Read the file list
+file_list = lfp_tfa_cfg.file_list;
+lfp_datafiles = file_list(:,3);
 
 session_lfp = struct();
 session_proc_lfp = struct();
@@ -30,11 +31,11 @@ lfp_pow = struct();
 try
     % loop through each session
     for i = 1:length(lfp_datafiles)
-        session_name = lfp_datafiles(i).name(7:end-4);
+        session_name = [file_list{i,1} '_' file_list{i,2}];
         fprintf('Processing LFP for session %s\n', session_name);
         lfp_tfa_cfg.session = session_name;
         lfp_tfa_cfg.session_results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, session_name);
-        lfp_tfa_cfg.data_filepath = fullfile(lfp_tfa_cfg.data_folder, lfp_datafiles(i).name);
+        lfp_tfa_cfg.data_filepath = lfp_datafiles{i};
         % load the LFP for one session
         session_lfp(i).sites = load(lfp_tfa_cfg.data_filepath);
         session_proc_lfp(i).sites = lfp_tfa_process_LFP(session_lfp(i).sites, lfp_tfa_cfg);
@@ -42,11 +43,11 @@ try
         session_proc_lfp(i).sites = lfp_tfa_compute_baseline_power(session_proc_lfp(i).sites, lfp_tfa_cfg);
     end
     for i = 1:length(session_proc_lfp)
-        session_name = lfp_datafiles(i).name(7:end-4);
+        session_name = [file_list{i,1} '_' file_list{i,2}];
         fprintf('Processing LFP for session %s\n', session_name);
         lfp_tfa_cfg.session = session_name;
         lfp_tfa_cfg.session_results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, session_name);
-        lfp_tfa_cfg.data_filepath = fullfile(lfp_tfa_cfg.data_folder, lfp_datafiles(i).name);
+        lfp_tfa_cfg.data_filepath = lfp_datafiles{i};
         
         lfp_tfr.session(i) = ...
             lfp_tfa_plot_site_average_tfr( session_proc_lfp(i).sites, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
@@ -63,13 +64,13 @@ end
 if length(session_proc_lfp) > 1
     if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
     lfp_tfr.sessions_avg = lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg);%struct();
-    lfp_evoked.sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg);
-    lfp_pow.sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg);%struct();    
+%     lfp_evoked.sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg);
+%     lfp_pow.sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg);%struct();    
     end
     if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sites'))
         lfp_tfr.sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg);%struct();
-        lfp_evoked.sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg);
-        lfp_pow.sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg);
+%         lfp_evoked.sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg);
+%         lfp_pow.sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg);
     end
 end
 

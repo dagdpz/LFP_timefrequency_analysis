@@ -150,7 +150,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
         end
     end
     
-    cfg_conditions = lfp_tfa_get_trial_conditions(states_lfp, lfp_tfa_cfg);
+    cfg_conditions = lfp_tfa_compare_conditions(states_lfp, lfp_tfa_cfg);
        
     % condition based TFS
     sites_pow = struct();
@@ -186,7 +186,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             
             %cond_based_tfs(cn).sites(i) = struct();
             % consider site based on recorded hemispace
-            if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace) 
+            if strcmp(states_lfp(i).target, cfg_conditions(cn).target) 
 %                 session_pow(i).condition(cn).site_ID = states_lfp(i).site_ID;
 %                 cond_based_psd(cn).sites(i).session = states_lfp(i).session;
 %                 cond_based_psd(cn).sites(i).target = states_lfp(i).target;
@@ -199,24 +199,8 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 sites_pow(i).target = states_lfp(i).target;
 
                 for hs = 1:length(hs_labels)
-                    cond_trials = zeros(1, length(states_lfp(i).trials));
-                    % get the trials for given condition and this hs label
-%                     if ~isnan(cfg_conditions(cn).perturbation)
-%                         cond_trials = cond_trials & ...
-%                             ([states_lfp(i).trials.perturbation]) == ...
-%                             (cfg_conditions(cn).perturbation);
-%                     end
-                    if ~isnan(cfg_conditions(cn).block)
-                        for b = cfg_conditions(cn).block
-                            cond_trials = cond_trials | ...
-                                ([states_lfp(i).trials.block] == b);
-                        end
-                    end
-                    if ~isnan(cfg_conditions(cn).choice)
-                        cond_trials = cond_trials & ...
-                            ([states_lfp(i).trials.choice_trial] == ...
-                            cfg_conditions(cn).choice);
-                    end
+                    cond_trials = lfp_tfa_get_condition_trials(states_lfp(i), cfg_conditions(cn));
+                    
                     cond_trials = cond_trials & ...
                         strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
                     sites_pow(i).condition(cn).ntrials(hs) = sum(cond_trials);
@@ -285,7 +269,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
 
                 plottitle = ['Site ID: ', sites_pow(i).site_ID ...
                     ', Target = ' sites_pow(i).target ', '  ...
-                '(block ' num2str(cfg_conditions(cn).block) '), '];
+                '(Perturb ' num2str(cfg_conditions(cn).perturbation_group{1}) '), '];
                 if cfg_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
                 else
@@ -315,12 +299,13 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     % Average power spectrum across sites  
     session_pow.condition = struct();
     for cn = 1:length(cfg_conditions)
-        nsites = sum([states_lfp.recorded_hemispace] == cfg_conditions(cn).recorded_hemispace);
+        nsites = sum(contains({states_lfp.target}, cfg_conditions(cn).target));
+        session_pow.condition(cn).hs_tuned_power = [];
         % variable to store no:of sites with trials satisfying this
         % condition
         isite = 0;            
         for i = 1:length(states_lfp)
-            if ~strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace)
+            if ~strcmp(states_lfp(i).target, cfg_conditions(cn).target)
                 continue;
             end
             % calculate the average LFP power spectrum across sites for this condition 
@@ -382,7 +367,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
         if ~isempty(session_pow.condition(cn).hs_tuned_power)
             plottitle = ['Session: ', session_pow.condition(cn).session ...
                 ', Target = ' session_pow.condition(cn).target ', '  ...
-                'Block ' num2str(cfg_conditions(cn).block) ', '];
+                'Perturb ' num2str(cfg_conditions(cn).perturbation_group{1}) ', '];
             if cfg_conditions(cn).choice == 0
                 plottitle = [plottitle 'Instructed trials'];
             else

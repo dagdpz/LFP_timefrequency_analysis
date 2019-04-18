@@ -1,7 +1,10 @@
 function [ cfg_conditions ] = lfp_tfa_get_trial_conditions( states_lfp, lfp_tfa_cfg )
 %UNTITLED6 Summary of this function goes here
 %   Detailed explanation goes here
-    recorded_hemispace = ['R', 'L'];
+    
+    types = lfp_tfa_cfg.compare.types;
+    effectors = lfp_tfa_cfg.compare.effectors;
+    targets = lfp_tfa_cfg.compare.targets;
     %unique([states_lfp.recorded_hemispace]);
     choice = lfp_tfa_cfg.analyze_choice_trials;
     %unique([states_lfp(1).trials.choice_trial]);
@@ -52,7 +55,7 @@ function [ cfg_conditions ] = lfp_tfa_get_trial_conditions( states_lfp, lfp_tfa_
         for c = 1:length(lfp_tfa_cfg.add_conditions)
             if ~isempty(lfp_tfa_cfg.add_conditions(c))
                 if ~isempty(lfp_tfa_cfg.add_conditions(c).blocks)
-                    for rec_hem = recorded_hemispace        
+                    for rec_hem = targets        
                         for ch = choice
                             i = i + 1;
                             if strcmp(lfp_tfa_cfg.add_conditions(c).blocks, 'control')

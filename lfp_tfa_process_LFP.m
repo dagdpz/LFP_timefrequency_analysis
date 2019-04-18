@@ -55,9 +55,15 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
     % struct to save noise rejected data
     state_filt_lfp = struct();
     
+    usable_sites_table = lfp_tfa_cfg.sites_info;
+    
     % save data inside struct 
     % first loop through each site
     for i = 1:min(length(sites), lfp_tfa_cfg.maxsites)
+        if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
+                sites(i).site_ID)))
+            continue;
+        end
         fprintf('Processing site, %s\n', sites(i).site_ID);
         %site_lfp = struct();
         state_lfp(i).session = sites(1).site_ID(1:12);
@@ -71,10 +77,18 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
             completed = sites(i).trial(t).completed;
             if completed
                 comp_trial = comp_trial + 1;
+                type = sites(i).trial(t).type;
+                effector = sites(i).trial(t).effector;
+                run = sites(i).trial(t).run;
                 block = sites(i).trial(t).block;
+                if isempty(usable_sites_table(usable_sites_table.Block == ...
+                        block))
+                    continue;
+                end
                 choice_trial = sites(i).trial(t).choice;
                 reach_hand = sites(i).trial(t).reach_hand; % 1 = left, 2 = right
-                perturbation = sites(i).trial(t).perturbation; % 0 = control
+                perturbation = usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
+                    sites(i).site_ID) && usable_sites_table.Block == block).Perturbation; % 0 = control
                 tar_pos = sites(i).trial(t).tar_pos;
                 fix_pos = sites(i).trial(t).fix_pos;
                       
@@ -148,6 +162,9 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 TFR_wavelet      = ft_freqanalysis(cfg, ft_data_lfp);
 
                 % save retrieved data into struct
+                state_lfp(i).trials(comp_trial).type = type;
+                state_lfp(i).trials(comp_trial).effector = effector;
+                state_lfp(i).trials(comp_trial).run = run;
                 state_lfp(i).trials(comp_trial).block = block;
                 state_lfp(i).trials(comp_trial).choice_trial = choice_trial;
                 state_lfp(i).trials(comp_trial).lfp_data = LFP;
