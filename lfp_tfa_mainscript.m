@@ -64,13 +64,13 @@ end
 if length(session_proc_lfp) > 1
     if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
     lfp_tfr.sessions_avg = lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg);%struct();
-%     lfp_evoked.sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg);
-%     lfp_pow.sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg);%struct();    
+    lfp_evoked.sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg);
+    lfp_pow.sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg);%struct();    
     end
     if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sites'))
         lfp_tfr.sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg);%struct();
-%         lfp_evoked.sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg);
-%         lfp_pow.sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg);
+        lfp_evoked.sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg);
+        lfp_pow.sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg);
     end
 end
 

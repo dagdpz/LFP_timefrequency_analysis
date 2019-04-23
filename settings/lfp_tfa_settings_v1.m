@@ -40,8 +40,8 @@ lfp_tfa_cfg.trialinfo.ref_tstart = -0.4;
 lfp_tfa_cfg.trialinfo.end_state = lfp_tfa_states.REWARD;
 lfp_tfa_cfg.trialinfo.ref_tend = 0.6;
 
-% Specify lesional hemisphere
-lfp_tfa_cfg.lesional_hemispace = 'R';
+% reference hemisphere for hand-space labelling
+lfp_tfa_cfg.ref_hemisphere = 'R';
 
 % maximum no:of sites to analyse from each session
 maxsites = inf; % inf = analyse all sites
@@ -100,7 +100,7 @@ lfp_tfa_cfg.compare.choice_trials = 0; % 0 = only instructed, [0, 1] = both choi
 lfp_tfa_cfg.compare.reach_hands = {'R', 'L'}; % for future use
 lfp_tfa_cfg.compare.reach_spaces = {'R', 'L'}; % for future use
 lfp_tfa_cfg.compare.perturbations = [0, 1]; % 0 = pre, 1 = post
-lfp_tfa_cfg.compare.perturbation_groups = {0, 3}; % all, allbutone, 1xN int array
+lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; % 'all', 'allbutone', 1xN int array
 
 % define the peristates to analyse
 % state id, state name, tbefore_onset(s), tafter_onset (s)

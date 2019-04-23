@@ -66,23 +66,28 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
         end
         fprintf('Processing site, %s\n', sites(i).site_ID);
         %site_lfp = struct();
+        state_lfp(i).dataset = usable_sites_table(...
+            strcmp(usable_sites_table.Site_ID, sites(i).site_ID)).Set;
         state_lfp(i).session = sites(1).site_ID(1:12);
-        state_lfp(i).site_ID = sites(i).site_ID;
-        state_lfp(i).target = sites(i).target;
-        state_lfp(i).recorded_hemispace = sites(i).target(end);
-        state_lfp(i).lesioned_hemispace = lfp_tfa_cfg.lesional_hemispace;
+        state_lfp(i).site_ID = usable_sites_table(...
+            strcmp(usable_sites_table.Site_ID, sites(i).site_ID)).Site_ID;
+        state_lfp(i).target = usable_sites_table(...
+            strcmp(usable_sites_table.Site_ID, sites(i).site_ID)).Target;
+        state_lfp(i).recorded_hemisphere = usable_sites_table(...
+            strcmp(usable_sites_table.Site_ID, sites(i).site_ID)).Hemisphere;
+        state_lfp(i).ref_hemisphere = lfp_tfa_cfg.ref_hemisphere;
         % now loop through each trial for this site
         comp_trial = 0; % iterator for completed trials
         for t = 1:length(sites(i).trial)
             completed = sites(i).trial(t).completed;
             if completed
-                comp_trial = comp_trial + 1;
                 type = sites(i).trial(t).type;
                 effector = sites(i).trial(t).effector;
                 run = sites(i).trial(t).run;
                 block = sites(i).trial(t).block;
-                if isempty(usable_sites_table(usable_sites_table.Block == ...
-                        block))
+                % check if the block is usable
+                if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
+                        sites(i).site_ID) && usable_sites_table.Block == block))
                     continue;
                 end
                 choice_trial = sites(i).trial(t).choice;
@@ -104,14 +109,19 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 
                 
                 % assign hand-space for the trial
-                if strcmp(state_lfp(i).lesioned_hemispace, reach_space)
-                    if strcmp(state_lfp(i).lesioned_hemispace, reach_hand)
+                if strcmp(state_lfp(i).ref_hemisphere, reach_space)
+%                     space_label = 'Ipsi Space';
+%                 else
+%                     space_label = 'Contra Space';
+%                 end
+                
+                    if strcmp(state_lfp(i).ref_hemisphere, reach_hand)
                         hs_label = 'IH IS';
                     else
                         hs_label = 'CH IS';
                     end
                 else 
-                    if strcmp(state_lfp(i).lesioned_hemispace, reach_hand)
+                    if strcmp(state_lfp(i).ref_hemisphere, reach_hand)
                         hs_label = 'IH CS';
                     else
                         hs_label = 'CH CS';
@@ -162,6 +172,7 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 TFR_wavelet      = ft_freqanalysis(cfg, ft_data_lfp);
 
                 % save retrieved data into struct
+                comp_trial = comp_trial + 1;
                 state_lfp(i).trials(comp_trial).type = type;
                 state_lfp(i).trials(comp_trial).effector = effector;
                 state_lfp(i).trials(comp_trial).run = run;

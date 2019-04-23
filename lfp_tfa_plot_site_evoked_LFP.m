@@ -317,6 +317,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
                                     sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std ;
                                 session_evoked.condition(cn).hs_tuned_evoked(st, hs).time = ...
                                     sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time;
+                                
                             else
                                 nsamples = length(session_evoked.condition(cn).hs_tuned_evoked(st, hs).time);
                                 if nsamples > length(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time)
@@ -330,6 +331,8 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
                                     session_evoked.condition(cn).hs_tuned_evoked(st, hs).std(1:nsamples) + ...
                                     (1/nsites) * ...
                                     sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std(1:nsamples) ;
+                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).time = ...
+                                    session_evoked.condition(cn).hs_tuned_evoked(st, hs).time(1:nsamples) ;
 
                             end
                             session_evoked.condition(cn).hs_tuned_evoked(st, hs).hs_label = ...
