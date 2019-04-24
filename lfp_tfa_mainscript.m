@@ -29,7 +29,7 @@ lfp_tfr = struct();
 lfp_evoked = struct();
 lfp_pow = struct();
 try
-    % loop through each session
+    % loop through each session for processing lfp
     for i = 1:length(lfp_datafiles)
         session_name = [file_list{i,1} '_' file_list{i,2}];
         fprintf('Processing LFP for session %s\n', session_name);
@@ -42,6 +42,7 @@ try
         session_proc_lfp(i).sites = lfp_tfa_reject_noisy_lfp(session_proc_lfp(i).sites, lfp_tfa_cfg.noise);
         session_proc_lfp(i).sites = lfp_tfa_compute_baseline_power(session_proc_lfp(i).sites, lfp_tfa_cfg);
     end
+    % loop through each processed session for analysis
     for i = 1:length(session_proc_lfp)
         session_name = [file_list{i,1} '_' file_list{i,2}];
         fprintf('Processing LFP for session %s\n', session_name);
@@ -54,7 +55,8 @@ try
         lfp_evoked.session(i) = ...
             lfp_tfa_plot_site_evoked_LFP( session_proc_lfp(i).sites, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
         lfp_pow.session(i) = ...
-            lfp_tfa_plot_site_powspctrum( session_proc_lfp(i).sites, lfp_tfa_cfg ) ;
+            lfp_tfa_plot_site_powspctrum( session_proc_lfp(i).sites, lfp_tfa_cfg ) ;        
+        
     end
 catch e
     error(e.message());%save session_proc_lfp session_proc_lfp;

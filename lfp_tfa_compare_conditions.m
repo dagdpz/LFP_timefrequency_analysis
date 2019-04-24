@@ -4,6 +4,9 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( states_lfp, lfp_tfa_cf
     task_types = lfp_tfa_cfg.compare.types;
     effectors = lfp_tfa_cfg.compare.effectors;
     targets = lfp_tfa_cfg.compare.targets;
+    if strcmp(targets, 'auto')
+        targets = unique({states_lfp.target});
+    end
     %unique([states_lfp.recorded_hemispace]);
     if lfp_tfa_cfg.compare.choice_trials
         choices = unique([states_lfp(1).trials.choice_trial]);

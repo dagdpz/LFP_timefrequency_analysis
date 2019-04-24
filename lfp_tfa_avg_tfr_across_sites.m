@@ -8,13 +8,16 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
     
     % Average TFR across sessions
     sites_avg.condition = struct();
-    for cn = 1:length(lfp_tfr(1).session(1).condition)
+    for cn = 1:length(lfp_tfa_cfg.conditions)
         fprintf('Condition %s\n', lfp_tfr.session(1).condition(cn).label);
         sites_avg.condition(cn).hs_tuned_tfs = struct();
         nsites = 0;
-        %sessions_avg.condition(cn).hs_tuned_tfs = struct();
+        %sessions_avg.condition(cn).hs_tuned_tfs = struct();        
         for i = 1:length(lfp_tfr.session)  
             for j = 1:length(lfp_tfr.session(i).sites)
+                if ~strcmp(lfp_tfr.session(i).sites(j).target, lfp_tfa_cfg.conditions(cn).target)
+                    continue;
+                end
                 if ~isempty(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs) && ... 
                     isfield(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs, 'powspctrm')
                     nsites = nsites + 1;   

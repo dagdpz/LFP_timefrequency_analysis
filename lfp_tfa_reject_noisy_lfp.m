@@ -116,8 +116,8 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
         lfp_diff_mean = nanmean(arr_concat_diff_lfp);
         lfp_diff_std = nanstd(arr_concat_diff_lfp);
         % get lfp derivative threshold
-        lfp_diff_minbound = lfp_diff_mean - cfg_noise.amp_thr * lfp_diff_std;
-        lfp_diff_maxbound = lfp_diff_mean + cfg_noise.amp_thr * lfp_diff_std;
+        lfp_diff_minbound = lfp_diff_mean - cfg_noise.diff_thr * lfp_diff_std;
+        lfp_diff_maxbound = lfp_diff_mean + cfg_noise.diff_thr * lfp_diff_std;
 
         % save this data into the struct
         %noisy_lfp_trials(i).lfp_diff_mean = lfp_diff_mean;
@@ -317,8 +317,8 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
         hold on
         plot(arr_concat_site_lfp)
         line(xlim, [site_lfp_mean site_lfp_mean], 'color', 'k');
-        line(xlim, [site_lfp_mean + cfg_noise.amp_thr*site_lfp_std site_lfp_mean + cfg_noise.amp_thr*site_lfp_std], 'color', 'r');
-        line(xlim, [site_lfp_mean - cfg_noise.amp_thr*site_lfp_std site_lfp_mean - cfg_noise.amp_thr*site_lfp_std], 'color', 'r');
+        line(xlim, [lfp_raw_maxbound lfp_raw_maxbound], 'color', 'r');
+        line(xlim, [lfp_raw_minbound lfp_raw_minbound], 'color', 'r');
         title('LFP amplitude');
         %title(sprintf('Site = %s, (ntrials = %g, naccepted = %g)', strrep(site.site_ID, '_', '\_'), t, length(site.trials) - states_lfp(i).noisytrails));
         % divide blocks by drawing vertical lines
@@ -337,7 +337,7 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
         plot(arr_concat_diff_lfp)
         line(xlim, [lfp_diff_mean lfp_diff_mean], 'color', 'k');
         line(xlim, [lfp_diff_mean + cfg_noise.diff_thr*lfp_diff_std lfp_diff_mean + cfg_noise.diff_thr*lfp_diff_std], 'color', 'r');
-        line(xlim, [site_lfp_mean - cfg_noise.diff_thr*lfp_diff_std lfp_diff_mean - cfg_noise.diff_thr*lfp_diff_std], 'color', 'r');
+        line(xlim, [lfp_diff_minbound lfp_diff_minbound], 'color', 'r');
         % divide blocks by drawing vertical lines
         block_end_sample = 0;
         for b = 1:length(unq_blocks)

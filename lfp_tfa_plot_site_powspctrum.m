@@ -51,104 +51,104 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
 %         end
 %     end
     
-    recorded_hemispace = unique([states_lfp.recorded_hemispace]);
-    choice = unique([states_lfp(1).trials.choice_trial]);
-    perturbation = unique([states_lfp(1).trials.perturbation]);
-    blocks = unique([states_lfp(1).trials.block]);
-    
-    % create conditions
-    cfg_conditions = struct();
-       
-    i = 0;
-    for rec_hem = recorded_hemispace        
-        for c = choice
-            for b = blocks
-                i = i + 1;
-                cfg_conditions(i).recorded_hemispace = rec_hem;
-                cfg_conditions(i).choice = c;
-                cfg_conditions(i).block = b;
-                cfg_conditions(i).perturbation = ...
-                    unique([states_lfp(1).trials([states_lfp(1).trials.block] == b).perturbation]);
-                cond_label = [];
-                if cfg_conditions(i).recorded_hemispace == 'L'
-                    cond_label = [cond_label 'Left_hemisphere_'];
-                else
-                    cond_label = [cond_label 'Right_hemisphere_'];
-                end
-                if cfg_conditions(i).choice == 0
-                    cond_label = [cond_label 'Instructed_'];
-                else
-                    cond_label = [cond_label 'Choice_'];
-                end
-                if cfg_conditions(i).perturbation == 0
-                    cond_label = [cond_label 'Control_'];
-                else
-                    cond_label = [cond_label 'Inactivation_'];
-                end
-                cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
-                cfg_conditions(i).label = cond_label;
-                
-                % create a folder for storing results for this condition
-%                 cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
-%                 if ~exist(cfg_conditions(i).results_folder, 'dir')
-%                     mkdir(cfg_conditions(i).results_folder)
+%     recorded_hemisphere = unique([states_lfp.recorded_hemisphere]);
+%     choice = unique([states_lfp(1).trials.choice_trial]);
+%     perturbation = unique([states_lfp(1).trials.perturbation]);
+%     blocks = unique([states_lfp(1).trials.block]);
+%     
+%     % create conditions
+%     cfg_conditions = struct();
+%        
+%     i = 0;
+%     for rec_hem = recorded_hemisphere        
+%         for c = choice
+%             for b = blocks
+%                 i = i + 1;
+%                 cfg_conditions(i).recorded_hemisphere = rec_hem;
+%                 cfg_conditions(i).choice = c;
+%                 cfg_conditions(i).block = b;
+%                 cfg_conditions(i).perturbation = ...
+%                     unique([states_lfp(1).trials([states_lfp(1).trials.block] == b).perturbation]);
+%                 cond_label = [];
+%                 if cfg_conditions(i).recorded_hemisphere == 'L'
+%                     cond_label = [cond_label 'Left_hemisphere_'];
+%                 else
+%                     cond_label = [cond_label 'Right_hemisphere_'];
 %                 end
-                                
-            end
-        end
-    end
-    
-    
-    if isfield(lfp_tfa_cfg, 'add_conditions')
-        for c = 1:length(lfp_tfa_cfg.add_conditions)
-            if ~isempty(lfp_tfa_cfg.add_conditions(c))
-                if ~isempty(lfp_tfa_cfg.add_conditions(c).blocks)
-                    for rec_hem = recorded_hemispace        
-                        for ch = choice
-                            i = i + 1;
-                            if strcmp(lfp_tfa_cfg.add_conditions(c).blocks, 'inactivation')
-                                cfg_conditions(i).block = blocks(perturbation ~= 0);
-                                cfg_conditions(i).perturbation = 1;
-                            else
-                                cfg_conditions(i).block = lfp_tfa_cfg.add_conditions(c).blocks;
-                                cfg_conditions(i).perturbation = perturbation(blocks == lfp_tfa_cfg.add_conditions(c).blocks(1));
-                                
-                            end                    
-                            cfg_conditions(i).choice = ch;
-                            if isfield(lfp_tfa_cfg.add_conditions(c), 'perturbation')
-                                cfg_conditions(i).perturbation = lfp_tfa_cfg.add_conditions(c).perturbation;
-                            end
-                            cfg_conditions(i).recorded_hemispace = rec_hem;
-                            cond_label = [];
-                            if cfg_conditions(i).recorded_hemispace == 'L'
-                                cond_label = [cond_label 'Left_hemispace_'];
-                            else
-                                cond_label = [cond_label 'Right_hemispace_'];
-                            end
-                            if cfg_conditions(i).choice == 0
-                                cond_label = [cond_label 'Instructed_'];
-                            else
-                                cond_label = [cond_label 'Choice_'];
-                            end
-                            if cfg_conditions(i).perturbation == 0
-                                cond_label = [cond_label 'Control_'];
-                            else
-                                cond_label = [cond_label 'Inactivation_'];
-                            end
-                            cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
-                            cfg_conditions(i).label = cond_label;
-                            
-                            % create a folder for storing results for this condition
-%                             cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
-%                             if ~exist(cfg_conditions(i).results_folder, 'dir')
-%                                 mkdir(cfg_conditions(i).results_folder)
+%                 if cfg_conditions(i).choice == 0
+%                     cond_label = [cond_label 'Instructed_'];
+%                 else
+%                     cond_label = [cond_label 'Choice_'];
+%                 end
+%                 if cfg_conditions(i).perturbation == 0
+%                     cond_label = [cond_label 'Control_'];
+%                 else
+%                     cond_label = [cond_label 'Inactivation_'];
+%                 end
+%                 cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
+%                 cfg_conditions(i).label = cond_label;
+%                 
+%                 % create a folder for storing results for this condition
+% %                 cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
+% %                 if ~exist(cfg_conditions(i).results_folder, 'dir')
+% %                     mkdir(cfg_conditions(i).results_folder)
+% %                 end
+%                                 
+%             end
+%         end
+%     end
+%     
+%     
+%     if isfield(lfp_tfa_cfg, 'add_conditions')
+%         for c = 1:length(lfp_tfa_cfg.add_conditions)
+%             if ~isempty(lfp_tfa_cfg.add_conditions(c))
+%                 if ~isempty(lfp_tfa_cfg.add_conditions(c).blocks)
+%                     for rec_hem = recorded_hemisphere        
+%                         for ch = choice
+%                             i = i + 1;
+%                             if strcmp(lfp_tfa_cfg.add_conditions(c).blocks, 'inactivation')
+%                                 cfg_conditions(i).block = blocks(perturbation ~= 0);
+%                                 cfg_conditions(i).perturbation = 1;
+%                             else
+%                                 cfg_conditions(i).block = lfp_tfa_cfg.add_conditions(c).blocks;
+%                                 cfg_conditions(i).perturbation = perturbation(blocks == lfp_tfa_cfg.add_conditions(c).blocks(1));
+%                                 
+%                             end                    
+%                             cfg_conditions(i).choice = ch;
+%                             if isfield(lfp_tfa_cfg.add_conditions(c), 'perturbation')
+%                                 cfg_conditions(i).perturbation = lfp_tfa_cfg.add_conditions(c).perturbation;
 %                             end
-                        end
-                    end
-                end
-            end
-        end
-    end
+%                             cfg_conditions(i).recorded_hemispace = rec_hem;
+%                             cond_label = [];
+%                             if cfg_conditions(i).recorded_hemispace == 'L'
+%                                 cond_label = [cond_label 'Left_hemispace_'];
+%                             else
+%                                 cond_label = [cond_label 'Right_hemispace_'];
+%                             end
+%                             if cfg_conditions(i).choice == 0
+%                                 cond_label = [cond_label 'Instructed_'];
+%                             else
+%                                 cond_label = [cond_label 'Choice_'];
+%                             end
+%                             if cfg_conditions(i).perturbation == 0
+%                                 cond_label = [cond_label 'Control_'];
+%                             else
+%                                 cond_label = [cond_label 'Inactivation_'];
+%                             end
+%                             cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
+%                             cfg_conditions(i).label = cond_label;
+%                             
+%                             % create a folder for storing results for this condition
+% %                             cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
+% %                             if ~exist(cfg_conditions(i).results_folder, 'dir')
+% %                                 mkdir(cfg_conditions(i).results_folder)
+% %                             end
+%                         end
+%                     end
+%                 end
+%             end
+%         end
+%     end
     
     cfg_conditions = lfp_tfa_compare_conditions(states_lfp, lfp_tfa_cfg);
        
@@ -161,6 +161,10 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
         if ~exist(site_results_folder, 'dir')
             mkdir(site_results_folder);
         end
+        
+        % flag to indicate if this site should be used for
+        % averaging based on minimum no:of trials per condition
+        sites_pow(i).use_for_avg = 1;
         
         for cn = 1:length(cfg_conditions)
 
@@ -215,8 +219,13 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                     fprintf('Number of noisy trials %g\n', sum(cond_trials ...
                         & [states_lfp(i).trials.noisy]));
                     cond_trials = cond_trials & ~[states_lfp(i).trials.noisy];
+                    % check if the site contains a specified minimum number
+                    % of trials for all conditions
+                    if sum(cond_trials) < lfp_tfa_cfg.mintrials_percondition
+                        sites_pow(i).use_for_avg = 0;
+                    end
                     
-                                 
+                                
                     % loop through trials 
 
                     for ep = 1:length(lfp_tfa_cfg.epochs)
@@ -308,6 +317,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             if ~strcmp(states_lfp(i).target, cfg_conditions(cn).target)
                 continue;
             end
+            
             % calculate the average LFP power spectrum across sites for this condition 
             if ~isempty(sites_pow(i).condition(cn).hs_tuned_power) && ...
                     isfield(sites_pow(i).condition(cn).hs_tuned_power, 'mean')
@@ -387,5 +397,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     %save(fullfile(results_folder_psd, 'cfg_conditions.mat'), 'cfg_conditions');
     save(fullfile(results_folder_psd, ['LFP_Power_' session_pow.condition(cn).session '.mat']), 'session_pow');
     %save(fullfile(results_folder_psd, 'lfp_tfa_cfg.mat'), 'lfp_tfa_cfg');
+    % save settings file
+    save(fullfile(results_folder_psd, 'lfp_tfa_settings.mat'), 'lfp_tfa_cfg');
 end
         
