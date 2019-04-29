@@ -18,7 +18,7 @@ function sessions_avg = lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg)
             %sessions_avg(t).condition(cn).tfs_across_sessions = struct();
             for i = 1:length(lfp_tfr.session)  
                 for k = 1:length(lfp_tfr.session(i).session_avg)
-                    if strcmp(lfp_tfr.session(i).session_avg(k).target, lfp_tfa_cfg.conditions(cn).target)
+                    if strcmp(lfp_tfr.session(i).session_avg(k).target, lfp_tfa_cfg.compare.targets{t})
                         if ~isempty(lfp_tfr.session(i).session_avg(k).condition(cn).hs_tuned_tfs) && ... 
                             isfield(lfp_tfr.session(i).session_avg(k).condition(cn).hs_tuned_tfs, 'powspctrm')
                             nsessions = nsessions + 1;   
