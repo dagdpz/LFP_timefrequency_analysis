@@ -8,19 +8,20 @@ clear;
 % file containing settings for LFP analysis
 settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
 % folder containing LFP data for analysis
-data_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data';
+%data_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data';
 % maxsites 
-maxsites = 2;
+maxsites = inf;
 
 %% INITIALIZATION
 close all;
 
-lfp_tfa_cfg = lfp_tfa_define_settings(data_folder, settings_filepath, maxsites);
+lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites);
 
 %% Function calls for LFP TFA per site and per session
 
-% Read and process LFP data
-lfp_datafiles = dir(fullfile(lfp_tfa_cfg.data_folder, 'sites_*.mat'));
+% Read the file list
+file_list = lfp_tfa_cfg.file_list;
+lfp_datafiles = file_list(:,3);
 
 session_lfp = struct();
 session_proc_lfp = struct();
@@ -28,32 +29,37 @@ lfp_tfr = struct();
 lfp_evoked = struct();
 lfp_pow = struct();
 try
-    % loop through each session
+    % loop through each session for processing lfp
     for i = 1:length(lfp_datafiles)
-        session_name = lfp_datafiles(i).name(7:end-4);
+        session_name = [file_list{i,1} '_' file_list{i,2}];
         fprintf('Processing LFP for session %s\n', session_name);
         lfp_tfa_cfg.session = session_name;
         lfp_tfa_cfg.session_results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, session_name);
-        lfp_tfa_cfg.data_filepath = fullfile(lfp_tfa_cfg.data_folder, lfp_datafiles(i).name);
+        lfp_tfa_cfg.data_filepath = lfp_datafiles{i};
         % load the LFP for one session
         session_lfp(i).sites = load(lfp_tfa_cfg.data_filepath);
+%         session_proc_lfp(i).monkey = file_list{i,1};
+%         session_proc_lfp(i).date = file_list{i,2};
+%         session_proc_lfp(i).session = session_name;
         session_proc_lfp(i).sites = lfp_tfa_process_LFP(session_lfp(i).sites, lfp_tfa_cfg);
         session_proc_lfp(i).sites = lfp_tfa_reject_noisy_lfp(session_proc_lfp(i).sites, lfp_tfa_cfg.noise);
         session_proc_lfp(i).sites = lfp_tfa_compute_baseline_power(session_proc_lfp(i).sites, lfp_tfa_cfg);
     end
+    % loop through each processed session for analysis
     for i = 1:length(session_proc_lfp)
-        session_name = lfp_datafiles(i).name(7:end-4);
+        session_name = [file_list{i,1} '_' file_list{i,2}];
         fprintf('Processing LFP for session %s\n', session_name);
         lfp_tfa_cfg.session = session_name;
         lfp_tfa_cfg.session_results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, session_name);
-        lfp_tfa_cfg.data_filepath = fullfile(lfp_tfa_cfg.data_folder, lfp_datafiles(i).name);
+        lfp_tfa_cfg.data_filepath = lfp_datafiles{i};
         
         lfp_tfr.session(i) = ...
             lfp_tfa_plot_site_average_tfr( session_proc_lfp(i).sites, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
         lfp_evoked.session(i) = ...
             lfp_tfa_plot_site_evoked_LFP( session_proc_lfp(i).sites, lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
         lfp_pow.session(i) = ...
-            lfp_tfa_plot_site_powspctrum( session_proc_lfp(i).sites, lfp_tfa_cfg ) ;
+            lfp_tfa_plot_site_powspctrum( session_proc_lfp(i).sites, lfp_tfa_cfg ) ;        
+        
     end
 catch e
     error(e.message());%save session_proc_lfp session_proc_lfp;

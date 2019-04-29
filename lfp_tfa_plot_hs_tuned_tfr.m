@@ -1,11 +1,8 @@
-function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file )
+function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file, varargin )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
     
-    figure;
-    cm = colormap('jet');
-    cm(1,:,:) = [1,1,1];
-    colormap(cm);
+    figure;    
     
     % colorbar title
     if strcmp(lfp_tfa_cfg.baseline_method, 'zscore')
@@ -70,7 +67,9 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                 state_info.finish_s]);
 
             % now plot
-            subplot(2,2,hs)
+            nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
+            nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
+            subplot(nhandlabels, nspacelabels, hs)
             cfg = [];
 %                 cfg.baseline     = 'no'; %baseline_shift;                 % -400ms to -100ms before the onset of first state
 %                 cfg.maskstyle    = 'saturation';
@@ -105,8 +104,8 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                 subplottitle = [subplottitle ' (nsessions = ' num2str(avg_tfr(1, hs).nsessions) ')'];
             elseif isfield(avg_tfr(1, hs), 'nsites')
                 subplottitle = [subplottitle ' (nsites = ' num2str(avg_tfr(1, hs).nsites) ')'];
-            elseif isfield(avg_tfr(1, hs), 'trials')
-                subplottitle = [subplottitle ' (ntrials = ' num2str(length(avg_tfr(1, hs).trials)) ')'];            
+            elseif isfield(avg_tfr(1, hs), 'ntrials') && ~isempty(avg_tfr(1, hs).ntrials)
+                subplottitle = [subplottitle ' (ntrials = ' num2str(avg_tfr(1, hs).ntrials) ')'];            
             end
             title(subplottitle);
             line([0 0], ylim, 'color', 'k');
@@ -121,6 +120,19 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
     
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
+    
+    % define colormap
+    cm = colormap('jet'); % default
+    if nargin > 4
+        cm = colormap(varargin{1});
+        colorbar;
+        %end
+    end
+    
+    %cm = colormap('jet'); 
+    cm(1,:,:) = [1,1,1];
+    colormap(cm);
+    
     saveas(gca, results_file);
 
 end

@@ -39,106 +39,106 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
         mkdir(results_folder_evoked);
     end
         
-    recorded_hemispace = unique([states_lfp.recorded_hemispace]);
-    choice = unique([states_lfp(1).trials.choice_trial]);
-    perturbation = unique([states_lfp(1).trials.perturbation]);
-    blocks = unique([states_lfp(1).trials.block]);
-    
-    % create conditions
-    cfg_conditions = struct();
-       
-    i = 0;
-    for rec_hem = recorded_hemispace        
-        for c = choice
-            for b = blocks
-                i = i + 1;
-                cfg_conditions(i).recorded_hemispace = rec_hem;
-                cfg_conditions(i).choice = c;
-                cfg_conditions(i).block = b;
-                cfg_conditions(i).perturbation = ...
-                    unique([states_lfp(1).trials([states_lfp(1).trials.block] == b).perturbation]);
-                cond_label = [];
-                if cfg_conditions(i).recorded_hemispace == 'L'
-                    cond_label = [cond_label 'Left_hemisphere_'];
-                else
-                    cond_label = [cond_label 'Right_hemisphere_'];
-                end
-                if cfg_conditions(i).choice == 0
-                    cond_label = [cond_label 'Instructed_'];
-                else
-                    cond_label = [cond_label 'Choice_'];
-                end
-                if cfg_conditions(i).perturbation == 0
-                    cond_label = [cond_label 'Control_'];
-                else
-                    cond_label = [cond_label 'Inactivation_'];
-                end
-                cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
-                cfg_conditions(i).label = cond_label;
-                
-                % create a folder for storing results for this condition
-%                 cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
-%                 if ~exist(cfg_conditions(i).results_folder, 'dir')
-%                     mkdir(cfg_conditions(i).results_folder)
+%     recorded_hemispace = unique([states_lfp.recorded_hemispace]);
+%     choice = unique([states_lfp(1).trials.choice_trial]);
+%     perturbation = unique([states_lfp(1).trials.perturbation]);
+%     blocks = unique([states_lfp(1).trials.block]);
+%     
+%     % create conditions
+%     cfg_conditions = struct();
+%        
+%     i = 0;
+%     for rec_hem = recorded_hemispace        
+%         for c = choice
+%             for b = blocks
+%                 i = i + 1;
+%                 cfg_conditions(i).recorded_hemispace = rec_hem;
+%                 cfg_conditions(i).choice = c;
+%                 cfg_conditions(i).block = b;
+%                 cfg_conditions(i).perturbation = ...
+%                     unique([states_lfp(1).trials([states_lfp(1).trials.block] == b).perturbation]);
+%                 cond_label = [];
+%                 if cfg_conditions(i).recorded_hemispace == 'L'
+%                     cond_label = [cond_label 'Left_hemisphere_'];
+%                 else
+%                     cond_label = [cond_label 'Right_hemisphere_'];
 %                 end
-                                
-            end
-        end
-    end
-    
-    
-    if isfield(lfp_tfa_cfg, 'add_conditions')
-        for c = 1:length(lfp_tfa_cfg.add_conditions)
-            if ~isempty(lfp_tfa_cfg.add_conditions(c))
-                if ~isempty(lfp_tfa_cfg.add_conditions(c).blocks)
-                    for rec_hem = recorded_hemispace        
-                        for ch = choice
-                            i = i + 1;
-                            if strcmp(lfp_tfa_cfg.add_conditions(c).blocks, 'inactivation')
-                                cfg_conditions(i).block = blocks(perturbation ~= 0);
-                                cfg_conditions(i).perturbation = 1;
-                            else
-                                cfg_conditions(i).block = lfp_tfa_cfg.add_conditions(c).blocks;
-                                cfg_conditions(i).perturbation = perturbation(blocks == lfp_tfa_cfg.add_conditions(c).blocks(1));
-                                
-                            end                    
-                            cfg_conditions(i).choice = ch;
-                            if isfield(lfp_tfa_cfg.add_conditions(c), 'perturbation')
-                                cfg_conditions(i).perturbation = lfp_tfa_cfg.add_conditions(c).perturbation;
-                            end
-                            cfg_conditions(i).recorded_hemispace = rec_hem;
-                            cond_label = [];
-                            if cfg_conditions(i).recorded_hemispace == 'L'
-                                cond_label = [cond_label 'Left_hemispace_'];
-                            else
-                                cond_label = [cond_label 'Right_hemispace_'];
-                            end
-                            if cfg_conditions(i).choice == 0
-                                cond_label = [cond_label 'Instructed_'];
-                            else
-                                cond_label = [cond_label 'Choice_'];
-                            end
-                            if cfg_conditions(i).perturbation == 0
-                                cond_label = [cond_label 'Control_'];
-                            else
-                                cond_label = [cond_label 'Inactivation_'];
-                            end
-                            cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
-                            cfg_conditions(i).label = cond_label;
-                            
-                            % create a folder for storing results for this condition
-%                             cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
-%                             if ~exist(cfg_conditions(i).results_folder, 'dir')
-%                                 mkdir(cfg_conditions(i).results_folder)
+%                 if cfg_conditions(i).choice == 0
+%                     cond_label = [cond_label 'Instructed_'];
+%                 else
+%                     cond_label = [cond_label 'Choice_'];
+%                 end
+%                 if cfg_conditions(i).perturbation == 0
+%                     cond_label = [cond_label 'Control_'];
+%                 else
+%                     cond_label = [cond_label 'Inactivation_'];
+%                 end
+%                 cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
+%                 cfg_conditions(i).label = cond_label;
+%                 
+%                 % create a folder for storing results for this condition
+% %                 cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
+% %                 if ~exist(cfg_conditions(i).results_folder, 'dir')
+% %                     mkdir(cfg_conditions(i).results_folder)
+% %                 end
+%                                 
+%             end
+%         end
+%     end
+%     
+%     
+%     if isfield(lfp_tfa_cfg, 'add_conditions')
+%         for c = 1:length(lfp_tfa_cfg.add_conditions)
+%             if ~isempty(lfp_tfa_cfg.add_conditions(c))
+%                 if ~isempty(lfp_tfa_cfg.add_conditions(c).blocks)
+%                     for rec_hem = recorded_hemispace        
+%                         for ch = choice
+%                             i = i + 1;
+%                             if strcmp(lfp_tfa_cfg.add_conditions(c).blocks, 'inactivation')
+%                                 cfg_conditions(i).block = blocks(perturbation ~= 0);
+%                                 cfg_conditions(i).perturbation = 1;
+%                             else
+%                                 cfg_conditions(i).block = lfp_tfa_cfg.add_conditions(c).blocks;
+%                                 cfg_conditions(i).perturbation = perturbation(blocks == lfp_tfa_cfg.add_conditions(c).blocks(1));
+%                                 
+%                             end                    
+%                             cfg_conditions(i).choice = ch;
+%                             if isfield(lfp_tfa_cfg.add_conditions(c), 'perturbation')
+%                                 cfg_conditions(i).perturbation = lfp_tfa_cfg.add_conditions(c).perturbation;
 %                             end
-                        end
-                    end
-                end
-            end
-        end
-    end
+%                             cfg_conditions(i).recorded_hemispace = rec_hem;
+%                             cond_label = [];
+%                             if cfg_conditions(i).recorded_hemispace == 'L'
+%                                 cond_label = [cond_label 'Left_hemispace_'];
+%                             else
+%                                 cond_label = [cond_label 'Right_hemispace_'];
+%                             end
+%                             if cfg_conditions(i).choice == 0
+%                                 cond_label = [cond_label 'Instructed_'];
+%                             else
+%                                 cond_label = [cond_label 'Choice_'];
+%                             end
+%                             if cfg_conditions(i).perturbation == 0
+%                                 cond_label = [cond_label 'Control_'];
+%                             else
+%                                 cond_label = [cond_label 'Inactivation_'];
+%                             end
+%                             cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
+%                             cfg_conditions(i).label = cond_label;
+%                             
+%                             % create a folder for storing results for this condition
+% %                             cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
+% %                             if ~exist(cfg_conditions(i).results_folder, 'dir')
+% %                                 mkdir(cfg_conditions(i).results_folder)
+% %                             end
+%                         end
+%                     end
+%                 end
+%             end
+%         end
+%     end
     
-    cfg_conditions = lfp_tfa_get_trial_conditions(states_lfp, lfp_tfa_cfg);
+    cfg_conditions = lfp_tfa_compare_conditions(states_lfp, lfp_tfa_cfg);
        
     % condition based Evoked
     sites_evoked = struct();
@@ -153,6 +153,10 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
         sites_evoked(i).site_ID = states_lfp(i).site_ID;
         sites_evoked(i).session = states_lfp(i).session;
         sites_evoked(i).target = states_lfp(i).target;
+        % flag to indicate if this site should be used for
+        % averaging based on minimum no:of trials per condition
+        sites_evoked(i).use_for_avg = 1;
+        
         for cn = 1:length(cfg_conditions)
 
             sites_evoked(i).condition(cn).label = cfg_conditions(cn).label;
@@ -176,7 +180,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
             
             %cond_based_tfs(cn).sites(i) = struct();
             % consider site based on recorded hemispace
-            if strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace) 
+            if strcmp(states_lfp(i).target, cfg_conditions(cn).target) 
                 
                 % struct to store evoked LFP
                 sites_evoked(i).condition(cn).hs_tuned_evoked = struct();
@@ -185,24 +189,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
                 sites_evoked(i).condition(cn).ntrials = zeros(1,length(hs_labels));
 
                 for hs = 1:length(hs_labels)
-                    cond_trials = zeros(1, length(states_lfp(i).trials));
-                    % get the trials for given condition and this hs label
-%                     if ~isnan(cfg_conditions(cn).perturbation)
-%                         cond_trials = cond_trials & ...
-%                             ([states_lfp(i).trials.perturbation]) == ...
-%                             (cfg_conditions(cn).perturbation);
-%                     end
-                    if ~isnan(cfg_conditions(cn).block)
-                        for b = cfg_conditions(cn).block
-                            cond_trials = cond_trials | ...
-                                ([states_lfp(i).trials.block] == b);
-                        end
-                    end
-                    if ~isnan(cfg_conditions(cn).choice)
-                        cond_trials = cond_trials & ...
-                            ([states_lfp(i).trials.choice_trial] == ...
-                            cfg_conditions(cn).choice);
-                    end
+                    cond_trials = lfp_tfa_get_condition_trials(states_lfp(i), cfg_conditions(cn));
                     cond_trials = cond_trials & ...
                         strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
                     sites_evoked(i).condition(cn).ntrials(hs) = sum(cond_trials);
@@ -217,6 +204,12 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
                     fprintf('Number of noisy trials %g\n', sum(cond_trials ...
                         & [states_lfp(i).trials.noisy]));
                     cond_trials = cond_trials & ~[states_lfp(i).trials.noisy];
+                    
+                    % check if the site contains a specified minimum number
+                    % of trials for all conditions
+                    if sum(cond_trials) < lfp_tfa_cfg.mintrials_percondition
+                        sites_evoked(i).use_for_avg = 0;
+                    end
                     
                                  
                     % loop through trials 
@@ -284,7 +277,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
             if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked)
                 plottitle = ['Site ID: ', sites_evoked(i).site_ID ', Target = ' ...
                     sites_evoked(i).target ', '  ...
-                    '(block ' num2str(cfg_conditions(cn).block) '), '];
+                    '(Perturb ' num2str(cfg_conditions(cn).perturbation_group{1}) '), '];
                 if cfg_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
                 else
@@ -308,63 +301,69 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
     % Average across sites for a session
     session_evoked.condition = struct();
     for cn = 1:length(cfg_conditions)
-        nsites = sum([states_lfp.recorded_hemispace] == cfg_conditions(cn).recorded_hemispace);
-        %cond_based_tfs(cn).tfs_avg_session = struct();
+        nsites = sum(contains({states_lfp.target}, cfg_conditions(cn).target));
+        session_evoked.condition(cn).hs_tuned_evoked = [];
         isite = 0;
         for i = 1:length(sites_evoked)      
-            if ~strcmp(states_lfp(i).recorded_hemispace, cfg_conditions(cn).recorded_hemispace)
+            if ~strcmp(states_lfp(i).target, cfg_conditions(cn).target)
                 continue;
             end
-            % calculate the average evoked LFP across sites for this condition 
-            if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked) && ...
-                isfield(sites_evoked(i).condition(cn).hs_tuned_evoked, 'mean')
-                % struct to store average evoked LFP across sites
-                %cond_based_evoked(cn).evoked_lfp_session = struct();%cell(length(analyse_states),length(hs_labels));
-                isite = isite + 1;
-                for hs = 1:length(hs_labels)
-                    for st = 1:length(analyse_states)
-                        if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean)
+            if sites_evoked(i).use_for_avg
+                % calculate the average evoked LFP across sites for this condition 
+                if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked) && ...
+                    isfield(sites_evoked(i).condition(cn).hs_tuned_evoked, 'mean')
+                    % struct to store average evoked LFP across sites
+                    %cond_based_evoked(cn).evoked_lfp_session = struct();%cell(length(analyse_states),length(hs_labels));
+                    isite = isite + 1;
+                    for hs = 1:length(hs_labels)
+                        for st = 1:length(analyse_states)
+                            if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean)
 
-                            if isite == 1
-                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).mean = ...
-                                    (1/nsites)*...
-                                    sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean ;
-                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).std = ...
-                                    (1/nsites)*...
-                                    sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std ;
-                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).time = ...
-                                    sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time;
-                            else
-                                nsamples = length(session_evoked.condition(cn).hs_tuned_evoked(st, hs).time);
-                                if nsamples > length(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time)
-                                    nsamples = length(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time);
+                                if isite == 1
+                                    session_evoked.condition(cn).hs_tuned_evoked(st, hs).mean = ...
+                                        (1/nsites)*...
+                                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean ;
+                                    session_evoked.condition(cn).hs_tuned_evoked(st, hs).std = ...
+                                        (1/nsites)*...
+                                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std ;
+                                    session_evoked.condition(cn).hs_tuned_evoked(st, hs).time = ...
+                                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time;
+
+                                else
+                                    nsamples = length(session_evoked.condition(cn).hs_tuned_evoked(st, hs).time);
+                                    if nsamples > length(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time)
+                                        nsamples = length(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time);
+                                    end
+                                    session_evoked.condition(cn).hs_tuned_evoked(st, hs).mean = ...
+                                        session_evoked.condition(cn).hs_tuned_evoked(st, hs).mean(1:nsamples) + ...
+                                        (1/nsites) * ...
+                                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean(1:nsamples) ;
+                                    session_evoked.condition(cn).hs_tuned_evoked(st, hs).std = ...
+                                        session_evoked.condition(cn).hs_tuned_evoked(st, hs).std(1:nsamples) + ...
+                                        (1/nsites) * ...
+                                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std(1:nsamples) ;
+                                    session_evoked.condition(cn).hs_tuned_evoked(st, hs).time = ...
+                                        session_evoked.condition(cn).hs_tuned_evoked(st, hs).time(1:nsamples) ;
+
                                 end
-                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).mean = ...
-                                    session_evoked.condition(cn).hs_tuned_evoked(st, hs).mean(1:nsamples) + ...
-                                    (1/nsites) * ...
-                                    sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean(1:nsamples) ;
-                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).std = ...
-                                    session_evoked.condition(cn).hs_tuned_evoked(st, hs).std(1:nsamples) + ...
-                                    (1/nsites) * ...
-                                    sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std(1:nsamples) ;
-
+                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).hs_label = ...
+                                    sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).hs_label;
+                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).state = ...
+                                    sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state;
+                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).nsites = ...
+                                    isite;
+                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).hs_label = ...
+                                    sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).hs_label;
+                                session_evoked.condition(cn).hs_tuned_evoked(st, hs).state = ...
+                                    sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state;
+                                session_evoked.condition(cn).condition = cfg_conditions(cn);
+                                session_evoked.condition(cn).label = cfg_conditions(cn).label;
+                                session_evoked.condition(cn).session = states_lfp(i).session;
+                                session_evoked.condition(cn).target = states_lfp(i).target;
+                                session_evoked.condition(cn).nsites = nsites;
                             end
-                            session_evoked.condition(cn).hs_tuned_evoked(st, hs).hs_label = ...
-                                sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).hs_label;
-                            session_evoked.condition(cn).hs_tuned_evoked(st, hs).state = ...
-                                sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state;
-                            session_evoked.condition(cn).hs_tuned_evoked(st, hs).nsites = ...
-                                isite;
-                            session_evoked.condition(cn).hs_tuned_evoked(st, hs).hs_label = ...
-                                sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).hs_label;
-                            session_evoked.condition(cn).hs_tuned_evoked(st, hs).state = ...
-                                sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state;
-                            session_evoked.condition(cn).condition = cfg_conditions(cn);
-                            session_evoked.condition(cn).label = cfg_conditions(cn).label;
-                            session_evoked.condition(cn).session = states_lfp(i).session;
-                            session_evoked.condition(cn).target = states_lfp(i).target;
-                        end
 
+                        end
                     end
                 end
             end
@@ -376,7 +375,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
         if ~isempty(session_evoked.condition(cn).hs_tuned_evoked)
             plottitle = ['Session: ', session_evoked.condition(cn).session ', Target = ' ...
                 session_evoked.condition(cn).target ', '  ...
-                'Block ' num2str(cfg_conditions(cn).block) ', '];
+                'Perturb ' num2str(cfg_conditions(cn).perturbation_group{1}) ', '];
             if cfg_conditions(cn).choice == 0
                 plottitle = [plottitle 'Instructed trials'];
             else
@@ -395,6 +394,8 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
     % save mat files
     %save(fullfile(results_folder_evoked, 'cfg_conditions.mat'), 'cfg_conditions');
     save(fullfile(results_folder_evoked, ['LFP_evoked_' session_evoked.condition(cn).session '.mat']), 'session_evoked');
+    % save settings file
+    save(fullfile(results_folder_evoked, 'lfp_tfa_settings.mat'), 'lfp_tfa_cfg');
 %     save(fullfile(results_folder_tfr, 'lfp_tfa_cfg.mat'), 'lfp_tfa_cfg');
 end
         
