@@ -18,6 +18,9 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
         mkdir(lfp_tfa_cfg.root_results_fldr);
     end
     
+    % get compare conditions
+    lfp_tfa_cfg.conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg);
+    
     % load states
     %lfp_tfa_cfg.all_states = lfp_tfa_define_states();
     % first read in the information about states

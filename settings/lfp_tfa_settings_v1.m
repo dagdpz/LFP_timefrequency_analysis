@@ -21,9 +21,14 @@ lfp_tfa_cfg.use_datasets = [31];
 
 % file list
 lfp_tfa_cfg.file_list = ...
-    {'Magnus', '20190130', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_inactivation_20190130\sites_Magnus_20190130.mat';
-    'Magnus', '20190213', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_control_20190213\sites_Magnus_20190213.mat'; 
-    'Magnus', '20190320', 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_control_20190320\sites_Magnus_20190320.mat'};
+    {'Magnus', '20190124', '';
+    'Magnus', '20190314', ''};
+%     'Magnus', '20190131', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_control_20190131\sites_Magnus_20190131.mat';
+%     'Magnus', '20190213', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_control_20190213\sites_Magnus_20190213.mat';
+%     };
+%     'Magnus', '20190130', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_inactivation_20190130\sites_Magnus_20190130.mat';
+%     'Magnus', '20190213', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_control_20190213\sites_Magnus_20190213.mat'; 
+%     'Magnus', '20190320', 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_control_20190320\sites_Magnus_20190320.mat'};
 %     'Lin', '20170707', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170707.mat';
 %     'Lin', '20170713', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170713.mat';
 %     'Lin', '20170720', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170720.mat';
@@ -95,7 +100,7 @@ lfp_tfa_cfg.baseline_use_choice_trial = 0;
 % which type of trials (instructed / choice) trials to analyze
 lfp_tfa_cfg.compare.types = [4];
 lfp_tfa_cfg.compare.effectors = [6];
-lfp_tfa_cfg.compare.targets = 'auto'; % 'auto' to automatically select
+lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L'}; % 'auto' to automatically select for session
 lfp_tfa_cfg.compare.choice_trials = 0; % 0 = only instructed, [0, 1] = both choice and instructed
 lfp_tfa_cfg.compare.reach_hands = {'R', 'L'}; % for future use
 lfp_tfa_cfg.compare.reach_spaces = {'R', 'L'}; % for future use

@@ -52,10 +52,10 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
     
     % struct to save data
     state_lfp = struct();
-    % struct to save noise rejected data
-    state_filt_lfp = struct();
     
-    %usable_sites_table = lfp_tfa_cfg.sites_info;
+    if ~isempty(lfp_tfa_cfg.sites_info)
+       usable_sites_table = lfp_tfa_cfg.sites_info;
+    end
     
     % save data inside struct 
     % first loop through each site

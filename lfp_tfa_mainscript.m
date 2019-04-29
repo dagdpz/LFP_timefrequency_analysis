@@ -38,6 +38,9 @@ try
         lfp_tfa_cfg.data_filepath = lfp_datafiles{i};
         % load the LFP for one session
         session_lfp(i).sites = load(lfp_tfa_cfg.data_filepath);
+%         session_proc_lfp(i).monkey = file_list{i,1};
+%         session_proc_lfp(i).date = file_list{i,2};
+%         session_proc_lfp(i).session = session_name;
         session_proc_lfp(i).sites = lfp_tfa_process_LFP(session_lfp(i).sites, lfp_tfa_cfg);
         session_proc_lfp(i).sites = lfp_tfa_reject_noisy_lfp(session_proc_lfp(i).sites, lfp_tfa_cfg.noise);
         session_proc_lfp(i).sites = lfp_tfa_compute_baseline_power(session_proc_lfp(i).sites, lfp_tfa_cfg);
