@@ -1,6 +1,36 @@
 function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
-%lfp_tfa_define_settings - Function to define LFP TFA settings 
-%   Detailed explanation goes here
+%lfp_tfa_define_settings - Function to define LFP time frequency analysis settings 
+%
+% USAGE:
+%	lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
+%
+% INPUTS:
+%       settings_filepath         - absolute path to the matlab script file
+%       where LFP TFA settings are defined, see settings/lfp_tfa_settings
+%       maxsites                  - maximum number of sites to be analysed per session,
+%       set to infinity to analyse all sites
+%
+% OUTPUTS:
+%		lfp_tfa_cfg               - structure containing all settings
+%
+% REQUIRES:	lfp_tfa_read_info_file, lfp_tfa_compare_conditions,
+% lfp_tfa_define_states, lfp_tfa_define_epochs
+%
+% See also settings/lfp_tfa_settings, lfp_tfa_read_info_file, lfp_tfa_compare_conditions,
+% lfp_tfa_define_states, lfp_tfa_define_epochs
+%
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     lfp_tfa_global_define_states;    
 

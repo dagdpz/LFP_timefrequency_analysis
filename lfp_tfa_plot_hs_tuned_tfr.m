@@ -91,9 +91,7 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
 %                 xticklabels = [];
             for so = state_onsets
                 line([so so], ylim, 'color', 'k'); 
-                state = avg_tfr(state_onsets == so, hs).state;
-                state_name = lfp_tfa_cfg.all_states([lfp_tfa_cfg.all_states.state_ID] ...
-                    == state).state_name;
+                state_name = avg_tfr(state_onsets == so, hs).state_name;
                 text(so, 10, state_name);
             end
             set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 8)

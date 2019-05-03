@@ -4,7 +4,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 % different hand-space tuning conditions for each site and across sites
 %
 % USAGE:
-%	[ cond_based_tfs ] = lfp_tfa_plot_average_tfr( sites_lfp_folder, analyse_states, lfp_tfa_cfg )
+%	[ session_tfs ] = lfp_tfa_plot_average_tfr( sites_lfp_folder, analyse_states, lfp_tfa_cfg )
 %
 % INPUTS:
 %		states_lfp  	- folder containing lfp data, output from
@@ -20,7 +20,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 %           'relchange')
 %           results_folder                      - folder to save results
 % OUTPUTS:
-%		cond_based_tfs	- output structure which saves the average tfs for  
+%		session_tfs    	- output structure which saves the average tfs for  
 %                         trials of a given condition for different handspace 
 %                         tunings and periods around the states analysed
 %                         same datastructure as input ft_data_sites, but
@@ -165,13 +165,13 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             mkdir(site_results_folder);
         end
         sites_tfr(i).condition = struct();
+        sites_tfr(i).site_ID = states_lfp(i).site_ID;
+        sites_tfr(i).session = states_lfp(i).session;
+        sites_tfr(i).target = states_lfp(i).target;
         % flag to indicate if this site should be used for
         % averaging based on minimum no:of trials per condition
         sites_tfr(i).use_for_avg = 1;
         for cn = 1:length(site_conditions)
-            
-            % states to be analysed
-        %     analyse_states = {states_lfp(1).states.name};
 
             % hand-space tuning of LFP
             hs_labels = site_conditions(cn).hs_labels;
@@ -195,10 +195,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             % consider site based on recorded hemispace
             sites_tfr(i).condition(cn).label = site_conditions(cn).label;
             sites_tfr(i).condition(cn).cfg_condition = site_conditions(cn);
-            %if strcmp(states_lfp(i).target, cfg_conditions(cn).target) 
-            sites_tfr(i).site_ID = states_lfp(i).site_ID;
-            sites_tfr(i).session = states_lfp(i).session;
-            sites_tfr(i).target = states_lfp(i).target;
+            %if strcmp(states_lfp(i).target, cfg_conditions(cn).target)             
             % make a struct for concatenating TFR for all states
             sites_tfr(i).condition(cn).hs_tuned_tfs = struct(); 
             %cond_based_tfs(i).tfs_avg_site.powspctrm = cell(length(analyse_states),length(hs_labels));
@@ -230,7 +227,12 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 end
                 % loop through trials 
 
-                for st = 1:length(analyse_states)
+                for st = 1:size(analyse_states, 1)
+                    state_id = analyse_states{st, 1};
+                    state_name = analyse_states{st, 2};
+                    state_ref_tstart = analyse_states{st, 3};
+                    state_ref_tend = analyse_states{st, 4};
+                    
                     state_tfs.powspctrm = {}; % power spectrogram
                     state_tfs.time = {}; % timebins fo spectrogram
                     state_tfs.freq = {}; % freq bins
@@ -239,11 +241,11 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 
                         states          = states_lfp(i).trials(t).states;
                         state_onset_t   = states([states(:).id] == ...
-                            analyse_states{st}).onset_t;
+                            state_id).onset_t;
                         state_start_t   = states([states(:).id] == ...
-                            analyse_states{st}).start_t;
+                            state_id).onset_t + state_ref_tstart;
                         state_end_t     = states([states(:).id] == ...
-                            analyse_states{st}).end_t;
+                            state_id).onset_t + state_ref_tend;
                         % sampling frequency
                         fs = states_lfp(i).trials(t).fsample;
 
@@ -296,7 +298,8 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq = state_tfs.freq{1}; 
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).cfg = state_tfs.cfg;
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).hs_label = hs_labels(hs);
-                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state = analyse_states{st};
+                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state = state_id;
+                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state_name = state_name;
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).trials = find(cond_trials);
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).ntrials = length(find(cond_trials));
                     end
@@ -387,7 +390,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                             %for i = 1:length(cond_based_tfs(cn).sites)
 
                             for hs = 1:length(hs_labels)
-                                for st = 1:length(analyse_states)                        
+                                for st = 1:size(lfp_tfa_cfg.analyse_states, 1)                        
                                     if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm)
                                         if isite == 1%~isfield(cond_based_tfs(cn).tfs_avg_session(st, hs), 'powspctrm')
                                             session_avg(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
@@ -419,6 +422,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).freq = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq;
                                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).hs_label = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).hs_label;
                                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).state = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state;
+                                        session_avg(t).condition(cn).hs_tuned_tfs(st, hs).state_name = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state_name;
                                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).cfg = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).cfg;
                                         %session_tfs(t).condition(cn).hs_tuned_tfs(st, hs).nsites = nsites;
                                         session_avg(t).condition(cn).cfg_condition = site_conditions(cn);
@@ -437,7 +441,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             % average TFR across sites for a session
             if isfield(session_avg(t).condition(cn).hs_tuned_tfs, 'powspctrm') 
                 for hs = 1:length(hs_labels)
-                    for st = 1:length(analyse_states)
+                    for st = 1:size(analyse_states,1)
                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
                             session_avg(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm / isite;
                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).nsites = isite;

@@ -1,28 +1,45 @@
 function [ session_proc_lfp_out ] = lfp_tfa_compute_baseline_power( session_lfp_in, cfg_tfs )
 
-% computeBaseline - Computes mean and stddev of baseline power according to
+% lfp_tfa_compute_baseline_power - Computes mean and stddev of baseline power according to
 % the given configuration
 %
 % USAGE:
-%	[ sites_lfp_folder, baseline ] = lfp_tfa_compute_baseline_power( sites_lfp_folder, cfg_tfs )
+%	session_proc_lfp_out = lfp_tfa_compute_baseline_power( session_lfp_in, cfg_tfs )
 %
 % INPUTS:
-%		sites_lfp_folder      - folder containing LFP data strcture for all
-%		sites
-%       cfg_tfs         - configuration structure for baseline computation
-%           baseline_refstate   : reference state for baseline
-%           baseline_period     : period around the reference state to be
+%		sites_lfp_folder        - struct containing LFP data strcture for all
+%		sites for one session, output of lfp_tfa_reject_noisy_lfp or
+%		lfp_tfa_process_lfp
+%       cfg_tfs                 - configuration structure for baseline computation
+%           Required Fields: see lfp_tfa_settings
+%           baseline_refstate           - reference state for baseline
+%           baseline_period             - period around the reference state to be
 %           considered for baseline computation
-%           baseline_block      : block to be considered for baseline
+%           baseline_perturbation       - perturbation group to be considered for baseline
 %           calculation
-%           use_choice_trial    : 1/0 whether to consider choice trials (1)
+%           baseline_use_choice_trial   - 1/0 whether to consider choice trials (1)
 %           or instructed trials (0) for baseline computation
 % OUTPUTS:
-%		sites_lfp_folder      - folder to which the results are updated,
-%		same as input data folder
-%       baseline        - struct which saves the baseline mean and stddev for each site and 
-%       configuration used for baseline calculation
-% See also lfp_tfa_reject_noisy_trials
+%		session_proc_lfp_out      - same as input struct with additional
+%		fields
+%           baseline_mean   - mean spectral power in baseline period
+%           baseline_std    - standard dev LFP spectral power in baseline
+%           perios
+%
+% See also lfp_tfa_reject_noisy_lfp, lfp_tfa_process_lfp, lfp_tfa_settings,
+% 
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % struct for storing results
     session_proc_lfp_out = session_lfp_in;

@@ -1,6 +1,50 @@
 function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin )
-%UNTITLED6 Summary of this function goes here
-%   Detailed explanation goes here
+%lfp_tfa_compare_conditions  - Create conditions to compare by permuting
+%the compare conditions in the settings
+%
+% USAGE:
+%	cmp_conditions = lfp_tfa_compare_conditions( lfp_tfa_cfg )
+%
+% INPUTS:
+%		lfp_tfa_cfg     - struct containing the required settings
+%           Required Fields: see lfp_tfa_settings
+%               1. compare.type                 - trial types to be compared
+%               2. compare.effector             - trial effectors to be compared
+%               3. compare.choice               - trial choices to be compared
+%               (0 = instructed, 1 = choice trial)
+%               4. compare.perturbation         - perturbations to be compared
+%               (0 = preinjection, 1 = postinjection)
+%               5. compare.perturbation_groups  - perturbation_groups for
+%               pre and post injection (typically 0 for pre and same as
+%               block number for post)
+%               6. compare.reach_hands          - hand labels to compare
+%               ('R' = right, 'L' = left)
+%               7. compare.reach_spaces         - space labels to compare
+%               ('R' = right, 'L' = left)
+%               8. ref_hemisphere               - reference hemisphere for
+%               hand-space labelling ('R' or 'L', typically, the inactivated
+%               hemisphere)
+% OUTPUTS:
+%		cmp_conditions      - structure containing conditions to compare, a
+%		permutation of all given comparison conditions
+%
+% REQUIRES:	
+%
+% See also lfp_tfa_settings, lfp_tfa_define_settings
+%
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
+
     task_types = lfp_tfa_cfg.compare.types;
     effectors = lfp_tfa_cfg.compare.effectors;
     targets = lfp_tfa_cfg.compare.targets;
