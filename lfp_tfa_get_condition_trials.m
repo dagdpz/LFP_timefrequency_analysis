@@ -16,18 +16,7 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
         cond_trials = cond_trials & ...
             ([site_lfp.trials.choice_trial] == condition.choice);
     end
-    % filter by hand
-%                     if ~isnan(cfg_conditions(cn).reach_hand)
-%                         cond_trials = cond_trials & ...
-%                             ([states_lfp(i).trials.reach_hand] == ...
-%                             cfg_conditions(cn).reach_hand);
-%                     end
-%                     % filter by space
-%                     if ~isnan(cfg_conditions(cn).reach_space)
-%                         cond_trials = cond_trials & ...
-%                             ([states_lfp(i).trials.reach_space] == ...
-%                             cfg_conditions(cn).reach_space);
-%                     end
+    
     % filter by perturbation
     perturbations = [site_lfp.trials.perturbation];
     postinj_perturb = unique(perturbations(perturbations ~= 0));
@@ -55,9 +44,3 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
         cond_trials_perturb = ones(1, length(site_lfp.trials));
     end
     cond_trials = cond_trials & cond_trials_perturb;
-%                     if ~isnan(cfg_conditions(cn).block)
-%                         for b = cfg_conditions(cn).block
-%                             cond_trials = cond_trials | ...
-%                                 ([states_lfp(i).trials.block] == b);
-%                         end
-%                     end
