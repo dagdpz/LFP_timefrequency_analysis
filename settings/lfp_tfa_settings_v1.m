@@ -19,7 +19,7 @@ lfp_tfa_cfg.info_filepath = 'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_wo
 % dataset to be used
 lfp_tfa_cfg.use_datasets = [31];
 
-% file list
+% file list format ???
 lfp_tfa_cfg.file_list = ...
     {'Magnus', '20190124', '';
     'Magnus', '20190314', ''};
