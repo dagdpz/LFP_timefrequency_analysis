@@ -18,6 +18,8 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
 %               3. compare.reach_spaces         - space labels to compare
 %       plottitle       - title for the plot
 %       results_file    - path to filename to store the resulting image
+%       varargin        - colormap to be used (default = 'jet', can be any 
+%       standard colormap additionally supported is 'bluewhitered')
 %
 % REQUIRES:	bluewhitered
 %
