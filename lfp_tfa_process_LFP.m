@@ -1,13 +1,14 @@
 function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
 
-% lfp_tfa_read_LFP - function to read in the processed lfp and
+% lfp_tfa_process_LFP - function to read in the processed lfp and
 % compute the time frequency spectrogram for each trial
 %
 % USAGE:
-%	states_lfp = lfp_tfa_create_ft_datatype( session_filename, all_states, ...
-%       maxsites, root_results_fldr )
+%	state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
 %
 % INPUTS:
+%       session_lfp         - structure containing raw LFP data for one
+%       session
 %       lfp_tfa_cfg         - structure containing configurations for
 %       reading LFP data and calculating spectrograms
 %       Required fields: 

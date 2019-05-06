@@ -1,7 +1,38 @@
 function [ diff_tfr ] = lfp_tfa_compute_diff_tfr( lfp_tfr, lfp_tfa_cfg )
 %lfp_tfa_compute_diff_tfr - function to compute the difference in time freq
 %response between control and inactivation trials
-%   Detailed explanation goes here
+%
+% USAGE:
+%	diff_tfr = lfp_tfa_compute_diff_tfr( lfp_tfr, lfp_tfa_cfg )
+%
+% INPUTS:
+%       lfp_tfr         - struct containing the condition-based average LFP time freq spectrogram
+%       for individual sites or average across sites or average across
+%       sessions, see lfp_tfa_site_average_tfr,
+%       lfp_tfa_avg_tfr_across_sessions, lfp_tfa_avg_across_sites
+%		lfp_tfa_cfg     - struct containing the required settings
+%
+% OUTPUTS:
+%		diff_tfr        - struct containing the condition-based LFP time freq spectrogram
+%       average difference between post and pre injection
+%
+% REQUIRES:	
+%
+% See also lfp_tfa_site_average_tfr, lfp_tfa_avg_tfr_across_sessions, lfp_tfa_avg_across_sites 
+%
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
+
     diff_tfr = struct();
     %npostinj_conditions = npreinj_condtions;
     for dcn = 1:2:length(lfp_tfr.condition)-1
@@ -15,6 +46,10 @@ function [ diff_tfr ] = lfp_tfa_compute_diff_tfr( lfp_tfr, lfp_tfa_cfg )
         postinj_tfr = lfp_tfr.condition(dcn + 1);
         if isempty(postinj_tfr.hs_tuned_tfs)
             diff_tfr.difference(dcn) = postinj_tfr;
+            continue;
+        end
+        
+        if ~isfield(postinj_tfr.hs_tuned_tfs, 'powspctrm') || ~isfield(preinj_tfr.hs_tuned_tfs, 'powspctrm')
             continue;
         end
         % change the condition label

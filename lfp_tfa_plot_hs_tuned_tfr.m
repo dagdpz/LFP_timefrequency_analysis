@@ -1,6 +1,44 @@
 function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file, varargin )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%lfp_tfa_plot_hs_tuned_tfr  - Plots the LFP time frequency spectrogram 
+%averages for different hand-space conditions to be compared
+%
+% USAGE:
+%   lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file )
+%   lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file, 'bluewhitered' )
+%
+%
+% INPUTS:
+%       avg_tfr         - average LFP time frequency response for different
+%       hand-space conditions to be compared
+%		lfp_tfa_cfg     - struct containing the required settings
+%           Required Fields: see lfp_tfa_settings
+%               1. baseline_method             - method used for baseline
+%               normalization
+%               2. compare.reach_hands          - hand labels to compare
+%               3. compare.reach_spaces         - space labels to compare
+%       plottitle       - title for the plot
+%       results_file    - path to filename to store the resulting image
+%       varargin        - colormap to be used (default = 'jet', can be any 
+%       standard colormap additionally supported is 'bluewhitered')
+%
+% REQUIRES:	bluewhitered
+%
+% See also lfp_tfa_settings, lfp_tfa_plot_site_average_tfr, 
+% lfp_tfa_avg_tfr_across_sessions, lfp_tfa_avg_tfr_across_sites, 
+% bluewhitered, lfp_tfa_define_settings
+%
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
     
     figure;    
     
@@ -70,15 +108,6 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
             nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
             nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
             subplot(nhandlabels, nspacelabels, hs)
-            cfg = [];
-%                 cfg.baseline     = 'no'; %baseline_shift;                 % -400ms to -100ms before the onset of first state
-%                 cfg.maskstyle    = 'saturation';
-%                 cfg.interactive  = 'no';
-%                 cfg.zlim         = [-1 1];
-            cfg.channel  = concat_states_tfs.label;
-%                 subplot(2,2,hs)
-            %ft_singleplotTFR(cfg, concat_states_tfs);
-            %Z = zeros(size(squeeze(concat_states_tfs.powspctrm)));
             imagesc(concat_states_tfs.time, [1:numel(concat_states_tfs.freq)], squeeze(concat_states_tfs.powspctrm), [-1 1]);
             axis xy, cb = colorbar;
             set(get(cb,'title'),'string', cbtitle, 'fontsize',6);
@@ -91,9 +120,7 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
 %                 xticklabels = [];
             for so = state_onsets
                 line([so so], ylim, 'color', 'k'); 
-                state = avg_tfr(state_onsets == so, hs).state;
-                state_name = lfp_tfa_cfg.all_states([lfp_tfa_cfg.all_states.state_ID] ...
-                    == state).state_name;
+                state_name = avg_tfr(state_onsets == so, hs).state_name;
                 text(so, 10, state_name);
             end
             set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 8)

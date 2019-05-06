@@ -43,9 +43,6 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
     
     % struct to save info about noisz trials
     noisy_lfp_trials = struct();
-    noisy_lfp_trials.cfg = cfg_noise;
-    
-    states_filt_lfp = struct();
 
     % first, calculate the mean and std of length-wise concatenated LFP from
     % each site

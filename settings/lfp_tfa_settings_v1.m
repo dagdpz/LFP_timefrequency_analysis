@@ -23,19 +23,6 @@ lfp_tfa_cfg.use_datasets = [31];
 lfp_tfa_cfg.file_list = ...
     {'Magnus', '20190124', '';
     'Magnus', '20190314', ''};
-%     'Magnus', '20190131', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_control_20190131\sites_Magnus_20190131.mat';
-%     'Magnus', '20190213', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_control_20190213\sites_Magnus_20190213.mat';
-%     };
-%     'Magnus', '20190130', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_inactivation_20190130\sites_Magnus_20190130.mat';
-%     'Magnus', '20190213', 'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_control_20190213\sites_Magnus_20190213.mat'; 
-%     'Magnus', '20190320', 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_control_20190320\sites_Magnus_20190320.mat'};
-%     'Lin', '20170707', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170707.mat';
-%     'Lin', '20170713', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170713.mat';
-%     'Lin', '20170720', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170720.mat';
-%     'Lin', '20170802', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170802.mat';
-%     'Lin', '20170804', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170804.mat';
-%     'Lin', '20170818', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170818.mat';
-%     'Lin', '20171012', 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20171012.mat'};
 
 lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results';
 
@@ -98,25 +85,31 @@ lfp_tfa_cfg.baseline_use_choice_trial = 0;
 %% Settings for averaging TFR and evoked LFP based on conditions
 
 % which type of trials (instructed / choice) trials to analyze
+lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L'}; 
 lfp_tfa_cfg.compare.types = [4];
 lfp_tfa_cfg.compare.effectors = [6];
-lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L'}; % 'auto' to automatically select for session
 lfp_tfa_cfg.compare.choice_trials = 0; % 0 = only instructed, [0, 1] = both choice and instructed
 lfp_tfa_cfg.compare.reach_hands = {'R', 'L'}; % for future use
 lfp_tfa_cfg.compare.reach_spaces = {'R', 'L'}; % for future use
 lfp_tfa_cfg.compare.perturbations = [0, 1]; % 0 = pre, 1 = post
 lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; % 'all', 'allbutone', 1xN int array
 
-% define the peristates to analyse
-% state id, state name, tbefore_onset(s), tafter_onset (s)
-lfp_tfa_cfg.analyse_states = {6, 62};
-%lfp_tfa_cfg.analyse_states = {6,    'Cue',      -1.0,   0.5;...
-%                              62,   'Reach',    -0.5,   0.5};
+% define the states to analyse for LFP TFR and evoked LFP response
+%lfp_tfa_cfg.analyse_states = {6, 62};
+% {state_id, state_name, ref_tstart, ref_tend}
+lfp_tfa_cfg.analyse_states = {6,    'Cue',      -1.0,   0.5;...
+                             62,   'Reach',    -0.5,   0.5};
 
-% lfp_tfa_cfg.add_conditions = [];
-% lfp_tfa_cfg.add_conditions(1).blocks = 'control'; % Analyse all inactivation blocks together
-% lfp_tfa_cfg.add_conditions(2).blocks = 'inactivation'; % Analyse all inactivation blocks together
-% Leave empty for block-wise analysis of all blocks
+% define the states to analyse for LFP power spectrum
+%lfp_tfa_cfg.analyse_states = {6, 62};
+% {state_id, state_name, ref_tstart, ref_tend}
+lfp_tfa_cfg.analyse_epochs = {6,    'FHol',    -0.3 ,    0  ;...
+                              6,    'Cue' ,    0.05 ,    0.2 ; ...
+                              8,    'EDel',    0.3 ,     0.6 ; ...
+                              4,    'Del',     -0.3 ,    0  ; ...
+                              62,   'PreR',    -0.3 ,    -0.05 ; ...
+                              63,   'PeriR',   -0.2 ,    0.2 ; ...
+                              20,   'THol',    -0.3 ,    0    };
 
 lfp_tfa_cfg.mintrials_percondition = 5;
 
