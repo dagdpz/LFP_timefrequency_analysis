@@ -29,12 +29,12 @@ lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_an
 % Specify events which mark trial start and end
 lfp_tfa_cfg.trialinfo = struct();
 lfp_tfa_cfg.trialinfo.start_state = lfp_tfa_states.FIX_ACQ;
-lfp_tfa_cfg.trialinfo.ref_tstart = -0.4;
+lfp_tfa_cfg.trialinfo.ref_tstart = -0.4; % s, start_state + ref_tstart will be taken
 lfp_tfa_cfg.trialinfo.end_state = lfp_tfa_states.REWARD;
 lfp_tfa_cfg.trialinfo.ref_tend = 0.6;
 
 % reference hemisphere for hand-space labelling
-lfp_tfa_cfg.ref_hemisphere = 'R';
+lfp_tfa_cfg.ref_hemisphere = 'R'; % can be 'R' or 'L'
 
 % maximum no:of sites to analyse from each session
 maxsites = inf; % inf = analyse all sites
@@ -49,7 +49,7 @@ lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
 lfp_tfa_cfg.tfr.taper           = [];
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
 lfp_tfa_cfg.tfr.tapsmofrq       = [];
-lfp_tfa_cfg.tfr.timestep        = 25; % x sampling time
+lfp_tfa_cfg.tfr.timestep        = 25; % number of lfp samples for one step 
 
 %% Settings to detect noisy trials
 % configuration for lfp noise rejection
@@ -79,7 +79,7 @@ lfp_tfa_cfg.baseline_ref_state = '';
 lfp_tfa_cfg.baseline_ref_period = 'trial'; 
 % which blocks to consider for baseline calculation
 lfp_tfa_cfg.baseline_perturbation = 0; 
-% whether to consider choice or instructed trials
+% whether to consider choice (1) or instructed trials (0)
 lfp_tfa_cfg.baseline_use_choice_trial = 0; 
 
 %% Settings for averaging TFR and evoked LFP based on conditions
