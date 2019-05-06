@@ -1,6 +1,38 @@
 function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_file )
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+%lfp_tfa_plot_evoked_lfp  - Plots the LFP evoked response
+%averages for different hand-space conditions to be compared
+%
+% USAGE:
+%   lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_file )
+%
+% INPUTS:
+%       evoked_lfp       - average LFP power spectrum for different
+%       hand-space conditions to be compared
+%		lfp_tfa_cfg      - struct containing the required settings
+%           Required Fields: see lfp_tfa_settings
+%               1. 
+%       plottitle        - title for the plot
+%       results_file     - path to filename to store the resulting image
+%
+% REQUIRES:	
+%
+% See also lfp_tfa_settings, lfp_tfa_plot_site_evoked_LFP, 
+% lfp_tfa_avg_evoked_LFP_across_sites, 
+% lfp_tfa_avg_evoked_LFP_across_sessions
+%
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
+
     figure;
 
     % loop through handspace
@@ -60,9 +92,9 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
 %                 xticklabels = [];
             for so = state_onsets
                 line([so so], ylim); 
-                state = evoked_lfp(state_onsets == so, hs).state;
-                state_name = lfp_tfa_cfg.all_states(...
-                    [lfp_tfa_cfg.all_states.state_ID] == state).state_name;
+                state_name = evoked_lfp(state_onsets == so, hs).state_name;
+%                 state_name = lfp_tfa_cfg.all_states(...
+%                     [lfp_tfa_cfg.all_states.state_ID] == state).state_name;
                 ypos = ylim;
                 ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;
                 text(so, ypos, state_name);

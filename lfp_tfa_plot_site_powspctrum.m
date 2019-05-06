@@ -1,35 +1,34 @@
 function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg ) 
 
-% lfp_tfa_plot_average_powspctrum  - plots lfp power spectrum for
-% different hand-space tuning conditions for each site and across sites
+% lfp_tfa_plot_average_powspctrum  - calculate and plot the average lfp power spectrum for
+% different hand-space tuning conditions for each site and across sites for
+% a session
 %
 % USAGE:
-%	[ session_pow ] = lfp_tfa_plot_average_powspctrum( sites_lfp_folder, lfp_tfa_cfg )
+%	[ session_pow ] = lfp_tfa_plot_average_powspctrum( states_lfp, lfp_tfa_cfg )
 %
 % INPUTS:
 %		states_lfp  	- structure containing processed lfp data for all
 %		sites of one session, output of lfp_tfa_process_lfp or
 %		lfp_tfa_reject_noisy_lfp or lfp_tfa_compute_baseline_power
-%       lfp_tfa_cfg     - struct containing configuration for TFR 
-%           Required fields:
-%           trial_condition.blocks              - blocks to be analysed, 
-%           leave empty to analyse each block separately
-%           trial_condition.baseline_method     - method to be used for 
-%           baseline normalization ('zscore', 'subtraction', 'division',
-%           'relchange')
-%           results_folder                      - folder to save results
-%
+%       lfp_tfa_cfg     - struct containing configuration for LFP TFR analysis 
+%           Required fields: see settings\lfp_tfa_settings
+%               session_results_fldr            - folder to which the
+%               results of the session should be saved
+%               mintrials_percondition          - minimum number of trials
+%               required per condition for considering the site for
+%               averaging
+%               analyse_epochs                  - epochs to analyse 
+%               
 % OUTPUTS:
-%		session_pow     - output structure which saves the average power spectrum for  
-%                         trials of a given condition for different handspace 
-%                         tunings and periods around the states analysed
-%                         same datastructure as input ft_data_sites, but
-%                         with additional field to store condition-wise lfp
-%                         time freq response		
+%		session_pow     - output structure which saves the average LFP power spectrum for  
+%       trials of a given condition for different handspace 
+%       tunings and periods around the epochs analysed
 %
+% REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_plot_hs_tuned_psd
 %
-%
-% See also lfp_tfa_compute_baseline, lfp_tfa_define_states
+% See also lfp_tfa_process_lfp, lfp_tfa_settings,
+% lfp_tfa_compare_conditions, lfp_tfa_plot_hs_tuned_psd
     
     % suppress warning for xticklabel
     warning ('off', 'MATLAB:hg:willberemoved');
@@ -40,119 +39,6 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     if ~exist(results_folder_psd, 'dir')
         mkdir(results_folder_psd);
     end
-    
-%     states_lfp = struct();
-%     load site lfps
-%     site_lfp_files = dir([sites_lfp_folder, '\*.mat']);
-%     for i = 1:length( site_lfp_files )
-%         load(fullfile(sites_lfp_folder, site_lfp_files(i).name));
-%         if i == 1
-%             states_lfp = site_lfp;
-%         else
-%             states_lfp = [states_lfp, site_lfp];
-%         end
-%     end
-    
-%     recorded_hemisphere = unique([states_lfp.recorded_hemisphere]);
-%     choice = unique([states_lfp(1).trials.choice_trial]);
-%     perturbation = unique([states_lfp(1).trials.perturbation]);
-%     blocks = unique([states_lfp(1).trials.block]);
-%     
-%     % create conditions
-%     cfg_conditions = struct();
-%        
-%     i = 0;
-%     for rec_hem = recorded_hemisphere        
-%         for c = choice
-%             for b = blocks
-%                 i = i + 1;
-%                 cfg_conditions(i).recorded_hemisphere = rec_hem;
-%                 cfg_conditions(i).choice = c;
-%                 cfg_conditions(i).block = b;
-%                 cfg_conditions(i).perturbation = ...
-%                     unique([states_lfp(1).trials([states_lfp(1).trials.block] == b).perturbation]);
-%                 cond_label = [];
-%                 if cfg_conditions(i).recorded_hemisphere == 'L'
-%                     cond_label = [cond_label 'Left_hemisphere_'];
-%                 else
-%                     cond_label = [cond_label 'Right_hemisphere_'];
-%                 end
-%                 if cfg_conditions(i).choice == 0
-%                     cond_label = [cond_label 'Instructed_'];
-%                 else
-%                     cond_label = [cond_label 'Choice_'];
-%                 end
-%                 if cfg_conditions(i).perturbation == 0
-%                     cond_label = [cond_label 'Control_'];
-%                 else
-%                     cond_label = [cond_label 'Inactivation_'];
-%                 end
-%                 cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
-%                 cfg_conditions(i).label = cond_label;
-%                 
-%                 % create a folder for storing results for this condition
-% %                 cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
-% %                 if ~exist(cfg_conditions(i).results_folder, 'dir')
-% %                     mkdir(cfg_conditions(i).results_folder)
-% %                 end
-%                                 
-%             end
-%         end
-%     end
-%     
-%     
-%     if isfield(lfp_tfa_cfg, 'add_conditions')
-%         for c = 1:length(lfp_tfa_cfg.add_conditions)
-%             if ~isempty(lfp_tfa_cfg.add_conditions(c))
-%                 if ~isempty(lfp_tfa_cfg.add_conditions(c).blocks)
-%                     for rec_hem = recorded_hemisphere        
-%                         for ch = choice
-%                             i = i + 1;
-%                             if strcmp(lfp_tfa_cfg.add_conditions(c).blocks, 'inactivation')
-%                                 cfg_conditions(i).block = blocks(perturbation ~= 0);
-%                                 cfg_conditions(i).perturbation = 1;
-%                             else
-%                                 cfg_conditions(i).block = lfp_tfa_cfg.add_conditions(c).blocks;
-%                                 cfg_conditions(i).perturbation = perturbation(blocks == lfp_tfa_cfg.add_conditions(c).blocks(1));
-%                                 
-%                             end                    
-%                             cfg_conditions(i).choice = ch;
-%                             if isfield(lfp_tfa_cfg.add_conditions(c), 'perturbation')
-%                                 cfg_conditions(i).perturbation = lfp_tfa_cfg.add_conditions(c).perturbation;
-%                             end
-%                             cfg_conditions(i).recorded_hemispace = rec_hem;
-%                             cond_label = [];
-%                             if cfg_conditions(i).recorded_hemispace == 'L'
-%                                 cond_label = [cond_label 'Left_hemispace_'];
-%                             else
-%                                 cond_label = [cond_label 'Right_hemispace_'];
-%                             end
-%                             if cfg_conditions(i).choice == 0
-%                                 cond_label = [cond_label 'Instructed_'];
-%                             else
-%                                 cond_label = [cond_label 'Choice_'];
-%                             end
-%                             if cfg_conditions(i).perturbation == 0
-%                                 cond_label = [cond_label 'Control_'];
-%                             else
-%                                 cond_label = [cond_label 'Inactivation_'];
-%                             end
-%                             cond_label = [cond_label, 'Block_', num2str(cfg_conditions(i).block)];
-%                             cfg_conditions(i).label = cond_label;
-%                             
-%                             % create a folder for storing results for this condition
-% %                             cfg_conditions(i).results_folder = fullfile(results_folder_tfr); %, cfg_conditions(i).label
-% %                             if ~exist(cfg_conditions(i).results_folder, 'dir')
-% %                                 mkdir(cfg_conditions(i).results_folder)
-% %                             end
-%                         end
-%                     end
-%                 end
-%             end
-%         end
-%     end
-    
-    %cfg_conditions = lfp_tfa_compare_conditions(states_lfp, lfp_tfa_cfg);
        
     % condition based TFS
     sites_pow = struct();
@@ -232,17 +118,26 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
 
                 % loop through trials 
 
-                for ep = 1:length(lfp_tfa_cfg.epochs)
+                for ep = 1:size(lfp_tfa_cfg.analyse_epochs, 1)
+                    epoch_refstate   = lfp_tfa_cfg.analyse_epochs{ep, 1};
+                    epoch_name       = lfp_tfa_cfg.analyse_epochs{ep, 2};
+                    epoch_reftstart  = lfp_tfa_cfg.analyse_epochs{ep, 3};
+                    epoch_reftend    = lfp_tfa_cfg.analyse_epochs{ep, 4};
+                    
                     epoch_tfs.psd = {}; % power spectrum
                     epoch_tfs.psd_f = {}; % power spectrum freq
 
                     for t = find(cond_trials)
 
-                        epochs          = states_lfp(i).trials(t).epochs;
+                        states          = states_lfp(i).trials(t).states;
+                        state_onset_t   = states([states(:).id] == ...
+                            epoch_refstate).onset_t;
                         %states          = states_lfp(i).trials(t).states;
-                        epoch_onset_t   = epochs(ep).onset_t;
-                        epoch_start_t   = epochs(ep).start_t;
-                        epoch_end_t     = epochs(ep).end_t;
+                        %epoch_onset_t   = epochs(ep).onset_t;
+                        epoch_start_t   = states([states(:).id] == ...
+                            epoch_refstate).onset_t + epoch_reftstart;
+                        epoch_end_t     = states([states(:).id] == ...
+                            epoch_refstate).onset_t + epoch_reftend;
                         % sampling frequency
                         %fs = states_lfp(i).trials(t).fsample;
 
@@ -265,7 +160,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq = epoch_tfs.psd_f;
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).trials = find(cond_trials);
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).hs_label = hs_labels(hs);
-                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).epoch_name = lfp_tfa_cfg.epochs(ep).name;
+                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).epoch_name = epoch_name;
 
                     end
 
@@ -335,7 +230,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
 
 
                     for hs = 1:length(hs_labels)
-                        for ep = 1:length(lfp_tfa_cfg.epochs)
+                        for ep = 1:size(lfp_tfa_cfg.analyse_epochs, 1)
                             if ~isempty(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean)
                                 
                                 if isite == 1
@@ -375,7 +270,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             % average TFR across sites for a session
             if isfield(session_avg(t).condition(cn).hs_tuned_power, 'mean')
                 for hs = 1:length(hs_labels)
-                    for ep = 1:length(lfp_tfa_cfg.epochs)
+                    for ep = 1:size(lfp_tfa_cfg.analyse_epochs, 1)
                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
                             session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean / isite;
                         session_avg(t).condition(cn).hs_tuned_tfs(ep, hs).nsites = isite;

@@ -94,11 +94,22 @@ lfp_tfa_cfg.compare.reach_spaces = {'R', 'L'}; % for future use
 lfp_tfa_cfg.compare.perturbations = [0, 1]; % 0 = pre, 1 = post
 lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; % 'all', 'allbutone', 1xN int array
 
-% define the states to analyse
+% define the states to analyse for LFP TFR and evoked LFP response
 %lfp_tfa_cfg.analyse_states = {6, 62};
 % {state_id, state_name, ref_tstart, ref_tend}
 lfp_tfa_cfg.analyse_states = {6,    'Cue',      -1.0,   0.5;...
                              62,   'Reach',    -0.5,   0.5};
+
+% define the states to analyse for LFP power spectrum
+%lfp_tfa_cfg.analyse_states = {6, 62};
+% {state_id, state_name, ref_tstart, ref_tend}
+lfp_tfa_cfg.analyse_epochs = {6,    'FHol',    -0.3 ,    0  ;...
+                              6,    'Cue' ,    0.05 ,    0.2 ; ...
+                              8,    'EDel',    0.3 ,     0.6 ; ...
+                              4,    'Del',     -0.3 ,    0  ; ...
+                              62,   'PreR',    -0.3 ,    -0.05 ; ...
+                              63,   'PeriR',   -0.2 ,    0.2 ; ...
+                              20,   'THol',    -0.3 ,    0    };
 
 lfp_tfa_cfg.mintrials_percondition = 5;
 

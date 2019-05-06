@@ -1,6 +1,36 @@
 function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results_file )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+%lfp_tfa_plot_hs_tuned_tfr  - Plots the LFP power spectrum 
+%averages for different hand-space conditions to be compared
+%
+% USAGE:
+%   lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results_file )
+%
+% INPUTS:
+%       avg_lfp_psd      - average LFP power spectrum for different
+%       hand-space conditions to be compared
+%		lfp_tfa_cfg      - struct containing the required settings
+%           Required Fields: see lfp_tfa_settings
+%               1. analyse_epochs - epochs to be analysed
+%       plottitle       - title for the plot
+%       results_file    - path to filename to store the resulting image
+%
+% REQUIRES:	
+%
+% See also lfp_tfa_settings, lfp_tfa_plot_site_powspctrm, 
+% lfp_tfa_avg_pow_across_sites, lfp_tfa_avg_pow_across_sessions
+%
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
     
     figure;
     cm = colormap('jet');
@@ -40,7 +70,7 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
                 end
             end
             title(subplottitle); 
-            legend({lfp_tfa_cfg.epochs.name});
+            legend({lfp_tfa_cfg.analyse_epochs{:,2}});
         end
     end
     
