@@ -17,7 +17,7 @@ lfp_tfa_cfg.version = 'SN_0.2';
 lfp_tfa_cfg.info_filepath = 'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\Lin_sorted_neurons.xls';
 
 % dataset to be used
-lfp_tfa_cfg.use_datasets = [31];
+lfp_tfa_cfg.use_datasets = [31]; %???
 
 % file list format ???
 lfp_tfa_cfg.file_list = ...
