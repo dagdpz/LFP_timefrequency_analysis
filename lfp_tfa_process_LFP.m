@@ -107,7 +107,13 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 end
                 
                 % reach hand
-                if reach_hand == 1, reach_hand = 'L'; else reach_hand = 'R'; end               
+                if reach_hand == 1
+                    reach_hand = 'L'; 
+                elseif reach_hand == 2
+                    reach_hand = 'R'; 
+                else
+                    reach_hand = 'N';  % no hand labeling
+                end               
                 
                 
                 % assign hand-space for the trial

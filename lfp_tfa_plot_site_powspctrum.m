@@ -68,27 +68,12 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             sites_pow(i).condition(cn).label = site_conditions(cn).label;
             sites_pow(i).condition(cn).cfg_cond = site_conditions(cn);
 
-            % states to be analysed
-        %     analyse_states = {states_lfp(1).states.name};
-
             % hand-space tuning of LFP
-            hs_labels = unique({states_lfp(1).trials.hndspc_lbl});
+            hs_labels = site_conditions(cn).hs_labels;
 
-            % current trial condition analysed
-            cfg_condition = site_conditions(cn);
-
-
-            % cell array to store time frequency average across sites
-            %TFR_avg = cell(length(analyse_states),length(hs_labels));
-
-            % loop through each site
-            nsites = length(states_lfp); 
-                 
-            
-            % consider site based on recorded hemispace
+            % store details of condition
             sites_pow(i).condition(cn).label = site_conditions(cn).label;
             sites_pow(i).condition(cn).cfg_condition = site_conditions(cn);
-            % make a struct for storing LFP power spectrum for all states
             sites_pow(i).condition(cn).hs_tuned_tfs = struct(); 
             sites_pow(i).condition(cn).ntrials = zeros(1,length(hs_labels));           
 
@@ -132,14 +117,12 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                         states          = states_lfp(i).trials(t).states;
                         state_onset_t   = states([states(:).id] == ...
                             epoch_refstate).onset_t;
-                        %states          = states_lfp(i).trials(t).states;
-                        %epoch_onset_t   = epochs(ep).onset_t;
                         epoch_start_t   = states([states(:).id] == ...
                             epoch_refstate).onset_t + epoch_reftstart;
                         epoch_end_t     = states([states(:).id] == ...
                             epoch_refstate).onset_t + epoch_reftend;
                         % sampling frequency
-                        %fs = states_lfp(i).trials(t).fsample;
+                        fs = states_lfp(i).trials(t).fsample;
 
                         % LFP power spectrum
                         epoch_powspctrm = states_lfp(i).trials(t).tfs.powspctrm(1, :, ...
@@ -167,12 +150,8 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 end
 
             end
-%             else
-%                 continue;
-% 
-%             end
             
-            % TFR
+            % plot site average
             if ~isempty(sites_pow(i).condition(cn).hs_tuned_power)
 
                 plottitle = ['Site ID: ', sites_pow(i).site_ID ...
@@ -211,7 +190,6 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     for t = 1:length(targets)
         session_avg(t).target = targets{t};
         for cn = 1:length(site_conditions)
-            %nsites = sum(contains({states_lfp.target}, site_conditions(cn).target));
             session_avg(t).condition(cn).hs_tuned_power = [];
             % variable to store no:of sites with trials satisfying this
             % condition
@@ -225,8 +203,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 if ~isempty(sites_pow(i).condition(cn).hs_tuned_power) && ...
                         isfield(sites_pow(i).condition(cn).hs_tuned_power, 'mean')
                     isite = isite + 1;
-                    % struct to store average evoked LFP across sites
-                    %cond_based_psd(cn).hs_tuned_power = struct();%cell(length(analyse_states),length(hs_labels));            
+                                
 
 
                     for hs = 1:length(hs_labels)

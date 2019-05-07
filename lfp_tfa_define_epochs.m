@@ -1,5 +1,5 @@
 function epochs = lfp_tfa_define_epochs()
-
+% TO be removed after testing
 % lfp_tfa_define_epochs - function which defines configuration for epochs 
 % of interest 
 %
@@ -16,24 +16,6 @@ function epochs = lfp_tfa_define_epochs()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     epochs = struct();
-
-    % Trial start
-    % all_states(1).state_ID = 1;
-    % all_states(1).state_name = 'trial_ini';
-    % all_states(1).state_desc = 'Initialization of a trial';
-    % all_states(1).tminus_onset = 0; % time to be considered for analysis before state onset
-    % all_states(1).tplus_onset = 0.5; % time to be considered for analysis after state onset
-    % 
-    % % Fixation acq
-    % all_states(2).state_ID = 2;
-    % all_states(2).state_name = 'fix_acq';
-    % all_states(2).state_desc = 'Fixation acquisition';
-
-    % % Fixation hold
-    % all_states(3).state_ID = 3;
-    % all_states(3).state_name = 'fix_hold';
-    % all_states(3).state_desc = 'Fixation hold';
-    % 
 
     % Fixation hold
     epochs(1).name = 'Fhol';
