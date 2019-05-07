@@ -32,35 +32,38 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    % define state IDs
     lfp_tfa_global_define_states;    
 
     % load the specified settings file
     run(settings_filepath);
     
-    % read info excel file
+    % read info excel file (Sorted neurons file)
     lfp_tfa_cfg.sites_info = lfp_tfa_read_info_file(lfp_tfa_cfg);
      
-%     lfp_tfa_cfg.data_folder = data_folder;
-    % create a folder to save results
+    % create a root folder to save results of the analysis
+    % root_results_folder = [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
+    % eg: 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\20190506\ver_SN_0.2'
     lfp_tfa_cfg.root_results_fldr = fullfile(lfp_tfa_cfg.results_folder, ...
         date, ['ver_' num2str(lfp_tfa_cfg.version)]);
     if ~exist(lfp_tfa_cfg.root_results_fldr, 'dir')
         mkdir(lfp_tfa_cfg.root_results_fldr);
     end
     
-    % get compare conditions
+    % get conditions to be included in the analysis
     lfp_tfa_cfg.conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg);
     
-    % load states
-    %lfp_tfa_cfg.all_states = lfp_tfa_define_states();
+    % load states - this will be removed after testing
+    % now loading directly from settings file
     % first read in the information about states
     all_states = lfp_tfa_define_states();
     lfp_tfa_cfg.all_states = all_states;
     
-    % load epochs
+    % load epochs - this will be removed after testing
+    % now loading directly from settings file
     lfp_tfa_cfg.epochs = lfp_tfa_define_epochs();
     
-    % maxsites
+    % maximum number of sites from each session to analyse
     if nargin > 2
         lfp_tfa_cfg.maxsites = maxsites;
     end
