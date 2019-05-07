@@ -56,14 +56,12 @@ function sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg)
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
             sessions_avg(t).condition(cn).avg_across_sessions = struct();
             nsessions = 0;
-            %sessions_avg(t).cond_based_tfs(cn).tfs_across_sessions = struct();
             for i = 1:length(lfp_pow.session)
                 for k = 1:length(lfp_pow.session(i).session_avg)
                     if strcmp(lfp_pow.session(i).session_avg(k).target, lfp_tfa_cfg.compare.targets{t})
                         if ~isempty(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power) && ... 
                             isfield(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power, 'mean')
                             nsessions = nsessions + 1;   
-                            %sessions_avg(t).cond_based_tfs(cn).tfs_across_sessions = struct();
                             for ep = 1:size(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power, 1)
                                 for hs = 1:size(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power, 2)
                                     if isfield(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs), 'mean') ...

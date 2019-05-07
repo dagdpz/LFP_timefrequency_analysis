@@ -51,7 +51,6 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
     if nargin > 1
         targets = varargin{1};
     end
-    %unique([states_lfp.recorded_hemispace]);
     if lfp_tfa_cfg.compare.choice_trials
         choices = unique([states_lfp(1).trials.choice_trial]);
     else
@@ -97,6 +96,7 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
     cmp_conditions = struct();
     
     i = 0;
+    % should clarify if target belongs to condition
     %for target = targets
         %target_label = target{1};
     for type = task_types
@@ -125,7 +125,6 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
                         ch_label, '_', p_label];
                     cmp_conditions(i).type = type;
                     cmp_conditions(i).effector = eff;
-                    %cmp_conditions(i).target = target{1};
                     cmp_conditions(i).choice = ch;
                     cmp_conditions(i).perturbation = perturbations(p);
                     cmp_conditions(i).perturbation_group = perturbation_groups(p);
@@ -133,8 +132,6 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
                     cmp_conditions(i).reach_hands = reach_hands;
                     cmp_conditions(i).reach_spaces = reach_spaces;
                     cmp_conditions(i).label = condition_label;
-%                             end
-%                         end
                 end
             end
         end

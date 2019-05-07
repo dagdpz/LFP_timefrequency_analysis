@@ -56,7 +56,6 @@ function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
             sites_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
             sites_avg(t).condition(cn).avg_across_sessions = struct();
             nsites = 0;
-            %sessions_avg.cond_based_tfs(cn).tfs_across_sessions = struct();
             for i = 1:length(lfp_pow.session)  
                 for j = 1:length(lfp_pow.session(i).sites)
                     if ~strcmp(lfp_pow.session(i).sites(j).target, lfp_tfa_cfg.compare.targets{t})
@@ -68,7 +67,6 @@ function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
                     if ~isempty(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power) && ... 
                         isfield(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power, 'mean')
                         nsites = nsites + 1;   
-                        %sessions_avg.cond_based_tfs(cn).tfs_across_sessions = struct();
                         for ep = 1:size(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power, 1)
                             for hs = 1:size(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power, 2)
                                 if isfield(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs), 'mean') ...

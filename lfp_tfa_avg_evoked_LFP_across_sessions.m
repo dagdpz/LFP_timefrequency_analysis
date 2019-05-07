@@ -57,14 +57,12 @@ function sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_t
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
             sessions_avg(t).condition(cn).avg_across_sessions = struct();
             nsessions = 0;
-            %sessions_avg(t).cond_based_tfs(cn).tfs_across_sessions = struct();
             for i = 1:length(lfp_evoked.session)
                 for k = 1:length(lfp_evoked.session(i).session_avg)
                     if strcmp(lfp_evoked.session(i).session_avg(k).target, lfp_tfa_cfg.compare.targets{t})
                         if ~isempty(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked) && ... 
                             isfield(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked, 'mean')
                             nsessions = nsessions + 1;   
-                            %sessions_avg(t).cond_based_tfs(cn).tfs_across_sessions = struct();
                             for st = 1:size(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked, 1)
                                 for hs = 1:size(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked, 2)
                                     if isfield(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs), 'mean') ...

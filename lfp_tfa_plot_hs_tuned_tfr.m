@@ -117,7 +117,6 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                 round(concat_states_tfs.freq([1:8:numel(concat_states_tfs.freq)])));
             % mark state onsets
             set(gca,'xtick',state_samples)
-%                 xticklabels = [];
             for so = state_onsets
                 line([so so], ylim, 'color', 'k'); 
                 state_name = avg_tfr(state_onsets == so, hs).state_name;
@@ -153,10 +152,8 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
     if nargin > 4
         cm = colormap(varargin{1});
         colorbar;
-        %end
     end
     
-    %cm = colormap('jet'); 
     cm(1,:,:) = [1,1,1];
     colormap(cm);
     

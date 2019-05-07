@@ -34,7 +34,6 @@ function [ diff_tfr ] = lfp_tfa_compute_diff_tfr( lfp_tfr, lfp_tfa_cfg )
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     diff_tfr = struct();
-    %npostinj_conditions = npreinj_condtions;
     for dcn = 1:2:length(lfp_tfr.condition)-1
         % initially load the pre-injection data structure
         preinj_tfr = lfp_tfr.condition(dcn);

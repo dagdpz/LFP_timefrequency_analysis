@@ -54,19 +54,17 @@ function sessions_avg = lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg)
             sessions_avg(t).condition(cn).hs_tuned_tfs = struct();
             sessions_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
             nsessions = 0;
-            %sessions_avg(t).condition(cn).tfs_across_sessions = struct();
             for i = 1:length(lfp_tfr.session)  
                 for k = 1:length(lfp_tfr.session(i).session_avg)
                     if strcmp(lfp_tfr.session(i).session_avg(k).target, lfp_tfa_cfg.compare.targets{t})
                         if ~isempty(lfp_tfr.session(i).session_avg(k).condition(cn).hs_tuned_tfs) && ... 
                             isfield(lfp_tfr.session(i).session_avg(k).condition(cn).hs_tuned_tfs, 'powspctrm')
                             nsessions = nsessions + 1;   
-                            %sessions_avg(t).condition(cn).tfs_across_sessions = struct();
                             for st = 1:size(lfp_tfr.session(i).session_avg(k).condition(cn).hs_tuned_tfs, 1)
                                 for hs = 1:size(lfp_tfr.session(i).session_avg(k).condition(cn).hs_tuned_tfs, 2)
                                     if isfield(lfp_tfr.session(i).session_avg(k).condition(cn).hs_tuned_tfs(st, hs), 'powspctrm') ...
                                             && ~isempty(lfp_tfr.session(i).session_avg(k).condition(cn).hs_tuned_tfs(st, hs).powspctrm)
-                                        if nsessions == 1%~isfield(sessions_avg(t).cond_based_tfs(cn).tfs_across_sessions, 'powspctrm')
+                                        if nsessions == 1
                                             sessions_avg(t).condition(cn).hs_tuned_tfs(st,hs).time ...
                                             = lfp_tfr.session(i).session_avg(k).condition(cn).hs_tuned_tfs(st, hs).time;
                                             sessions_avg(t).condition(cn).hs_tuned_tfs(st,hs).hs_label ...
