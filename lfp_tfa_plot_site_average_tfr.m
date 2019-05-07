@@ -259,12 +259,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                         if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs) && ... 
                             isfield(sites_tfr(i).condition(cn).hs_tuned_tfs, 'powspctrm')
                             isite = isite + 1;                                
-                            % struct to store average tfr across sites
-                            %cond_based_tfs(cn).tfs_avg_session = struct();
-                            %cell(length(analyse_states),length(hs_labels));
-
-                            %for i = 1:length(cond_based_tfs(cn).sites)
-
+                            
                             for hs = 1:length(hs_labels)
                                 for st = 1:size(lfp_tfa_cfg.analyse_states, 1)                        
                                     if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm)

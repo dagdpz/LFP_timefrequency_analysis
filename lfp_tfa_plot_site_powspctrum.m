@@ -190,7 +190,6 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     for t = 1:length(targets)
         session_avg(t).target = targets{t};
         for cn = 1:length(site_conditions)
-            %nsites = sum(contains({states_lfp.target}, site_conditions(cn).target));
             session_avg(t).condition(cn).hs_tuned_power = [];
             % variable to store no:of sites with trials satisfying this
             % condition
