@@ -34,7 +34,6 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     warning ('off', 'MATLAB:hg:willberemoved');
 
     % make a folder to save figures
-    %sessionName = states_lfp(1).session;
     results_folder_psd = fullfile(lfp_tfa_cfg.session_results_fldr, 'Condition_based_LFP_Power');
     if ~exist(results_folder_psd, 'dir')
         mkdir(results_folder_psd);

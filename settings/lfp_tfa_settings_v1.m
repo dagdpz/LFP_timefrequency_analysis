@@ -315,7 +315,7 @@ lfp_tfa_cfg.compare.perturbations = [0, 1];
 % 3. lfp_tfa_cfg.compare.perturbation_groups = {0, [2, 3, 4]}; 
 % consider trials with perturbation value = 0 for pre-injection and
 % perturbation value = 2, 3 or 4 for post injection
-lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; % 'all', 'allbutone', 1xN int array
+lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; 
 
 % define the time windows to analyse for LFP TFR and evoked LFP response
 % Must be a Nx4 cell array, N = number of windows to analyse
@@ -382,4 +382,12 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
 lfp_tfa_cfg.baseline_method = 'zscore';
     
 %% Settings for average across sessions
+
+% how to average the session averages
+% 'sessions' - average the session averages (a session average is the
+% average of site averages within a session)
+% 'sites' - average the site averages
+% Example: lfp_tfa_cfg.compute_avg_across = 'sites'
+% Example: lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'};  compute
+% both averages across session averages and across site averages
 lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'}; 

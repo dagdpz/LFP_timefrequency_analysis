@@ -41,7 +41,6 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
     warning ('off', 'MATLAB:hg:willberemoved');
 
     % make a folder to save figures
-    %sessionName = states_lfp(1).session;
     results_folder_tfr = fullfile(lfp_tfa_cfg.session_results_fldr, 'Condition_based_TFS');
     if ~exist(results_folder_tfr, 'dir')
         mkdir(results_folder_tfr);

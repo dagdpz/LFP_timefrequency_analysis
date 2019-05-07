@@ -75,7 +75,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 end
 
             end
-            %lfp_time = 1:1:length(concat_states_lfp.time);
+            
             state_onsets = find(concat_states_lfp.time(1:end-1) .* ...
                 concat_states_lfp.time(2:end) <= 0);
             state_samples = sort([state_info.start_s, state_info.onset_s, ...
@@ -89,10 +89,10 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             plot(concat_states_lfp.mean - concat_states_lfp.std, 'r--');
             % mark state onsets
             set(gca,'xtick',state_samples)
-%                 xticklabels = [];
             for so = state_onsets
                 line([so so], ylim); 
                 state_name = evoked_lfp(state_onsets == so, hs).state_name;
+                % commented - for further inspection and testing
 %                 state_name = lfp_tfa_cfg.all_states(...
 %                     [lfp_tfa_cfg.all_states.state_ID] == state).state_name;
                 ypos = ylim;
@@ -112,7 +112,6 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                     num2str(length(evoked_lfp(1, hs).trials)) ')'];            
             end
             title(subplottitle);
-            %line([0 0], ylim, 'color', 'k');
         end
     end
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...

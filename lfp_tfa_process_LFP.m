@@ -159,18 +159,14 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 
                 % calculate the TFR
                 cfg              = [];
-                cfg.method       = lfp_tfa_cfg.tfr.method;                
-                cfg.width        = lfp_tfa_cfg.tfr.width;
-%                 cfg.method       = 'mtmconvol';
-                cfg.taper        = lfp_tfa_cfg.tfr.taper;
-                cfg.pad          = 'nextpow2';
-                cfg.foi          = lfp_tfa_cfg.tfr.foi;   % analysis 2 to 100 Hz in steps of 2 Hz
-                %cfg.foi          = 2:2:120;
-                %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.2 sec
-                cfg.t_ftimwin    = lfp_tfa_cfg.tfr.t_ftimwin;           % 4 cycles per time window
-                %cfg.t_ftimwin    = ones(length(cfg.foi),1).*500*ts;    % length of time window = 0.5 sec
+                cfg.method       = lfp_tfa_cfg.tfr.method; % method used to calculate spectra             
+                cfg.width        = lfp_tfa_cfg.tfr.width; % width of wavelet in number of cycles
+                cfg.taper        = lfp_tfa_cfg.tfr.taper; % taper used
+                cfg.pad          = 'nextpow2'; % zero padding for FFT
+                cfg.foi          = lfp_tfa_cfg.tfr.foi;   % freqs of interest
+                cfg.t_ftimwin    = lfp_tfa_cfg.tfr.t_ftimwin;           % length of sliding time window for each foi
                 cfg.toi          = timestamps(1):lfp_tfa_cfg.tfr.timestep*ts:...
-                    timestamps(end);% time window "slides" from -0.5 to 1.5 sec in steps of 0.05 sec (50 ms)
+                    timestamps(end);% time window "slides" from start time to and time in steps of timestep number of LFP samples
                 cfg.channel      = ft_data_lfp.label;
                 TFR_wavelet      = ft_freqanalysis(cfg, ft_data_lfp);
 
@@ -194,7 +190,7 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 % lfp_tfa_reject_noisy_lfp.m
                 state_lfp(i).trials(comp_trial).noisy = 0;
     
-                % get state onset times and onset samples
+                % get state onset times and onset samples - test and delete
                 state_lfp(i).trials(comp_trial).states = struct();
                 if i > 1 && strcmp(state_lfp(i).session,  state_lfp(i-1).session)
                     state_lfp(i).trials(comp_trial).states = ...
@@ -229,7 +225,8 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                     end
                 end
                 
-                % get state onset times and onset samples
+                % get state onset times and onset samples - test and
+                % delete
                 state_lfp(i).trials(comp_trial).epochs = struct();
                 if i > 1 && strcmp(state_lfp(i).session,  state_lfp(i-1).session)
                     state_lfp(i).trials(comp_trial).epochs = ...
@@ -249,13 +246,6 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                             max(timestamps(1), epoch_onset + lfp_tfa_cfg.epochs(e).ref_period(1));
                         state_lfp(i).trials(comp_trial).epochs(e).end_t = ...
                             min(timestamps(end), epoch_onset + lfp_tfa_cfg.epochs(e).ref_period(2));
-    %                     site_lfp.trials(comp_trial).states(s).onset_s  = state_onset_sample;
-    %                     site_lfp.trials(comp_trial).states(s).start_s  = ...
-    %                         max(1, state_onset_sample - ...
-    %                         round(lfp_tfa_cfg.all_states(s).tminus_onset / ts));
-    %                     site_lfp.trials(comp_trial).states(s).end_s = ...
-    %                         min(length(timestamps), state_onset_sample + ...
-    %                         round(lfp_tfa_cfg.all_states(s).tminus_onset / ts));
 
                     end
                 end
@@ -265,7 +255,8 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 state_lfp(i).trials(comp_trial).trialperiod = [trial_start_t, ...
                     trial_end_t];
                 
-                % get baseline samples
+                % get baseline samples - shuld baseline be computed within
+                % processing - check and delete if not required
 %                 states_lfp(i).trials(comp_trial).baseline = struct();
 %                 states_lfp(i).trials(comp_trial).baseline.ref_t = ...
 %                     sites(i).trial(t).states_onset(sites(i).trial(t).states == baseline.ref_state);
@@ -281,7 +272,7 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
             end
         end
         
-        %%% Noise rejection %%%
+        %%% Noise rejection - should thi be included within processing check this%%%
         %state_filt_lfp(i) = lfp_tfa_reject_noisy_lfp( state_lfp(i), lfp_tfa_cfg.noise );
         
         % save data

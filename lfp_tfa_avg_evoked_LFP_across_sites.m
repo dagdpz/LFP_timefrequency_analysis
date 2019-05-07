@@ -56,7 +56,6 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
             sites_avg(t).condition(cn).hs_tuned_evoked = struct();
             sites_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
             nsites = 0;
-            %sessions_avg.cond_based_tfs(cn).tfs_across_sessions = struct();
             for i = 1:length(lfp_evoked.session) 
                 for j = 1:length(lfp_evoked.session(i).sites)
                     if ~strcmp(lfp_evoked.session(i).sites(j).target, lfp_tfa_cfg.compare.targets{t})
@@ -68,7 +67,6 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
                     if ~isempty(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked) && ... 
                         isfield(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked, 'mean')
                         nsites = nsites + 1;   
-                        %sessions_avg.cond_based_tfs(cn).tfs_across_sessions = struct();
                         for st = 1:size(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked, 1)
                             for hs = 1:size(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked, 2)
                                 if isfield(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs), 'mean') ...

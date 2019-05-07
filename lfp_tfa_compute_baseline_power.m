@@ -48,7 +48,6 @@ function [ session_proc_lfp_out ] = lfp_tfa_compute_baseline_power( session_lfp_
     fprintf('Computing baseline ...\n');
     
     % folder for saving results
-    %sessionName = states_lfp(1).session;
     root_results_folder = cfg_tfs.results_folder;
     results_folder = fullfile(root_results_folder);
     if ~exist(results_folder, 'dir')
@@ -86,7 +85,8 @@ function [ session_proc_lfp_out ] = lfp_tfa_compute_baseline_power( session_lfp_
         baseline_pow_std = nanstd(arr_baseline_pow, 0, 3);
         session_proc_lfp_out(i).baseline_mean = baseline_pow_mean;
         session_proc_lfp_out(i).baseline_std = baseline_pow_std;
-        
+
+        % store baseline power - commented for further inspection
 %         baseline.sites(i).mean = baseline_pow_mean;
 %         baseline.sites(i).std = baseline_pow_std;
         
@@ -94,12 +94,9 @@ function [ session_proc_lfp_out ] = lfp_tfa_compute_baseline_power( session_lfp_
         site_lfp = session_proc_lfp_out(i);
         save(fullfile(cfg_tfs.session_results_fldr, ...
             [site_lfp.site_ID, '.mat']), 'site_lfp');
-    end
+
+    end    
     
-    % save results
-    %save(fullfile(results_folder, 'states_lfp.mat'), 'states_lfp');
-    %save(fullfile(results_folder, 'baseline.mat'), 'baseline');
-    session_proc_lfp_out(i) = site_lfp;
     fprintf(' done\n');
     fprintf('=============================================================\n');
 end
