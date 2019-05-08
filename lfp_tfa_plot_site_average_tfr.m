@@ -1,7 +1,7 @@
 function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_states, lfp_tfa_cfg ) 
-% lfp_tfa_compute_plot_tfr  - compute and plot average lfp time freq response for
-% different hand-space tuning conditions for each site and across all sites
-% of a session
+% lfp_tfa_compute_plot_tfr  - compute and plot average lfp time freq
+% response for different hand-space tuning conditions for each site and
+% across all sites of a session
 %
 % USAGE:
 %	[ session_tfs ] = lfp_tfa_plot_average_tfr( sites_lfp_folder, analyse_states, lfp_tfa_cfg )
@@ -33,7 +33,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 % REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_plot_hs_tuned_tfr,
 % lfp_tfa_compute_diff_tfr, bluewhitered
 %
-% See also lfp_tfa_process_lfp, lfp_tfa_compute_baseline, 
+% See also lfp_tfa_process_lfp, lfp_tfa_compute_baseline_power, 
 % lfp_tfa_compare_conditions, lfp_tfa_compute_diff_tfr, 
 % lfp_tfa_plot_hs_tuned_tfr, bluewhitered
     
