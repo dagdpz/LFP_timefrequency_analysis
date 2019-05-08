@@ -46,18 +46,27 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     task_types = lfp_tfa_cfg.compare.types;
-    effectors = lfp_tfa_cfg.compare.effectors;
-    targets = lfp_tfa_cfg.compare.targets;
-    if nargin > 1
-        targets = varargin{1};
-    end
+    effectors = lfp_tfa_cfg.compare.effectors;    
     if lfp_tfa_cfg.compare.choice_trials
         choices = unique([states_lfp(1).trials.choice_trial]);
     else
         choices = lfp_tfa_cfg.compare.choice_trials;
     end
     perturbations = lfp_tfa_cfg.compare.perturbations;
-    perturbation_groups = lfp_tfa_cfg.compare.perturbation_groups;
+    % if different sessions have different perturbation groups
+    if nargin > 1
+        perturbation_groups = varargin{1};
+    % if perturbation groups are same for all sessions
+    elseif isfield(lfp_tfa_cfg.compare, 'perturbation_groups')
+        perturbation_groups = lfp_tfa_cfg.compare.perturbation_groups;
+        % default perturbation groups based on perturbation input
+    elseif sum (perturbations == [0, 1])
+        perturbation_groups = {0, 'all'};
+    elseif perturbations == 0
+        perturbation_groups = {0};
+    end
+    % commented on 08052019, each session has its own perturbation group
+    %perturbation_groups = lfp_tfa_cfg.compare.perturbation_groups;
     
     hands = lfp_tfa_cfg.compare.reach_hands;
     spaces = lfp_tfa_cfg.compare.reach_spaces;  

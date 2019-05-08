@@ -19,17 +19,24 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
     
     % filter by perturbation
     perturbations = [site_lfp.trials.perturbation];
-    postinj_perturb = unique(perturbations(perturbations ~= 0));
+    % commented on 08.05.2019, to be tested
+%     preinj_perturb = 0;
+%     postinj_perturb = unique(perturbations(perturbations ~= 0));
     cond_trials_perturb = zeros(1, length(site_lfp.trials));
     if ~isnan(condition.perturbation)
+        if condition.perturbation == 0 % pre-injection
+            perturbation_values = 0;
+        else % post-injection
+            perturbation_values = unique(perturbations(perturbations ~= 0));
+        end
         
         if strcmp(condition.perturbation_group, 'all')
-            for b = postinj_perturb
+            for b = perturbation_values
                 cond_trials_perturb = cond_trials_perturb | ...
                 ([site_lfp.trials.perturbation] == b);
             end
         elseif strcmp(condition.perturbation_group, 'allbutone')
-            for b = postinj_perturb(2:end)
+            for b = perturbation_values(2:end)
                 cond_trials_perturb = cond_trials_perturb | ...
                 ([site_lfp.trials.perturbation] == b);
             end

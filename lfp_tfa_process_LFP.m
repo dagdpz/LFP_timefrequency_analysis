@@ -38,7 +38,8 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
     
     close all; 
     
-%     % Read in LFP data for the session
+%     % Read in LFP data for the session - check if this is better than the
+%     current approach
 %     fprintf('Reading processed LFP data \n');
 %     session = load(lfp_tfa_cfg.data_filepath);
     
@@ -54,27 +55,30 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
     % struct to save data
     state_lfp = struct();
     
-    if ~isempty(lfp_tfa_cfg.sites_info)
-       usable_sites_table = lfp_tfa_cfg.sites_info;
-    end
+    % for future use
+%     usable_sites_table = table;
+%     if ~isempty(lfp_tfa_cfg.sites_info)
+%        usable_sites_table = lfp_tfa_cfg.sites_info;
+%     end
     
     % save data inside struct 
     % first loop through each site
     for i = 1:min(length(sites), lfp_tfa_cfg.maxsites)
+        % for future use
+        % find if this site's entry is available in usable_sites_table
 %         if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
 %                 sites(i).site_ID),:))
 %             continue;
 %         end
         fprintf('Processing site, %s\n', sites(i).site_ID);
-        %site_lfp = struct();
+        % for future use
+        % get 'Set' entry from usable_sites_table
 %         state_lfp(i).dataset = usable_sites_table(...
 %             strcmp(usable_sites_table.Site_ID, sites(i).site_ID), :).Set(1);
         state_lfp(i).session = sites(1).site_ID(1:12);
         state_lfp(i).site_ID = sites(i).site_ID;
         state_lfp(i).target = sites(i).target;
         state_lfp(i).recorded_hemisphere = upper(sites(i).target(end));
-        %usable_sites_table(...
-        %    strcmp(usable_sites_table.Site_ID, sites(i).site_ID), :).Hemisphere(1);
         state_lfp(i).ref_hemisphere = lfp_tfa_cfg.ref_hemisphere;
         % now loop through each trial for this site
         comp_trial = 0; % iterator for completed trials
@@ -85,6 +89,7 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 effector = sites(i).trial(t).effector;
                 run = sites(i).trial(t).run;
                 block = sites(i).trial(t).block;
+                % for future use
                 % check if the block is usable
 %                 if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
 %                         sites(i).site_ID) && usable_sites_table.Block == block))
@@ -130,6 +135,8 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                         hs_label = 'CH CS';
                     end
                 end
+                
+                % check if this kind of labeling is required
 %                 if reach_hand == 'R' && reach_space == 'R'
 %                     hs_label = 'RH RS';
 %                 elseif reach_hand == 'R' && reach_space == 'L'
@@ -140,7 +147,6 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
 %                     hs_label = 'LH LS';
 %                 end
 
-                %states = trial(i).states;
                 start_time = (sites(i).trial(t).TDT_LFPx_tStart); % trial start time
                 fs = sites(i).trial(t).TDT_LFPx_SR; % sample rate
                 LFP = sites(i).trial(t).LFP; % LFP data
@@ -255,8 +261,8 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 state_lfp(i).trials(comp_trial).trialperiod = [trial_start_t, ...
                     trial_end_t];
                 
-                % get baseline samples - shuld baseline be computed within
-                % processing - check and delete if not required
+                % get baseline samples - should baseline be computed within
+                % processing? - check and delete if not required
 %                 states_lfp(i).trials(comp_trial).baseline = struct();
 %                 states_lfp(i).trials(comp_trial).baseline.ref_t = ...
 %                     sites(i).trial(t).states_onset(sites(i).trial(t).states == baseline.ref_state);
@@ -272,7 +278,7 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
             end
         end
         
-        %%% Noise rejection - should thi be included within processing check this%%%
+        %%% Noise rejection - should this be included within processing check this? %%%
         %state_filt_lfp(i) = lfp_tfa_reject_noisy_lfp( state_lfp(i), lfp_tfa_cfg.noise );
         
         % save data

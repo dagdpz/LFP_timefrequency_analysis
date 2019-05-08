@@ -24,10 +24,47 @@ lfp_tfa_cfg.use_datasets = [31];
 % Each row corresponds to one session
 % { Monkey name, Recording Date of session, Absolute path to the file containing LFP data for
 % the session }
+% Note: This will be deleted once the perturbation blocks per session in
+% successfully tested
 lfp_tfa_cfg.file_list = ...
     {'Magnus', '20190124', 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190124\sites_Magnus_20190124.mat';
     'Magnus', '20190314', 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190314\sites_Magnus_20190314.mat'};
 
+% info about sessions to be analysed
+% should be a 1 x N struct, N = number of sessions to analyse
+% the struct should contain the following fields:
+%       Monkey:         name of monkey (string)
+%       Date:           recording date (string of format YYYYMMDD)
+%       Input_file:     Absolute path to the file containing LFP data for the session
+%       Preinj_blocks:  Blocks to be considered for pre-injection,
+%       typically 0
+%       Postinj_blocks: Blocks to be considered for post-injection, can be
+%       integer, array of integers, 'all' or 'allbutone' (if 'all' is
+%       specified, all post-injection blocks will be combined; if
+%       'allbutone', all blocks from the second post-injection block will
+%       be combined)
+lfp_tfa_cfg.session_info(1) = ...
+    struct('Monkey',        'Magnus', ...
+           'Date',          '20190124', ...
+           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190124\sites_Magnus_20190124.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 'all');
+lfp_tfa_cfg.session_info(2) = ...
+    struct('Monkey',        'Magnus', ...
+           'Date',          '20190314', ...
+           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190314\sites_Magnus_20190314.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 'all');
+% To add a new session to analyse, increment the counter by 1 and add a new
+% value into the lfp_tfa_cfg.session_info struct
+% Example: 
+% lfp_tfa_cfg.session_info(3) = ...
+%     struct('Monkey',        'Magnus', ...
+%            'Date',          '20190208', ...
+%            'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190208\sites_Magnus_20190208.mat', ...
+%            'Preinj_blocks',  0, ...
+%            'Postinj_blocks', 'all');
+       
 % absolute path to the folder where the results of analysis should be stored
 lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results';
 
@@ -115,7 +152,9 @@ lfp_tfa_cfg.tfr.timestep        = 25;
 
 % depending on the method chosen, other configurations vary
 
-% For method = 'mtmfft' or 'mtmconvol', taper (single or multiple) to be used 
+% For method = 'mtmfft' or 'mtmconvol', Ignored for method = 'wavelet'
+
+% taper (single or multiple) to be used 
 % can be 'dpss', 'hanning' or many others
 % 'hanning' - conventional single taper
 % 'dpss' - multiple tapers based on discrete prolate spheroidal sequences 
@@ -124,14 +163,14 @@ lfp_tfa_cfg.tfr.taper           = [];
 
 % the width of frequency smoothing in Hz (fw)
 % Note that 4 Hz smoothing means plus-minus 4 Hz, i.e. a 8 Hz smoothing box.
-% should be a vector of size 1 x numfoi
+% should be a vector of size 1 x numfoi, Leave empty for method = 'wavelet'
 % Example: 
 % 1. lfp_tfa_cfg.tfr.tapsmofrq  = 0.4 *cfg.foi; 
 %the smoothing will increase with frequency.
 lfp_tfa_cfg.tfr.tapsmofrq       = [];
 
 % length of the sliding time-window in seconds (= tw)
-% should be vector of length 1 x numfoi, Leave empty for method = 'wavelet'
+% should be vector of length 1 x numfoi
 % Following relation must hold: 
 % K = 2twfw-1, where K is required to be larger than 0
 % K is the number of tapers applied
@@ -140,7 +179,8 @@ lfp_tfa_cfg.tfr.tapsmofrq       = [];
 % window length decreases with frequency
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
 
-% For method = 'wavelet', width of the wavelets in number of cycles
+% For method = 'wavelet', Ignored for other methods
+% width of the wavelets in number of cycles
 % Making the value smaller will increase the temporal resolution at the expense of frequency resolution and vice versa
 % Wavelet duration = width / F / pi (F = frequency), wavelet duration
 % decreases with frequency
@@ -152,8 +192,10 @@ lfp_tfa_cfg.tfr.width           = 6;
 %% Settings to detect noisy trials
 % configuration for lfp noise rejection
 lfp_tfa_cfg.noise = [];
-% whether or not to apply noise rejection - future use
-lfp_tfa_cfg.noise.detect = 0;
+% whether or not to apply noise rejection 
+% Set to 0 to accept all trials
+% Set to 1 to run the noise trial detection methods
+lfp_tfa_cfg.noise.detect = 1;
 % combination of methods to be used - future use
 % currently all methods are used together 
 lfp_tfa_cfg.noise.methods = {'amp', 'std', 'diff', 'pow'};
@@ -378,8 +420,21 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
 % 'division' - relative increase in power w.r.t. the baseline
 % P_norm(t,f) = (P(t, f)) / (mu_P(f))
 % Example:
-% lfp_tfa_cfg.baseline_method = 'zscore';
+% lfp_tfa_cfg.baseline_method = 'relchange';
 lfp_tfa_cfg.baseline_method = 'zscore';
+
+% flag to indicate if LFP TFR average should be computed - for future use
+% Set to 0 if LFP TFR average should not be computed, else set to 1
+% lfp_tfa_cfg.compute_tfr = 1;
+
+% flag to indicate if LFP evoked response average should be computed - for future use
+% Set to 0 if LFP evoked response average should not be computed, else set to 1
+% lfp_tfa_cfg.compute_evoked = 1;
+
+% flag to indicate if LFP power spectrum average should be computed - for future use
+% Set to 0 if LFP power spectrum average should not be computed, else set to 1
+% lfp_tfa_cfg.compute_pow = 1;
+
     
 %% Settings for average across sessions
 
