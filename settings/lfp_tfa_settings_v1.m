@@ -14,8 +14,9 @@ lfp_tfa_cfg.version = 'SN_0.2';
 % individual sites can be obtained
 lfp_tfa_cfg.info_filepath = 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190314\Mag_sorted_neurons.xls';
 
-% dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
-% only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
+% dataset to be used for analysis, see entry 'Set' in the sorted neurons
+% excel file. - for future use, not implemented currently
+% Only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
 % used for analysis
 lfp_tfa_cfg.use_datasets = [31];
 
@@ -35,7 +36,7 @@ lfp_tfa_cfg.file_list = ...
 % the struct should contain the following fields:
 %       Monkey:         name of monkey (string)
 %       Date:           recording date (string of format YYYYMMDD)
-%       Input_file:     Absolute path to the file containing LFP data for the session
+%       Input:          Absolute path to the file containing LFP data for the session
 %       Preinj_blocks:  Blocks to be considered for pre-injection,
 %       typically 0
 %       Postinj_blocks: Blocks to be considered for post-injection, can be
