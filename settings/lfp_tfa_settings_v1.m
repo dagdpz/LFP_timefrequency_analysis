@@ -64,6 +64,17 @@ lfp_tfa_cfg.session_info(2) = ...
 %            'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190208\sites_Magnus_20190208.mat', ...
 %            'Preinj_blocks',  0, ...
 %            'Postinj_blocks', 'all');
+
+
+% targets to be included in the analysis
+% should be a cell array of strings which indicate the target names
+% the target names should be same as the target field in the LFP data
+% structure
+% Those targets which are not in the analysed sessions will be ignored
+% Example:
+% 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
+lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L'}; 
+
        
 % absolute path to the folder where the results of analysis should be stored
 lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results';
@@ -152,6 +163,16 @@ lfp_tfa_cfg.tfr.timestep        = 25;
 
 % depending on the method chosen, other configurations vary
 
+% For method = 'wavelet', Ignored for other methods
+% width of the wavelets in number of cycles
+% Making the value smaller will increase the temporal resolution at the expense of frequency resolution and vice versa
+% Wavelet duration = width / F / pi (F = frequency), wavelet duration
+% decreases with frequency
+% for width = 6, frequency F = 30 Hz, wavelet duration = 6/30/pi = 0.0637 s
+% Example: 
+% 1. lfp_tfa_cfg.tfr.width = 6; % wavelet of width 6 cycles 
+lfp_tfa_cfg.tfr.width           = 6; 
+
 % For method = 'mtmfft' or 'mtmconvol', Ignored for method = 'wavelet'
 
 % taper (single or multiple) to be used 
@@ -179,15 +200,7 @@ lfp_tfa_cfg.tfr.tapsmofrq       = [];
 % window length decreases with frequency
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
 
-% For method = 'wavelet', Ignored for other methods
-% width of the wavelets in number of cycles
-% Making the value smaller will increase the temporal resolution at the expense of frequency resolution and vice versa
-% Wavelet duration = width / F / pi (F = frequency), wavelet duration
-% decreases with frequency
-% for width = 6, frequency F = 30 Hz, wavelet duration = 6/30/pi = 0.0637 s
-% Example: 
-% 1. lfp_tfa_cfg.tfr.width = 6; % wavelet of width 6 cycles 
-lfp_tfa_cfg.tfr.width           = 6; 
+
 
 %% Settings to detect noisy trials
 % configuration for lfp noise rejection
@@ -235,7 +248,12 @@ lfp_tfa_cfg.baseline_ref_state = '';
 % -0.5 s to -0.1s from the cue onset is considered as baseline period)
 % 2. lfp_tfa_cfg.baseline_ref_period = 'trial'; to consider the complete trial period
 % for baseline power calculation
-lfp_tfa_cfg.baseline_ref_period = 'trial'; 
+
+if isempty(lfp_tfa_cfg.baseline_ref_state)
+	lfp_tfa_cfg.baseline_ref_period = 'trial';
+else
+	lfp_tfa_cfg.baseline_ref_period = []; % SET LIMITS OF baseline_ref_period here
+end
 
 % which perturbation blocks to be considered for baseline power calculation
 % set to 0 for considering only pre-injection blocks
@@ -257,14 +275,6 @@ lfp_tfa_cfg.baseline_use_choice_trial = 0;
 
 %% Settings for averaging TFR and evoked LFP based on conditions
 
-% targets to be included in the analysis
-% should be a cell array of strings which indicate the target names
-% the target names should be same as the target field in the LFP data
-% structure
-% Those targets which are not in the analysed sessions will be ignored
-% Example:
-% 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
-lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L'}; 
 
 % trial types to be included in the analysis
 % should be a vector of integers specifying the types
@@ -309,7 +319,7 @@ lfp_tfa_cfg.compare.choice_trials = 0;
 % which reach hand is left and right separately
 % 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
 % any hand label is combined)
-lfp_tfa_cfg.compare.reach_hands = {'R', 'L'}; % for future use
+lfp_tfa_cfg.compare.reach_hands = {'R', 'L'};
 
 % reach space to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -337,27 +347,6 @@ lfp_tfa_cfg.compare.reach_spaces = {'R', 'L'};
 % lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
 % any perturbation value 
 lfp_tfa_cfg.compare.perturbations = [0, 1]; 
-
-% perturbation groups to be considered for pre- and post- injection
-% analysis
-% Should be a cell array of same size as that of lfp_tfa_cfg.compare.perturbations
-% First element can be a vector of integers and corresponds to the 
-% perturbation blocks to be considered for pre-injection analysis, typically 0
-% Second element can be a vector of integers or 'all' or 'allbutone' and 
-% corresponds to the perturbation blocks to be considered for
-% post-injection analysis
-% Examples:
-% 1. lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; 
-% consider trials with perturbation value = 0 for pre-injection and any
-% perturbation value not equal to zero for post injection
-% 2. lfp_tfa_cfg.compare.perturbation_groups = {0, 'allbutone'}; 
-% similar to example 1, but the trials with first post-injection 
-% perturbation value is excluded (considers only from the second
-% perturbation block)
-% 3. lfp_tfa_cfg.compare.perturbation_groups = {0, [2, 3, 4]}; 
-% consider trials with perturbation value = 0 for pre-injection and
-% perturbation value = 2, 3 or 4 for post injection
-lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; 
 
 % define the time windows to analyse for LFP TFR and evoked LFP response
 % Must be a Nx4 cell array, N = number of windows to analyse
@@ -407,6 +396,7 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
 % Example:
 % consider those sites with atleast 5 trials for each condition
 % lfp_tfa_cfg.mintrials_percondition = 5; 
+% By condition, we mean a combination of choice/instr, pre/post-injection, type and effector, hand-space
  lfp_tfa_cfg.mintrials_percondition = 5;
 
 % method to be used for baseline normalization
@@ -436,12 +426,12 @@ lfp_tfa_cfg.baseline_method = 'zscore';
 % lfp_tfa_cfg.compute_pow = 1;
 
     
-%% Settings for average across sessions
+%% Settings for averaging across sessions or sites
 
-% how to average the session averages
+% how to average data across multiple sessions/sites
 % 'sessions' - average the session averages (a session average is the
 % average of site averages within a session)
-% 'sites' - average the site averages
+% 'sites' - average across sites, regardless of which session they come from
 % Example: lfp_tfa_cfg.compute_avg_across = 'sites'
 % Example: lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'};  compute
 % both averages across session averages and across site averages
