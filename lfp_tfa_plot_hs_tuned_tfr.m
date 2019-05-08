@@ -56,7 +56,7 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
     for hs = 1:size(avg_tfr, 2)
         % check if no trials exist for this condition and HS
         if ~isempty(cat(3, avg_tfr(:, hs).powspctrm))
-            % concatenate states
+            % concatenate tfs for different state windows for plotting
             concat_states_tfs = struct();
             concat_states_tfs.powspctrm = [];
             concat_states_tfs.state_time = [];
@@ -78,15 +78,24 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                     concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
                         nan(1, 300/25)];
                 end
-
+                
+                % state timing information
+                % state onset sample number
                 state_info(st).onset_s = find(...
-                    avg_tfr(st, hs).time <= 0, 1, 'last');
-                state_info(st).onset_t = 0;
+                    avg_tfr(st, hs).time <= 0, 1, 'last'); 
+                % state onset time
+                state_info(st).onset_t = 0; 
+                % start start sample
                 state_info(st).start_s = 1;
+                % state start time
                 state_info(st).start_t = avg_tfr(st, hs).time(1);
+                % start finish sample
                 state_info(st).finish_s = length(avg_tfr(st, hs).time);
+                % start end sample
                 state_info(st).finish_t = avg_tfr(st, hs).time(end);                    
-
+                
+                % state onset, start and finish samples for further states
+                % offset from previous state window
                 if st > 1
                     state_info(st).start_s = length(avg_tfr(st-1, hs).time) + ...
                         state_info(st).start_s + (st-1)*(300/25);
@@ -105,6 +114,7 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                 state_info.finish_s]);
 
             % now plot
+            % number of subplots required
             nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
             nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
             subplot(nhandlabels, nspacelabels, hs)
@@ -144,6 +154,7 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
         end
     end
     
+    % plot title
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
     
@@ -153,7 +164,7 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
         cm = colormap(varargin{1});
         colorbar;
     end
-    
+    % white separation between two state windows
     cm(1,:,:) = [1,1,1];
     colormap(cm);
     
