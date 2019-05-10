@@ -6,7 +6,7 @@
 clear; 
 
 % file containing settings for LFP analysis
-settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v2.m';
+settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
 
 %% INITIALIZATION
 close all;
