@@ -34,15 +34,17 @@ function [ diff_tfr ] = lfp_tfa_compute_diff_tfr( lfp_tfr, lfp_tfa_cfg )
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     diff_tfr = struct();
-    for dcn = 1:2:length(lfp_tfr.condition)-1
+    dcn = 0;
+    for cn = 1:2:length(lfp_tfr.condition)-1
+        dcn = dcn + 1;
         % initially load the pre-injection data structure
-        preinj_tfr = lfp_tfr.condition(dcn);
+        preinj_tfr = lfp_tfr.condition(cn);
         diff_tfr.difference(dcn) = preinj_tfr;
         if isempty(preinj_tfr.hs_tuned_tfs) 
             continue;
         end
         % post injection
-        postinj_tfr = lfp_tfr.condition(dcn + 1);
+        postinj_tfr = lfp_tfr.condition(cn + 1);
         if isempty(postinj_tfr.hs_tuned_tfs)
             diff_tfr.difference(dcn) = postinj_tfr;
             continue;
@@ -62,8 +64,9 @@ function [ diff_tfr ] = lfp_tfa_compute_diff_tfr( lfp_tfr, lfp_tfa_cfg )
                         isfield(postinj_tfr.hs_tuned_tfs(st, hs), 'powspctrm') && ...
                         ~isempty(preinj_tfr.hs_tuned_tfs(st, hs).powspctrm) && ...
                     ~isempty(postinj_tfr.hs_tuned_tfs(st, hs).powspctrm)
-                    ntimebins = min(length(postinj_tfr.hs_tuned_tfs(st, hs).time), ...
-                        length(diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).time));
+                    ntimebins = min([size(postinj_tfr.hs_tuned_tfs(st, hs).powspctrm, 3), ...
+                        size(preinj_tfr.hs_tuned_tfs(st, hs).powspctrm, 3), ...
+                        size(diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).powspctrm, 3)]);
                     % calculate the difference
                     diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).powspctrm = ...
                         postinj_tfr.hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) - ...

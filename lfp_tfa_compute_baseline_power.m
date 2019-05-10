@@ -65,7 +65,7 @@ function [ session_proc_lfp_out ] = lfp_tfa_compute_baseline_power( session_lfp_
             trial = site_lfp.trials(t);
             % whether this trial should be considered for baseline calculation
             consider_trial = ~(trial.noisy) & sum(trial.perturbation == cfg_tfs.baseline_perturbation) ...
-                & (trial.choice_trial == cfg_tfs.baseline_use_choice_trial);
+                & sum(trial.choice_trial == cfg_tfs.baseline_use_choice_trial);
             if consider_trial 
                 if strcmp(cfg_tfs.baseline_ref_state, '') && strcmp(cfg_tfs.baseline_ref_period , 'trial')
                     baseline_pow{t} = trial.tfs.powspctrm(1, :, ...

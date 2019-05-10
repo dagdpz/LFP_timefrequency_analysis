@@ -157,8 +157,8 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             if ~isempty(sites_pow(i).condition(cn).hs_tuned_power)
 
                 plottitle = ['Site ID: ', sites_pow(i).site_ID ...
-                    ', Target = ' sites_pow(i).target ', '  ...
-                '(Perturb ' num2str(site_conditions(cn).perturbation_group{1}) '), '];
+                    ', Target = ' sites_pow(i).target ' (ref_' lfp_tfa_cfg.ref_hemisphere '), ' ...
+                'Perturb ' num2str(site_conditions(cn).perturbation_group{1}) ', '];
                 if site_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
                 else
@@ -201,51 +201,52 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 if ~strcmp(states_lfp(i).target, targets{t})
                     continue;
                 end
-
+                if sites_pow(i).use_for_avg                    
                 % calculate the average LFP power spectrum across sites for this condition 
-                if ~isempty(sites_pow(i).condition(cn).hs_tuned_power) && ...
-                        isfield(sites_pow(i).condition(cn).hs_tuned_power, 'mean')
-                    isite = isite + 1;
-                                
+                    if ~isempty(sites_pow(i).condition(cn).hs_tuned_power) && ...
+                            isfield(sites_pow(i).condition(cn).hs_tuned_power, 'mean')
+                        isite = isite + 1;
 
-                    % hand-space labels
-                    for hs = 1:length(hs_labels)
-                        % epochs
-                        for ep = 1:size(lfp_tfa_cfg.analyse_epochs, 1)
-                            if ~isempty(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean)
-                                
-                                if isite == 1
-                                    session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
-                                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean ;
-                                    session_avg(t).condition(cn).hs_tuned_power(ep, hs).freq = ...
-                                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq;
-                                else
-                                    if ~isempty(session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean)
-                                        nfreqs = length(session_avg(t).condition(cn).hs_tuned_power(ep, hs).freq);
-                                        % average same number fo frequency
-                                        % bins
-                                        if nfreqs > length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq)
-                                            nfreqs = length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq);
-                                        end                               
-                                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
-                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs) + ...
-                                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs) ;
-                                    else
+
+                        % hand-space labels
+                        for hs = 1:length(hs_labels)
+                            % epochs
+                            for ep = 1:size(lfp_tfa_cfg.analyse_epochs, 1)
+                                if ~isempty(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean)
+
+                                    if isite == 1
                                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
                                             sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean ;
+                                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).freq = ...
+                                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq;
+                                    else
+                                        if ~isempty(session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean)
+                                            nfreqs = length(session_avg(t).condition(cn).hs_tuned_power(ep, hs).freq);
+                                            % average same number fo frequency
+                                            % bins
+                                            if nfreqs > length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq)
+                                                nfreqs = length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq);
+                                            end                               
+                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
+                                                session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs) + ...
+                                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs) ;
+                                        else
+                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
+                                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean ;
+                                        end
                                     end
+                                    % store lfp power spectra average for
+                                    % session
+                                    session_avg(t).condition(cn).hs_tuned_power(ep, hs).hs_label = ...
+                                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).hs_label;
+                                    session_avg(t).condition(cn).hs_tuned_power(ep, hs).epoch_name = ...
+                                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).epoch_name;
+                                    session_avg(t).condition(cn).condition = site_conditions(cn);
+                                    session_avg(t).condition(cn).session = states_lfp(i).session;
+                                    session_avg(t).condition(cn).target = states_lfp(i).target;
+                                    session_avg(t).condition(cn).condition = site_conditions(cn);
+                                    session_avg(t).condition(cn).label = site_conditions(cn).label;
                                 end
-                                % store lfp power spectra average for
-                                % session
-                                session_avg(t).condition(cn).hs_tuned_power(ep, hs).hs_label = ...
-                                    sites_pow(i).condition(cn).hs_tuned_power(ep, hs).hs_label;
-                                session_avg(t).condition(cn).hs_tuned_power(ep, hs).epoch_name = ...
-                                    sites_pow(i).condition(cn).hs_tuned_power(ep, hs).epoch_name;
-                                session_avg(t).condition(cn).condition = site_conditions(cn);
-                                session_avg(t).condition(cn).session = states_lfp(i).session;
-                                session_avg(t).condition(cn).target = states_lfp(i).target;
-                                session_avg(t).condition(cn).condition = site_conditions(cn);
-                                session_avg(t).condition(cn).label = site_conditions(cn).label;
                             end
                         end
                     end
@@ -266,7 +267,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             % plot average power spectrum across sites for this session
             if ~isempty(session_avg(t).condition(cn).hs_tuned_power)
                 plottitle = ['Session: ', session_avg(t).condition(cn).session ...
-                    ', Target = ' session_avg(t).condition(cn).target ', '  ...
+                    ', Target = ' session_avg(t).condition(cn).target '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
                     'Perturb ' num2str(site_conditions(cn).perturbation_group{1}) ', '];
                 if site_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];

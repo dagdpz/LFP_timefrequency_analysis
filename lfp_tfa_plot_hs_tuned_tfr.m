@@ -74,9 +74,9 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                 % append nans to separate the states
                 if st < size(avg_tfr, 1)
                     concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
-                        nan(1, length(concat_states_tfs.freq), 300/25));
+                        nan(1, length(concat_states_tfs.freq), 100/25));
                     concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
-                        nan(1, 300/25)];
+                        nan(1, 100/25)];
                 end
                 
                 % state timing information
@@ -98,11 +98,11 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                 % offset from previous state window
                 if st > 1
                     state_info(st).start_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).start_s + (st-1)*(300/25);
+                        state_info(st).start_s + (st-1)*(100/25);
                     state_info(st).finish_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).finish_s + (st-1)*(300/25);
+                        state_info(st).finish_s + (st-1)*(100/25);
                     state_info(st).onset_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).onset_s + (st-1)*(300/25);
+                        state_info(st).onset_s + (st-1)*(100/25);
                 end
 
 
@@ -130,9 +130,10 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
             for so = state_onsets
                 line([so so], ylim, 'color', 'k'); 
                 state_name = avg_tfr(state_onsets == so, hs).state_name;
-                text(so, 10, state_name);
+                text(so, 10, state_name, 'fontsize', 9);
             end
             set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 8)
+            set(gca, 'xticklabelrotation', 0)
             xlabel('Time (s)');
             ylabel('Frequency (Hz)');
             subplottitle = concat_states_tfs.label{1};
@@ -155,7 +156,8 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
     end
     
     % plot title
-    ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
+    plottitle = strrep(plottitle, '_', '\_');
+    ann = annotation('textbox', [0 0.9 1 0.1], 'String', plottitle...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
     
     % define colormap
