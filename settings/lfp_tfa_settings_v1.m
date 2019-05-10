@@ -349,27 +349,6 @@ lfp_tfa_cfg.compare.reach_spaces = {'L', 'R'};
 % any perturbation value 
 lfp_tfa_cfg.compare.perturbations = [0, 1]; 
 
-% perturbation groups to be considered for pre- and post- injection
-% analysis
-% Should be a cell array of same size as that of lfp_tfa_cfg.compare.perturbations
-% First element can be a vector of integers and corresponds to the 
-% perturbation blocks to be considered for pre-injection analysis, typically 0
-% Second element can be a vector of integers or 'all' or 'allbutone' and 
-% corresponds to the perturbation blocks to be considered for
-% post-injection analysis
-% Examples:
-% 1. lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; 
-% consider trials with perturbation value = 0 for pre-injection and any
-% perturbation value not equal to zero for post injection
-% 2. lfp_tfa_cfg.compare.perturbation_groups = {0, 'allbutone'}; 
-% similar to example 1, but the trials with first post-injection 
-% perturbation value is excluded (considers only from the second
-% perturbation block)
-% 3. lfp_tfa_cfg.compare.perturbation_groups = {0, [2, 3, 4]}; 
-% consider trials with perturbation value = 0 for pre-injection and
-% perturbation value = 2, 3 or 4 for post injection
-lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; 
-
 % define the time windows to analyse for LFP TFR and evoked LFP response
 % Must be a Nx4 cell array, N = number of windows to analyse
 % Each row corresponds to one state and contain following elements
