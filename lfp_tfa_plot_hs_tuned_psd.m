@@ -33,10 +33,9 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
     
     figure;
-    cm = colormap('jet');
-    cm(1,:,:) = [1,1,1];
-    colormap(cm);
-
+    
+    cm = colormap(jet(size(avg_lfp_psd, 1)));
+    
     % loop through handspace
     for hs = 1:size(avg_lfp_psd, 2)
         if ~isempty([avg_lfp_psd(:,hs).mean] )       
@@ -50,7 +49,8 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
 
                     hold on;
 
-                    plot(avg_lfp_psd(ep, hs).freq, 10*log10(avg_lfp_psd(ep, hs).mean));                
+                    plot(avg_lfp_psd(ep, hs).freq, 10*log10(avg_lfp_psd(ep, hs).mean), ...
+                        'Color', cm(ep,:));                
 
 
                 end
@@ -58,6 +58,7 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
                 set(gca, 'xtick', (avg_lfp_psd(ep, hs).freq([1:8:numel(avg_lfp_psd(ep, hs).freq)])));
                 set(gca, 'xticklabel', ...
                     round((avg_lfp_psd(ep, hs).freq([1:8:numel(avg_lfp_psd(ep, hs).freq)]))));
+                set(gca, 'xlim', [avg_lfp_psd(ep, hs).freq(1) avg_lfp_psd(ep, hs).freq(end)]);
                 ylabel('LFP Power (dB)');
                 xlabel('Frequency (Hz)');
                 subplottitle = avg_lfp_psd(ep, hs).hs_label{1};
@@ -73,7 +74,7 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
             legend({lfp_tfa_cfg.analyse_epochs{:,2}});
         end
     end
-    
+        
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
     saveas(gca, results_file);

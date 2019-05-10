@@ -47,11 +47,8 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
 
     task_types = lfp_tfa_cfg.compare.types;
     effectors = lfp_tfa_cfg.compare.effectors;    
-    if lfp_tfa_cfg.compare.choice_trials
-        choices = unique([states_lfp(1).trials.choice_trial]);
-    else
-        choices = lfp_tfa_cfg.compare.choice_trials;
-    end
+    
+    choices = lfp_tfa_cfg.compare.choice_trials;
     perturbations = lfp_tfa_cfg.compare.perturbations;
     % if different sessions have different perturbation groups
     if nargin > 1
@@ -115,7 +112,7 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
             for ch = choices
                 if ch == 0
                     ch_label = 'Instr';
-                elseif choice == 1
+                elseif ch == 1
                     ch_label = 'Choice';
                 else
                     ch_label = [];
