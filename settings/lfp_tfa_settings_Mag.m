@@ -14,9 +14,8 @@ lfp_tfa_cfg.version = 'SN_0.2';
 % individual sites can be obtained
 lfp_tfa_cfg.info_filepath = 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190314\Mag_sorted_neurons.xls';
 
-% dataset to be used for analysis, see entry 'Set' in the sorted neurons
-% excel file. - for future use, not implemented currently
-% Only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
+% dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
+% only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
 % used for analysis
 lfp_tfa_cfg.use_datasets = [31];
 
@@ -36,7 +35,7 @@ lfp_tfa_cfg.file_list = ...
 % the struct should contain the following fields:
 %       Monkey:         name of monkey (string)
 %       Date:           recording date (string of format YYYYMMDD)
-%       Input:          Absolute path to the file containing LFP data for the session
+%       Input_file:     Absolute path to the file containing LFP data for the session
 %       Preinj_blocks:  Blocks to be considered for pre-injection,
 %       typically 0
 %       Postinj_blocks: Blocks to be considered for post-injection, can be
@@ -45,63 +44,18 @@ lfp_tfa_cfg.file_list = ...
 %       'allbutone', all blocks from the second post-injection block will
 %       be combined)
 lfp_tfa_cfg.session_info(1) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20170622', ...
-           'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170622.mat', ...
+    struct('Monkey',        'Magnus', ...
+           'Date',          '20190124', ...
+           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190124\sites_Magnus_20190124.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 3);
 lfp_tfa_cfg.session_info(2) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20170629', ...
-           'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170629.mat', ...
+    struct('Monkey',        'Magnus', ...
+           'Date',          '20190314', ...
+           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190314\sites_Magnus_20190314.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
-lfp_tfa_cfg.session_info(3) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20170707', ...
-           'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170707.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
-lfp_tfa_cfg.session_info(4) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20170713', ...
-           'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170713.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
-lfp_tfa_cfg.session_info(5) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20170720', ...
-           'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170720.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
-lfp_tfa_cfg.session_info(6) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20170802', ...
-           'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170802.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
-       
-lfp_tfa_cfg.session_info(7) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20170804', ...
-           'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170804.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
-       
-lfp_tfa_cfg.session_info(8) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20170818', ...
-           'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170818.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
-       
-lfp_tfa_cfg.session_info(9) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20171012', ...
-           'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20171012.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
-       
+           'Postinj_blocks', 3);
+
        
 % To add a new session to analyse, increment the counter by 1 and add a new
 % value into the lfp_tfa_cfg.session_info struct
@@ -112,9 +66,20 @@ lfp_tfa_cfg.session_info(9) = ...
 %            'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190208\sites_Magnus_20190208.mat', ...
 %            'Preinj_blocks',  0, ...
 %            'Postinj_blocks', 'all');
+
+
+% targets to be included in the analysis
+% should be a cell array of strings which indicate the target names
+% the target names should be same as the target field in the LFP data
+% structure
+% Those targets which are not in the analysed sessions will be ignored
+% Example:
+% 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
+lfp_tfa_cfg.compare.targets = {'MIPa_R'}; 
+
        
 % absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\Lin';
+lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\Mag';
 
 % Specify events which mark trial start and end
 lfp_tfa_cfg.trialinfo = struct();
@@ -200,6 +165,16 @@ lfp_tfa_cfg.tfr.timestep        = 25;
 
 % depending on the method chosen, other configurations vary
 
+% For method = 'wavelet', Ignored for other methods
+% width of the wavelets in number of cycles
+% Making the value smaller will increase the temporal resolution at the expense of frequency resolution and vice versa
+% Wavelet duration = width / F / pi (F = frequency), wavelet duration
+% decreases with frequency
+% for width = 6, frequency F = 30 Hz, wavelet duration = 6/30/pi = 0.0637 s
+% Example: 
+% 1. lfp_tfa_cfg.tfr.width = 6; % wavelet of width 6 cycles 
+lfp_tfa_cfg.tfr.width           = 6; 
+
 % For method = 'mtmfft' or 'mtmconvol', Ignored for method = 'wavelet'
 
 % taper (single or multiple) to be used 
@@ -227,15 +202,7 @@ lfp_tfa_cfg.tfr.tapsmofrq       = [];
 % window length decreases with frequency
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
 
-% For method = 'wavelet', Ignored for other methods
-% width of the wavelets in number of cycles
-% Making the value smaller will increase the temporal resolution at the expense of frequency resolution and vice versa
-% Wavelet duration = width / F / pi (F = frequency), wavelet duration
-% decreases with frequency
-% for width = 6, frequency F = 30 Hz, wavelet duration = 6/30/pi = 0.0637 s
-% Example: 
-% 1. lfp_tfa_cfg.tfr.width = 6; % wavelet of width 6 cycles 
-lfp_tfa_cfg.tfr.width           = 6; 
+
 
 %% Settings to detect noisy trials
 % configuration for lfp noise rejection
@@ -283,7 +250,12 @@ lfp_tfa_cfg.baseline_ref_state = '';
 % -0.5 s to -0.1s from the cue onset is considered as baseline period)
 % 2. lfp_tfa_cfg.baseline_ref_period = 'trial'; to consider the complete trial period
 % for baseline power calculation
-lfp_tfa_cfg.baseline_ref_period = 'trial'; 
+
+if isempty(lfp_tfa_cfg.baseline_ref_state)
+	lfp_tfa_cfg.baseline_ref_period = 'trial';
+else
+	lfp_tfa_cfg.baseline_ref_period = []; % SET LIMITS OF baseline_ref_period here
+end
 
 % which perturbation blocks to be considered for baseline power calculation
 % set to 0 for considering only pre-injection blocks
@@ -296,8 +268,8 @@ lfp_tfa_cfg.baseline_ref_period = 'trial';
 % 2 and 3
 lfp_tfa_cfg.baseline_perturbation = 0; 
 
-% whether to consider choice (1) or instructed trials (0), or both in
-% baseline power calculation 
+% whether to consider choice (1) or instructed trials (0) in baseline power
+% calculation 
 % Examples:
 % 1. lfp_tfa_cfg.baseline_use_choice_trial = 0; % consider only instructed trials
 % 2. lfp_tfa_cfg.baseline_use_choice_trial = 1; % consider only choice trials
@@ -306,14 +278,6 @@ lfp_tfa_cfg.baseline_use_choice_trial = 0;
 
 %% Settings for averaging TFR and evoked LFP based on conditions
 
-% targets to be included in the analysis
-% should be a cell array of strings which indicate the target names
-% the target names should be same as the target field in the LFP data
-% structure
-% Those targets which are not in the analysed sessions will be ignored
-% Example:
-% 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
-lfp_tfa_cfg.compare.targets = {'MIP_R', 'MIP_L'}; 
 
 % trial types to be included in the analysis
 % should be a vector of integers specifying the types
@@ -335,7 +299,7 @@ lfp_tfa_cfg.compare.types = [4];
 % and effector = 6 separately
 % 2. lfp_tfa_cfg.compare.types = nan; Ignore effector (trials with any
 % effector value are combined)
-lfp_tfa_cfg.compare.effectors = [4];
+lfp_tfa_cfg.compare.effectors = [6];
 
 % which type of choice trials are to be included in the analysis
 % Examples:
@@ -358,7 +322,7 @@ lfp_tfa_cfg.compare.choice_trials = 0;
 % which reach hand is left and right separately
 % 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
 % any hand label is combined)
-lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; % for future use
+lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
 
 % reach space to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -386,27 +350,6 @@ lfp_tfa_cfg.compare.reach_spaces = {'L', 'R'};
 % lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
 % any perturbation value 
 lfp_tfa_cfg.compare.perturbations = [0, 1]; 
-
-% perturbation groups to be considered for pre- and post- injection
-% analysis
-% Should be a cell array of same size as that of lfp_tfa_cfg.compare.perturbations
-% First element can be a vector of integers and corresponds to the 
-% perturbation blocks to be considered for pre-injection analysis, typically 0
-% Second element can be a vector of integers or 'all' or 'allbutone' and 
-% corresponds to the perturbation blocks to be considered for
-% post-injection analysis
-% Examples:
-% 1. lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; 
-% consider trials with perturbation value = 0 for pre-injection and any
-% perturbation value not equal to zero for post injection
-% 2. lfp_tfa_cfg.compare.perturbation_groups = {0, 'allbutone'}; 
-% similar to example 1, but the trials with first post-injection 
-% perturbation value is excluded (considers only from the second
-% perturbation block)
-% 3. lfp_tfa_cfg.compare.perturbation_groups = {0, [2, 3, 4]}; 
-% consider trials with perturbation value = 0 for pre-injection and
-% perturbation value = 2, 3 or 4 for post injection
-lfp_tfa_cfg.compare.perturbation_groups = {0, 'all'}; 
 
 % define the time windows to analyse for LFP TFR and evoked LFP response
 % Must be a Nx4 cell array, N = number of windows to analyse
@@ -456,7 +399,8 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
 % Example:
 % consider those sites with atleast 5 trials for each condition
 % lfp_tfa_cfg.mintrials_percondition = 5; 
- lfp_tfa_cfg.mintrials_percondition = 5;
+% By condition, we mean a combination of choice/instr, pre/post-injection, type and effector, hand-space
+ lfp_tfa_cfg.mintrials_percondition = 0;
 
 % method to be used for baseline normalization
 % can be 'zscore', 'relchange', 'subtraction', 'division'
@@ -485,12 +429,12 @@ lfp_tfa_cfg.baseline_method = 'zscore';
 % lfp_tfa_cfg.compute_pow = 1;
 
     
-%% Settings for average across sessions
+%% Settings for averaging across sessions or sites
 
-% how to average the session averages
+% how to average data across multiple sessions/sites
 % 'sessions' - average the session averages (a session average is the
 % average of site averages within a session)
-% 'sites' - average the site averages
+% 'sites' - average across sites, regardless of which session they come from
 % Example: lfp_tfa_cfg.compute_avg_across = 'sites'
 % Example: lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'};  compute
 % both averages across session averages and across site averages

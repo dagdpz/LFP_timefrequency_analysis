@@ -1,4 +1,4 @@
-function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file, varargin )
+function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle, results_file, varargin )
 %lfp_tfa_plot_hs_tuned_tfr  - Plots the LFP time frequency spectrogram 
 %averages for different hand-space conditions to be compared
 %
@@ -40,7 +40,8 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    figure;    
+    figure;
+    hold on
     
     % colorbar title
     if strcmp(lfp_tfa_cfg.baseline_method, 'zscore')
@@ -52,6 +53,13 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
     elseif strcmp(lfp_tfa_cfg.baseline_method, 'relchange')
         cbtitle = '(P - \mu) / \mu';
     end
+    
+    % offset samples
+    noffset = 100;
+    % number of subplots required
+    nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
+    nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
+    
     % loop through handspace
     for hs = 1:size(avg_tfr, 2)
         % check if no trials exist for this condition and HS
@@ -62,10 +70,12 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
             concat_states_tfs.state_time = [];
             concat_states_tfs.freq = avg_tfr(1, hs).freq;
             concat_states_tfs.label = avg_tfr(1, hs).hs_label;
+            
+            subplot(nhandlabels, nspacelabels, hs);
+            hold on;
 
             state_info = struct();
             for st = 1:size(avg_tfr, 1)
-
 
                 concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
                     avg_tfr(st, hs).powspctrm);
@@ -104,6 +114,19 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                     state_info(st).onset_s = length(avg_tfr(st-1, hs).time) + ...
                         state_info(st).onset_s + (st-1)*(100/25);
                 end
+                
+                imagesc(linspace(state_info(st).start_s, state_info(st).finish_s, ...
+                    state_info(st).finish_s - state_info(st).start_s + 1), ...
+                    linspace(1, length(avg_tfr(st, hs).freq), length(avg_tfr(st, hs).freq)), ...
+                    squeeze(avg_tfr(st, hs).powspctrm) ,[-1 1]);
+                
+                % horizontal lines to separate frequency bands
+                for f = [2, 4, 8, 12, 18, 32, 80]
+                    f_idx = find(abs(avg_tfr(st, hs).freq - f) == ...
+                        min(abs(avg_tfr(st, hs).freq - f)), 1, 'first');
+                    line([state_info(st).start_s state_info(st).finish_s], ...
+                        [f_idx f_idx], 'color', 'k', 'linestyle', '--');
+                end
 
 
             end
@@ -114,44 +137,45 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
                 state_info.finish_s]);
 
             % now plot
-            % number of subplots required
-            nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
-            nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
-            subplot(nhandlabels, nspacelabels, hs)
-            imagesc(concat_states_tfs.time, [1:numel(concat_states_tfs.freq)], squeeze(concat_states_tfs.powspctrm), [-1 1]);
+            
+            %subplot(nhandlabels, nspacelabels, hs)
+            %imagesc(concat_states_tfs.time, [1:numel(concat_states_tfs.freq)], squeeze(concat_states_tfs.powspctrm), [-1 1]);
             axis xy, cb = colorbar;
             set(get(cb,'title'),'string', cbtitle, 'fontsize',6);
+            set(gca,'TickDir','out')
             % log y axis ticks
             set(gca, 'ytick', ([1:8:numel(concat_states_tfs.freq)]));
             set(gca, 'yticklabel', ...
                 round(concat_states_tfs.freq([1:8:numel(concat_states_tfs.freq)])));
+            % add 0.5 at end since the time value is the center of the bin
+            % add 0 at beginning to make x-axis visible
+            set(gca, 'ylim', [0.5 numel(avg_tfr(st, hs).freq) + 0.5]);
             % mark state onsets
             set(gca,'xtick',state_samples)
             for so = state_onsets
                 line([so so], ylim, 'color', 'k'); 
                 state_name = avg_tfr(state_onsets == so, hs).state_name;
-                text(so, 10, state_name, 'fontsize', 8);
+                text(so+1, 10, state_name, 'fontsize', 8);
             end
-            set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 8)
+            set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 7)
             set(gca, 'xticklabelrotation', 45)
+            % add 0.5 since the time value is the center of the bin
+            % add 0 at the beginning to make the y-axis visible
+            set(gca, 'xlim', [0.5 state_samples(end) + 0.5]);
             xlabel('Time (s)');
             ylabel('Frequency (Hz)');
+                        
             subplottitle = concat_states_tfs.label{1};
             if isfield(avg_tfr(1, hs), 'nsessions')
-                subplottitle = [subplottitle ', nsessions = ' num2str(avg_tfr(1, hs).nsessions)];
-            if isfield(avg_tfr(1, hs), 'nsites')
-                subplottitle = [subplottitle ', nsites = ' num2str(avg_tfr(1, hs).nsites)];
-            if isfield(avg_tfr(1, hs), 'ntrials') && ~isempty(avg_tfr(1, hs).ntrials)
-                subplottitle = [subplottitle ', ntrials = ' num2str(avg_tfr(1, hs).ntrials)];            
+                subplottitle = [subplottitle ' (nsessions = ' num2str(avg_tfr(1, hs).nsessions) ')'];
+            elseif isfield(avg_tfr(1, hs), 'nsites')
+                subplottitle = [subplottitle ' (nsites = ' num2str(avg_tfr(1, hs).nsites) ')'];
+            elseif isfield(avg_tfr(1, hs), 'ntrials') && ~isempty(avg_tfr(1, hs).ntrials)
+                subplottitle = [subplottitle ' (ntrials = ' num2str(avg_tfr(1, hs).ntrials) ')'];            
             end
             title(subplottitle);
-            line([0 0], ylim, 'color', 'k');
-            % horizontal lines to separate frequency bands
-            for f = [2, 4, 8, 12, 18, 32, 80]
-                f_idx = find(abs(concat_states_tfs.freq - f) == ...
-                    min(abs(concat_states_tfs.freq - f)), 1, 'first');
-                line(xlim, [f_idx f_idx], 'color', 'k', 'linestyle', '--');
-            end
+            %line([0 0], ylim, 'color', 'k');
+            
         end
     end
     
@@ -166,8 +190,9 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
         cm = colormap(varargin{1});
         colorbar;
     end
-    % white separation between two state windows
-    cm(1,:,:) = [1,1,1];
+    % white separation between two state windows - commented since there is
+    % a new method for separating windows - test and remove
+    %cm(1,:,:) = [1,1,1];
     colormap(cm);
     
     saveas(gca, results_file);

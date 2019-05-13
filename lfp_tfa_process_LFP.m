@@ -46,7 +46,6 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
     sites = session_lfp.sites;
     
     % prepare results folder
-    %sessionName = sites(1).site_ID(1:12);
     results_fldr = fullfile(lfp_tfa_cfg.session_results_fldr);
     if ~exist(results_fldr, 'dir')
         mkdir(results_fldr);

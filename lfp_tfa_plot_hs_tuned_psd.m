@@ -34,7 +34,7 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
     
     figure;
     
-    cm = colormap(jet(size(avg_lfp_psd, 1)));
+    cm = colormap(othercolor('BrBG4', size(avg_lfp_psd, 1)));
     
     % loop through handspace
     for hs = 1:size(avg_lfp_psd, 2)
@@ -57,8 +57,12 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
                 % log y axis ticks
                 set(gca, 'xtick', (avg_lfp_psd(ep, hs).freq([1:8:numel(avg_lfp_psd(ep, hs).freq)])));
                 set(gca, 'xticklabel', ...
-                    round((avg_lfp_psd(ep, hs).freq([1:8:numel(avg_lfp_psd(ep, hs).freq)]))));
+                    round((avg_lfp_psd(ep, hs).freq([1:8:numel(avg_lfp_psd(ep, hs).freq)]))), ...
+                    'fontsize', 8);
                 set(gca, 'xlim', [avg_lfp_psd(ep, hs).freq(1) avg_lfp_psd(ep, hs).freq(end)]);
+                % set y-axis (power) limits in dB
+                set(gca, 'ylim', [-100 -40]);
+                set(gca, 'box', 'on');                
                 ylabel('LFP Power (dB)');
                 xlabel('Frequency (Hz)');
                 subplottitle = avg_lfp_psd(ep, hs).hs_label{1};

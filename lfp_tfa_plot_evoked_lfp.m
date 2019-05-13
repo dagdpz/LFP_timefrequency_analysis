@@ -35,6 +35,8 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
 
     figure;
 
+    % number of offset samples to divide between time windows
+    noffset = 100;
     % loop through handspace
     for hs = 1:size(evoked_lfp, 2)
         if ~isempty([evoked_lfp(:,hs).mean]) &&  ~isempty([evoked_lfp(:,hs).std])
@@ -50,11 +52,11 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 % concatenate mean, std and time of evoked LFP for
                 % different states
                 concat_states_lfp.mean = [concat_states_lfp.mean, ...
-                    evoked_lfp(st, hs).mean, nan(1, 150)];
+                    evoked_lfp(st, hs).mean, nan(1, noffset)];
                 concat_states_lfp.std = [concat_states_lfp.std, ...
-                    evoked_lfp(st, hs).std, nan(1, 150)];
+                    evoked_lfp(st, hs).std, nan(1, noffset)];
                 concat_states_lfp.time = [concat_states_lfp.time, ...
-                    evoked_lfp(st, hs).time, nan(1, 150)];
+                    evoked_lfp(st, hs).time, nan(1, noffset)];
                 concat_states_lfp.label = evoked_lfp(st, hs).hs_label;                
 
                 state_info(st).onset_s = find(...
@@ -67,11 +69,11 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
 
                 if st > 1
                     state_info(st).start_s = length(evoked_lfp(st-1, hs).time) + ...
-                        state_info(st).start_s + (st-1)*150;
+                        state_info(st).start_s + (st-1)*noffset;
                     state_info(st).finish_s = length(evoked_lfp(st-1, hs).time) + ...
-                        state_info(st).finish_s + (st-1)*150;
+                        state_info(st).finish_s + (st-1)*noffset;
                     state_info(st).onset_s = length(evoked_lfp(st-1, hs).time) + ...
-                        state_info(st).onset_s + (st-1)*150;
+                        state_info(st).onset_s + (st-1)*noffset;
                 end
 
             end
@@ -90,16 +92,14 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             % mark state onsets
             set(gca,'xtick',state_samples)
             for so = state_onsets
-                line([so so], ylim); 
+                line([so so], ylim, 'color', 'k'); 
                 state_name = evoked_lfp(state_onsets == so, hs).state_name;
-                % commented - for further inspection and testing
-%                 state_name = lfp_tfa_cfg.all_states(...
-%                     [lfp_tfa_cfg.all_states.state_ID] == state).state_name;
                 ypos = ylim;
                 ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;
-                text(so, ypos, state_name);
+                text(so+1, ypos, state_name, 'fontsize', 8);
             end
             set(gca,'xticklabels', round(concat_states_lfp.time(state_samples), 2), 'fontsize', 8)
+            set(gca, 'xticklabelrotation', 45);
             xlabel('Time(s)');
             ylabel('LFP amplitude');
             subplottitle = [concat_states_lfp.label{1}];

@@ -6,7 +6,7 @@
 clear; 
 
 % file containing settings for LFP analysis
-settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
+settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Mag.m';
 
 %% INITIALIZATION
 close all;
@@ -42,7 +42,7 @@ try
         % folder to which results of analysis of this session should be
         % stored
         lfp_tfa_cfg.session_results_fldr = ...
-            fullfile(lfp_tfa_cfg.root_results_fldr, session_name);
+            fullfile(lfp_tfa_cfg.proc_lfp_folder, session_name);
         % absolute path of file containing LFP data for this session
         lfp_tfa_cfg.data_filepath = lfp_datafiles{i};
         % load the processed LFP data for one session
@@ -67,30 +67,32 @@ try
         session_name = [sessions_info(i).Monkey '_' sessions_info(i).Date];
         fprintf('Processing LFP for session %s\n', session_name);
         lfp_tfa_cfg.session = session_name;
+        
+        % folder containing processed LFP data for this session
+        lfp_tfa_cfg.session_proc_fldr = ...
+            fullfile(lfp_tfa_cfg.proc_lfp_folder, session_name);
         % folder to which results of analysis of this session should be
         % stored
         lfp_tfa_cfg.session_results_fldr = ...
-            fullfile(lfp_tfa_cfg.root_results_fldr, session_name);
+            fullfile(lfp_tfa_cfg.analyse_lfp_folder, session_name);
         % absolute path of file containing LFP data for this session
         lfp_tfa_cfg.data_filepath = lfp_datafiles{i};
+        % perturbation blocks
+        lfp_tfa_cfg.perturbation_groups = {};        
         % preinjection blocks for this session
-        lfp_tfa_cfg.perturbation_groups = cell(1, 2);
         if isfield(sessions_info, 'Preinj_blocks') && ...
                 ~isempty(sessions_info(i).Preinj_blocks)
-            lfp_tfa_cfg.perturbation_groups{1} = sessions_info(i).Preinj_blocks;
-        elseif isfield(lfp_tfa_cfg.compare, 'perturbation_groups')
-            lfp_tfa_cfg.perturbation_groups{1} = lfp_tfa_cfg.compare.perturbation_groups(1);
-        else
-            lfp_tfa_cfg.perturbation_groups{1} = 0;            
+            lfp_tfa_cfg.perturbation_groups = ...
+                [lfp_tfa_cfg.perturbation_groups sessions_info(i).Preinj_blocks];
+        elseif any(lfp_tfa_cfg.compare.perturbation == 0)            
+            lfp_tfa_cfg.perturbation_groups = [lfp_tfa_cfg.perturbation_groups 0];            
         end
         % postinjection blocks for this session
         if isfield(sessions_info, 'Postinj_blocks') && ...
                 ~isempty(sessions_info(i).Postinj_blocks)
             lfp_tfa_cfg.perturbation_groups{2} = sessions_info(i).Postinj_blocks;
-        elseif isfield(lfp_tfa_cfg.compare, 'perturbation_groups')
-            lfp_tfa_cfg.perturbation_groups{2} = lfp_tfa_cfg.compare.perturbation_groups(2);
-        else
-            lfp_tfa_cfg.perturbation_groups{2} = 'all';            
+        elseif any(lfp_tfa_cfg.compare.perturbation == 1)            
+            lfp_tfa_cfg.perturbation_groups = [lfp_tfa_cfg.perturbation_groups 'all'];            
         end
         % Calculate and plot the site-wise and session average TFR, 
         % evoked response and power spectral density for 

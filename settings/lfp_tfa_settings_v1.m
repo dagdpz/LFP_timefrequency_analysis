@@ -354,7 +354,7 @@ lfp_tfa_cfg.compare.effectors = [4];
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = 0; 
+lfp_tfa_cfg.compare.choice_trials = 1; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -445,7 +445,7 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
 % consider those sites with atleast 5 trials for each condition
 % lfp_tfa_cfg.mintrials_percondition = 5; 
 % By condition, we mean a combination of choice/instr, pre/post-injection, type and effector, hand-space
- lfp_tfa_cfg.mintrials_percondition = 5;
+ lfp_tfa_cfg.mintrials_percondition = 0;
 
 % method to be used for baseline normalization
 % can be 'zscore', 'relchange', 'subtraction', 'division'
