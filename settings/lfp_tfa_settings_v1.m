@@ -8,7 +8,7 @@ lfp_tfa_cfg = [];
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
 % eg: 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\20190506\ver_SN_0.2'
-lfp_tfa_cfg.version = 'SN_0.2';
+lfp_tfa_cfg.version = 'Linus_inactivation';
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
@@ -124,7 +124,7 @@ lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L'};
 
        
 % absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\Lin';
+lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\Linus_inactivation';
 
 % Specify events which mark trial start and end
 lfp_tfa_cfg.trialinfo = struct();
@@ -381,6 +381,18 @@ lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
 % 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
 % any hand label is combined)
 lfp_tfa_cfg.compare.reach_spaces = {'L', 'R'}; 
+
+% hand space combinations to be included from analysis
+% should be a cell array with each element containing the hand and space
+% label to be excluded
+% if no hand-space conditions are to be excluded, leave empty
+% Example:
+% 1. lfp_tfa_cfg.compare.exclude_handspace = {'LR', 'RL'};
+% exclude left hand right space and right hand left space trials
+% 2. lfp_tfa_cfg.compare.exclude_handspace = {'LL', 'RR'};
+% exclude left hand left space and right hand right space trials
+% 
+lfp_tfa_cfg.compare.exclude_handspace = {};
 
 % perturbations to be included in the analysis
 % should be nan, 0, 1 or [0, 1]

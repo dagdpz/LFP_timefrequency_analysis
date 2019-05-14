@@ -66,11 +66,18 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
     %perturbation_groups = lfp_tfa_cfg.compare.perturbation_groups;
     
     hands = lfp_tfa_cfg.compare.reach_hands;
-    spaces = lfp_tfa_cfg.compare.reach_spaces;  
+    spaces = lfp_tfa_cfg.compare.reach_spaces; 
+    
+    % hand-space labels to be excluded
+    exclude_handpsace = {};
+    if isfield(lfp_tfa_cfg.compare, 'exclude_handspace')
+        exclude_handpsace = lfp_tfa_cfg.compare.exclude_handspace;
+    end
     % assign hand space labels
-    hs_labels = cell(1, length(hands)*length(spaces));
-    reach_hands = cell(1, length(hands)*length(spaces));
-    reach_spaces = cell(1, length(hands)*length(spaces));
+    hs_labels = cell(1, length(hands)*length(spaces) - length(exclude_handpsace));
+    reach_hands = cell(1, length(hands)*length(spaces) - length(exclude_handpsace));
+    reach_spaces = cell(1, length(hands)*length(spaces) - length(exclude_handpsace));
+    hs_idx = 0;
     for h = 1:length(hands)
         if strcmp(hands{h},'R') || strcmp(hands{h},'L')
             if strcmp(hands{h},lfp_tfa_cfg.ref_hemisphere)
@@ -82,6 +89,12 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
             hand_label = [hands{h}, 'H'];
         end
         for s = 1:length(spaces)
+            % check if this hand space label should be excluded
+            hs_label = [hands{h}, spaces{s}];
+            if ~isempty(exclude_handpsace) && ...
+                    any(strcmp(lfp_tfa_cfg.compare.exclude_handspace, hs_label))
+                continue;
+            end
             if strcmp(spaces{s},'R') || strcmp(spaces{s},'L')
                 if strcmp(spaces{s},lfp_tfa_cfg.ref_hemisphere)
                     space_label = 'IS';
@@ -91,7 +104,7 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
             else
                 space_label = [spaces{s}, 'S'];
             end
-            hs_idx = (h-1)*length(spaces) + s;
+            hs_idx = hs_idx + 1;
             reach_hands{hs_idx} = hands{h};
             reach_spaces{hs_idx} = spaces{s};
             hs_labels{hs_idx} = [hand_label ' ' space_label];

@@ -309,7 +309,7 @@ lfp_tfa_cfg.compare.effectors = [6];
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = 0; 
+lfp_tfa_cfg.compare.choice_trials = 1; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -336,6 +336,18 @@ lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
 % 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
 % any hand label is combined)
 lfp_tfa_cfg.compare.reach_spaces = {'L', 'R'}; 
+
+% hand space combinations to be included from analysis
+% should be a cell array with each element containing the hand and space
+% label to be excluded
+% if no hand-space conditions are to be excluded, leave empty
+% Example:
+% 1. lfp_tfa_cfg.compare.exclude_handspace = {'LR', 'RL'};
+% exclude left hand right space and right hand left space trials
+% 2. lfp_tfa_cfg.compare.exclude_handspace = {'LL', 'RR'};
+% exclude left hand left space and right hand right space trials
+% 
+lfp_tfa_cfg.compare.exclude_handspace = {'LR', 'RL'};
 
 % perturbations to be included in the analysis
 % should be nan, 0, 1 or [0, 1]
