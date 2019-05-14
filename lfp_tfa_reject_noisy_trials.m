@@ -1,9 +1,9 @@
-function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
+function [states_lfp] = lfp_tfa_reject_noisy_trials( states_lfp, cfg_noise )
 %lfp_tfa_reject_noisy_trials  - marks noisy lfp trials based on threshold 
 %values of raw lfp amplitude and raw lfp derivative
 %
 % USAGE:
-%	[states_lfp] = lfp_tfa_reject_noisy_trials( states_lfp, cfg_noise )
+%	[sites, noisy_lfp_trials] = lfp_tfa_reject_noisy_trials( sites, cfg_nr )
 %
 % INPUTS:
 %		states_lfp       - struct containing processed lfp data which is 
@@ -23,8 +23,10 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
 %           results_folder: root folder to save output plots and results
 %
 % OUTPUTS:
-%		states_lfp      - struct containing processed lfp with
+%		filt_session_lfp - struct containing processed lfp with
 %                          additional field which marks noisy trials
+%       noisy_lfp_trials - struct with detailed information about noisy 
+%                          trials
 %
 % See also lfp_tfa_read_LFP
     
@@ -39,15 +41,15 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
     fprintf('=============================================================\n');
     
     
-    % struct to save info about noisz trials
-    noisy_lfp_trials = struct();
-
     % first, calculate the mean and std of length-wise concatenated LFP from
     % each site
     % read in lfp data for each site
+    %site_lfp_files = dir([sites_lfp_folder, '\*.mat']);
     for i = 1:length(states_lfp)
         site = states_lfp(i);
         fprintf('Processing site lfp %s ...\n', site.site_ID);
+        %load(fullfile(sites_lfp_folder, site_lfp_files(i).name)); 
+        %site = site_lfp;
         % cell arrays to store LFP data for all trials
         concat_site_lfp = cell(1,length(site.trials)); % store LFP raw data for each trial
         concat_site_time = cell(1, length(site.trials)); % store LFP timestamps for each trial
@@ -98,7 +100,7 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
         % get lfp raw threshold
         lfp_raw_minbound = site_lfp_mean - cfg_noise.amp_thr * site_lfp_std;
         lfp_raw_maxbound = site_lfp_mean + cfg_noise.amp_thr * site_lfp_std;
-        % save this data into the struct - check if intermediate struct should be saved
+        % save this data into the struct
         %noisy_lfp_trials(i).lfp_mean = site_lfp_mean;
         %noisy_lfp_trials(i).lfp_std = site_lfp_std;  
 
@@ -111,7 +113,7 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
         lfp_diff_minbound = lfp_diff_mean - cfg_noise.diff_thr * lfp_diff_std;
         lfp_diff_maxbound = lfp_diff_mean + cfg_noise.diff_thr * lfp_diff_std;
 
-        % save this data into the struct - check if intermediate struct should be saved
+        % save this data into the struct
         %noisy_lfp_trials(i).lfp_diff_mean = lfp_diff_mean;
         %noisy_lfp_trials(i).lfp_diff_std = lfp_diff_std;  
 
@@ -119,7 +121,6 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
         arr_concat_trials_tfr = cat(3,concat_site_lfp_pow{:});
         pow_mean_f = nanmean(arr_concat_trials_tfr, 3);
         pow_std_f = nanstd(arr_concat_trials_tfr, 0, 3);
-        % check if intermediate struct should be saved
         %noisy_lfp_trials(i).lfp_pow_mean = pow_mean_f;
         %noisy_lfp_trials(i).lfp_pow_std = pow_std_f;
 
@@ -209,6 +210,7 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
                 line(xlim, [lfp_raw_minbound lfp_raw_minbound], 'color', 'r');
                 line(xlim, [lfp_raw_maxbound lfp_raw_maxbound], 'color', 'r');
                 % mark all states
+                %states_names = cell(1, length(concat_site_states{t}));
                 for s = 1:length(concat_site_states{t})
                     state = concat_site_states{t}(s);
                     state_onset = concat_site_states_onset{t}(s);
@@ -224,6 +226,7 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
                 line(xlim, [lfp_diff_minbound lfp_diff_minbound], 'color', 'r');
                 line(xlim, [lfp_diff_maxbound lfp_diff_maxbound], 'color', 'r');
                 % mark all states
+                %states_names = cell(1, length(concat_site_states{t}));
                 for s = 1:length(concat_site_states{t})
                     state = concat_site_states{t}(s);
                     state_onset = concat_site_states_onset{t}(s);
@@ -259,6 +262,7 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
                     %ft_singleplotTFR(cfg, noisy_tfr);
 
                     % mark all states
+                    %states_names = cell(1, length(concat_site_states{t}));
                     for s = 1:length(concat_site_states{t})
                         state = concat_site_states{t}(s);
                         state_onset = concat_site_states_onset{t}(s);
@@ -293,6 +297,13 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
         for b = 1:length(unq_blocks)
             block_trials_lfp = horzcat(concat_site_lfp{concat_blocks == unq_blocks(b)}) ;
             block_nsamples(b) = length(block_trials_lfp);
+    %             for t = 1:length(site.trials)
+    %                 block_nsamples(b) = block_nsamples(b)...
+    %                     + length(concat_site_lfp{t});
+    %             end
+            %block_ntrials(b) = sum(concat_blocks == unq_blocks(b));
+            %block_nrejtrials(b) = sum(concat_blocks == unq_blocks(b) & ...
+            %    noisy_trials == 1);
         end
         figure;
         % concatenated raw LFP and LFP derivative
@@ -311,7 +322,6 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
             block_end_sample = block_end_sample + block_nsamples(b);
             line([block_end_sample block_end_sample], ylim, 'color', 'k', ...
                 'linestyle', '--');
-            % to use in future
             %block_ann = ['Block ', unq_blocks(b), ' ntrials = ' num2str(block_ntrials(b)), ' nrejected = ' num2str(block_nrejtrials(b))];
             %annotation('textbox', [1 0.6 0.1 0.3], 'String', block_ann);
         end
@@ -329,7 +339,6 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
             block_end_sample = block_end_sample + block_nsamples(b);
             line([block_end_sample block_end_sample], ylim, 'color', 'k', ...
                 'linestyle', '--');
-            % to use in future
             %block_ann = ['Block ', unq_blocks(b), ' ntrials = ' num2str(block_ntrials(b)), ' nrejected = ' num2str(block_nrejtrials(b))];
             %annotation('textbox', [1 0.6 0.1 0.3], 'String', block_ann);
         end
@@ -351,7 +360,7 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
         states_lfp(i).ntrails = length(site.trials);
         states_lfp(i).noisytrails = sum(noisy_trials);
 
-        % save into struct - check if intermediate struct should be saved
+        % save into struct
     %     noisy_lfp_trials(i).site_ID = site_lfp.site_ID;
     %     noisy_lfp_trials(i).raw_amp = find(noisy_trials_lfp_mean);
     %     noisy_lfp_trials(i).raw_std = find(noisy_trials_lfp_std);
@@ -359,7 +368,7 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
     %     noisy_lfp_trials(i).lfp_pow = find(noisy_trials_lfp_pow);
     %     noisy_lfp_trials(i).all_noisy = find(noisy_trials);
 
-        % save data - check if intermediate struct should be saved
+        % save data
 %         site_lfp = site;
 %         states_filt_lfp(i) = site_lfp;
         %save (fullfile(results_folder, 'states_lfp.mat'), 'states_lfp');
@@ -367,7 +376,7 @@ function [states_lfp] = lfp_tfa_reject_noisy_lfp( states_lfp, cfg_noise )
         
     end
 %     
-%     % save noisy trials - check if intermediate struct should be saved
+%     % save noisy trials
 %     save (fullfile(results_folder_noise, 'noisy_lfp_trials.mat'), 'noisy_lfp_trials');
     fprintf('Noise rejection in LFP done. \n');
     fprintf('=============================================================\n');

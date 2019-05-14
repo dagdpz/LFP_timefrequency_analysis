@@ -218,13 +218,14 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 
                 result_file = fullfile(site_results_folder, ...
                     ['LFP_TFR_' sites_tfr(i).site_ID '_' site_conditions(cn).label '.png']);
-                lfp_tfa_plot_hs_tuned_tfr(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
+                lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
                     lfp_tfa_cfg, plottitle, result_file);
             end
 
         end
         
         % difference between pre- and post-injection
+        % check if both pre- and post- injection blocks exist
         if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
             sites_tfr(i).difference = lfp_tfa_compute_diff_tfr(sites_tfr(i), lfp_tfa_cfg);
             % Plot TFR difference
@@ -241,7 +242,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 
                     result_file = fullfile(site_results_folder, ...
                         ['LFP_DiffTFR_' sites_tfr(i).site_ID '_' sites_tfr(i).difference(dcn).label '.png']);
-                    lfp_tfa_plot_hs_tuned_tfr(sites_tfr(i).difference(dcn).hs_tuned_tfs, ...
+                    lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).difference(dcn).hs_tuned_tfs, ...
                         lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
                 end
             end
@@ -356,7 +357,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 result_file = fullfile(results_folder_tfr, ...
                                 ['LFP_TFR_' session_avg(t).condition(cn).target '_'...
                                 session_avg(t).condition(cn).session '_' site_conditions(cn).label '.png']);
-                lfp_tfa_plot_hs_tuned_tfr(session_avg(t).condition(cn).hs_tuned_tfs, ...
+                lfp_tfa_plot_hs_tuned_tfr_multiple_img(session_avg(t).condition(cn).hs_tuned_tfs, ...
                             lfp_tfa_cfg, plottitle, result_file);
 
             end
@@ -364,6 +365,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         end
         
         % Difference TFR for session
+        % check if both pre- and post- injection blocks exist
         if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
             session_avg(t).difference = lfp_tfa_compute_diff_tfr(session_avg(t), lfp_tfa_cfg);
             % plot average TFR difference across sites for this session
@@ -380,7 +382,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                     result_file = fullfile(results_folder_tfr, ...
                                     ['LFP_DiffTFR_' session_avg(t).difference(dcn).target '_'...
                                     session_avg(t).difference(dcn).session '_' session_avg(t).difference(dcn).label '.png']);
-                    lfp_tfa_plot_hs_tuned_tfr(session_avg(t).difference(dcn).hs_tuned_tfs, ...
+                    lfp_tfa_plot_hs_tuned_tfr_multiple_img(session_avg(t).difference(dcn).hs_tuned_tfs, ...
                                 lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
 
                 end
@@ -391,6 +393,8 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
     
     session_tfs.session_avg = session_avg;
     
+    % close figures
+    close all;    
     
     % save session average tfs
     save(fullfile(results_folder_tfr, ['LFP_TFR_' session_tfs.session '.mat']), 'session_tfs');

@@ -32,6 +32,9 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    % add external functions to path
+    addpath(genpath('./external'));
+
     % define state IDs
     lfp_tfa_global_define_states;    
 
@@ -72,6 +75,11 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
     lfp_tfa_cfg.noise.results_folder = lfp_tfa_cfg.root_results_fldr;
     % folder to save baseline results
     lfp_tfa_cfg.results_folder = lfp_tfa_cfg.root_results_fldr;
+    
+    % folder to save LFP processing results
+    lfp_tfa_cfg.proc_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'Processed LFP'];
+    % folder to save LFP analysis results
+    lfp_tfa_cfg.analyse_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'LFP Analysis'];
 
     % save settings struct
     save(fullfile(lfp_tfa_cfg.root_results_fldr, ['lfp_tfa_settings_ver_' num2str(lfp_tfa_cfg.version) '.mat']), ...
