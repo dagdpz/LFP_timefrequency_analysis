@@ -149,7 +149,7 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
                 round(concat_states_tfs.freq([1:8:numel(concat_states_tfs.freq)])));
             % add 0.5 at end since the time value is the center of the bin
             % add 0 at beginning to make x-axis visible
-            set(gca, 'ylim', [0.5 numel(avg_tfr(st, hs).freq) + 0.5]);
+            set(gca, 'ylim', [0 numel(avg_tfr(st, hs).freq) + 0.5]);
             % mark state onsets
             set(gca,'xtick',state_samples)
             for so = state_onsets
@@ -161,7 +161,7 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
             set(gca, 'xticklabelrotation', 45)
             % add 0.5 since the time value is the center of the bin
             % add 0 at the beginning to make the y-axis visible
-            set(gca, 'xlim', [0.5 state_samples(end) + 0.5]);
+            set(gca, 'xlim', [0 state_samples(end) + 0.5]);
             xlabel('Time (s)');
             ylabel('Frequency (Hz)');
                         
