@@ -177,8 +177,11 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 
                         % baseline normalization
                         cfg_baseline.method = lfp_tfa_cfg.baseline_method;
-                        cfg_baseline.mean = states_lfp(i).baseline_mean;
-                        cfg_baseline.std = states_lfp(i).baseline_std;
+                        baseline_cnd_idx = [states_lfp(i).baseline.perturbation] == ...
+                            lfp_tfa_cfg.baseline_perturbation & [states_lfp(i).baseline.choice] == ...
+                            lfp_tfa_cfg.baseline_use_choice_trial;
+                        cfg_baseline.mean = states_lfp(i).baseline(baseline_cnd_idx).pow_mean;
+                        cfg_baseline.std = states_lfp(i).baseline(baseline_cnd_idx).pow_std;
                         state_tfs.powspctrm_normmean = lfp_tfa_baseline_normalization(...
                             state_tfs.powspctrm_rawmean, cfg_baseline); 
 

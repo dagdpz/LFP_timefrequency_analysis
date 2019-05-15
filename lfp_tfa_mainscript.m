@@ -3,10 +3,10 @@
 % Runs functions for reading processed LFP data, rejection of noise trials
 % and task specific analysis using TFR
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clear; 
+%clear; 
 
 % file containing settings for LFP analysis
-settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Mag.m';
+settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
 
 %% INITIALIZATION
 close all;
@@ -24,7 +24,7 @@ lfp_datafiles = {sessions_info.Input};
 % struct to read in LFP data
 session_lfp = struct();
 % struct to store processed LFP data
-session_proc_lfp = struct();
+%session_proc_lfp = struct();
 % struct to store average LFP TFR for different conditions
 lfp_tfr = struct();
 % struct to store average LFP evoked response for different conditions
@@ -49,14 +49,14 @@ try
         session_lfp(i).sites = load(lfp_tfa_cfg.data_filepath);
         % read LFP data for each site and each trial and calculate the 
         % trial-wise time frequency spectrogram
-        session_proc_lfp(i).sites = ...
-            lfp_tfa_process_LFP(session_lfp(i).sites, lfp_tfa_cfg);
+%         session_proc_lfp(i).sites = ...
+%             lfp_tfa_process_LFP(session_lfp(i).sites, lfp_tfa_cfg);
         % Detect the noisy trials for each site of a session
-        if lfp_tfa_cfg.noise.detect
-            session_proc_lfp(i).sites = ...
-                lfp_tfa_reject_noisy_lfp(session_proc_lfp(i).sites, ...
-                lfp_tfa_cfg.noise);
-        end
+%         if lfp_tfa_cfg.noise.detect
+%             session_proc_lfp(i).sites = ...
+%                 lfp_tfa_reject_noisy_lfp(session_proc_lfp(i).sites, ...
+%                 lfp_tfa_cfg.noise);
+%         end
         % Calculate the baseline power for each site
         session_proc_lfp(i).sites = ...
             lfp_tfa_compute_baseline_power(session_proc_lfp(i).sites, ...

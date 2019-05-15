@@ -53,9 +53,7 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
     % if different sessions have different perturbation groups
     if nargin > 1
         perturbation_groups = varargin{1};
-    % if perturbation groups are same for all sessions
-    elseif isfield(lfp_tfa_cfg.compare, 'perturbation_groups')
-        perturbation_groups = lfp_tfa_cfg.compare.perturbation_groups;
+
         % default perturbation groups based on perturbation input
     elseif sum (perturbations == [0, 1])
         perturbation_groups = {0, 'all'};

@@ -48,43 +48,56 @@ function [ session_proc_lfp_out ] = lfp_tfa_compute_baseline_power( session_lfp_
     fprintf('Computing baseline ...\n');
     
     % folder for saving results
-    root_results_folder = cfg_tfs.results_folder;
-    results_folder = fullfile(root_results_folder);
-    if ~exist(results_folder, 'dir')
-        mkdir(results_folder);
+    results_fldr = fullfile(cfg_tfs.session_results_fldr);
+    if ~exist(results_fldr, 'dir')
+        mkdir(results_fldr);
     end
     
     % loop through each site
     for i = 1:length( session_lfp_in )
         site_lfp = session_lfp_in(i);
         fprintf('Processing site (%g/%g): %s \n', i, length(session_lfp_in), site_lfp.site_ID);
-        % struct to store lfp power during baseline period for each trial
-        baseline_pow = cell(1, length(site_lfp.trials));
-        % loop through trial
-        for t = 1:length( site_lfp.trials )
-            trial = site_lfp.trials(t);
-            % whether this trial should be considered for baseline calculation
-            consider_trial = ~(trial.noisy) & sum(trial.perturbation == cfg_tfs.baseline_perturbation) ...
-                & sum(trial.choice_trial == cfg_tfs.baseline_use_choice_trial);
-            if consider_trial 
-                if strcmp(cfg_tfs.baseline_ref_state, '') && strcmp(cfg_tfs.baseline_ref_period , 'trial')
-                    baseline_pow{t} = trial.tfs.powspctrm(1, :, ...
-                        trial.tfs.time >= trial.trialperiod(1) & trial.tfs.time <= trial.trialperiod(2));
-                elseif ~strcmp(cfg_tfs.baseline_ref_state, '')
-                    ref = cfg_tfs.baseline_ref_state;
-                    ref_onset = trial.states([trial.states.id] == ref) .onset_t;
-                    ref_period = ref_onset + cfg_tfs.baseline_ref_period;
-                    baseline_pow{t} = trial.tfs.powspctrm(1, :, trial.tfs.time >= ...
-                        ref_period(1) & trial.tfs.time <= ref_period(2));
+        % structure to store baseline
+        baseline = struct();        
+        % baseline conditions
+        perturbation = unique([site_lfp.trials.perturbation]);
+        choice = unique([site_lfp.trials.choice_trial]);
+        % loop through each baseline condition
+        cnd = 1;
+        for p = perturbation
+            for c = choice
+                baseline(cnd).perturbation = p;
+                baseline(cnd).choice = c;
+                % struct to store lfp power during baseline period for each trial
+                baseline_pow = cell(1, length(site_lfp.trials));
+                % loop through trial
+                for t = 1:length( site_lfp.trials )
+                    trial = site_lfp.trials(t);
+                    % whether this trial should be considered for baseline calculation
+                    consider_trial = ~(trial.noisy) & sum(trial.perturbation == p) ...
+                        & sum(trial.choice_trial == c);
+                    if consider_trial 
+                        if strcmp(cfg_tfs.baseline_ref_state, '') && strcmp(cfg_tfs.baseline_ref_period , 'trial')
+                            baseline_pow{t} = trial.tfs.powspctrm(1, :, ...
+                                trial.tfs.time >= trial.trialperiod(1) & trial.tfs.time <= trial.trialperiod(2));
+                        elseif ~strcmp(cfg_tfs.baseline_ref_state, '')
+                            ref = cfg_tfs.baseline_ref_state;
+                            ref_onset = trial.states([trial.states.id] == ref) .onset_t;
+                            ref_period = ref_onset + cfg_tfs.baseline_ref_period;
+                            baseline_pow{t} = trial.tfs.powspctrm(1, :, trial.tfs.time >= ...
+                                ref_period(1) & trial.tfs.time <= ref_period(2));
+                        end
+                    end
                 end
+                % calculate baseline power mean and std
+                arr_baseline_pow = cat(3, baseline_pow{:});
+                baseline(cnd).pow_mean = nanmean(arr_baseline_pow, 3);
+                baseline(cnd).pow_std = nanstd(arr_baseline_pow, 0, 3);
+                session_proc_lfp_out(i).baseline = baseline;
+                cnd = cnd + 1;
+                clear('arr_baseline_pow'); 
             end
         end
-        % calculate baseline power mean and std
-        arr_baseline_pow = cat(3, baseline_pow{:});
-        baseline_pow_mean = nanmean(arr_baseline_pow, 3);
-        baseline_pow_std = nanstd(arr_baseline_pow, 0, 3);
-        session_proc_lfp_out(i).baseline_mean = baseline_pow_mean;
-        session_proc_lfp_out(i).baseline_std = baseline_pow_std;
 
         % store baseline power - commented for further inspection
 %         baseline.sites(i).mean = baseline_pow_mean;
@@ -92,9 +105,11 @@ function [ session_proc_lfp_out ] = lfp_tfa_compute_baseline_power( session_lfp_
         
         % save data
         site_lfp = session_proc_lfp_out(i);
-        save(fullfile(cfg_tfs.session_results_fldr, ...
+        save(fullfile(results_fldr, ...
             [site_lfp.site_ID, '.mat']), 'site_lfp');
-
+        
+        clear('baseline_pow');
+        
     end    
     
     fprintf(' done\n');

@@ -30,6 +30,9 @@ lfp_tfa_cfg.file_list = ...
     {'Magnus', '20190124', 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190124\sites_Magnus_20190124.mat';
     'Magnus', '20190314', 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190314\sites_Magnus_20190314.mat'};
 
+% absolute path to the folder where the results of analysis should be stored
+lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\Linus_inactivation';
+
 % info about sessions to be analysed
 % should be a 1 x N struct, N = number of sessions to analyse
 % the struct should contain the following fields:
@@ -41,65 +44,65 @@ lfp_tfa_cfg.file_list = ...
 %       Postinj_blocks: Blocks to be considered for post-injection, can be
 %       integer, array of integers, 'all' or 'allbutone' (if 'all' is
 %       specified, all post-injection blocks will be combined; if
-%       'allbutone', all blocks from the second post-injection block will
+%       'allbutfirst', all blocks from the second post-injection block will
 %       be combined)
 lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20170622', ...
            'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170622.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 'allbutfirst');
 lfp_tfa_cfg.session_info(2) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20170629', ...
            'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170629.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 'allbutfirst');
 lfp_tfa_cfg.session_info(3) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20170707', ...
            'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170707.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 'allbutfirst');
 lfp_tfa_cfg.session_info(4) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20170713', ...
            'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170713.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 'allbutfirst');
 lfp_tfa_cfg.session_info(5) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20170720', ...
            'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170720.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 'allbutfirst');
 lfp_tfa_cfg.session_info(6) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20170802', ...
            'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170802.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 'allbutfirst');
        
 lfp_tfa_cfg.session_info(7) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20170804', ...
            'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170804.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 'allbutfirst');
        
 lfp_tfa_cfg.session_info(8) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20170818', ...
            'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20170818.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 'allbutfirst');
        
 lfp_tfa_cfg.session_info(9) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20171012', ...
            'Input',         'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\sites_Linus_20171012.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutone');
+           'Postinj_blocks', 'allbutfirst');
        
        
 % To add a new session to analyse, increment the counter by 1 and add a new
@@ -110,7 +113,7 @@ lfp_tfa_cfg.session_info(9) = ...
 %            'Date',          '20190208', ...
 %            'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190208\sites_Magnus_20190208.mat', ...
 %            'Preinj_blocks',  0, ...
-%            'Postinj_blocks', 'all');
+%            'Postinj_blocks', 'allbutfirst');
 
 
 % targets to be included in the analysis
@@ -120,11 +123,116 @@ lfp_tfa_cfg.session_info(9) = ...
 % Those targets which are not in the analysed sessions will be ignored
 % Example:
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
-lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L'}; 
+lfp_tfa_cfg.compare.targets = {'MIP_R', 'MIP_L'}; 
 
-       
-% absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\Linus_inactivation';
+% reference hemisphere for hand-space labelling
+% can be 'R' (for right hemisphere) or 'L' (for left hemisphere)
+% ref_hemisphere is used for labelling contra and ipsi hand and space
+% set ref_hemisphere to lesioned hemishere for ipsi lesional and contra
+% lesional labeling
+% set ref_hemisphere to recorded hemishere for ipsi lateral and contra
+% lateral labeling
+lfp_tfa_cfg.ref_hemisphere = 'R'; 
+
+% maximum no:of sites to analyse from each session
+% If maxsites < total number of sites in a session, only maxsite number of
+% sites will be analysed
+% Examples:
+% 1. lfp_tfa_cfg.maxsites = 2; only first two sites will be analysed from 
+% each session
+% 1. lfp_tfa_cfg.maxsites = inf; all the sites will be analysed from 
+% each session
+lfp_tfa_cfg.maxsites = inf; % inf = analyse all sites
+
+%% Settings for averaging TFR and evoked LFP based on conditions
+
+% trial types to be included in the analysis
+% should be a vector of integers specifying the types
+% entries should be same as one of the type specified in the 'type' field
+% in the input LFP data
+% Example: 
+% 1. lfp_tfa_cfg.compare.types = [4, 2]; % analyse trials with type = 4
+% and type = 2 separately
+% 2. lfp_tfa_cfg.compare.types = nan; Ignore trial type (trials with any
+% type value are combined)
+lfp_tfa_cfg.compare.types = [4];
+
+% effectors to be included in the analysis
+% should be a vector of integers specifying the effectors
+% entries should be same as one of the type specified in the 'effector' field
+% in the input LFP data
+% Example: 
+% 1. lfp_tfa_cfg.compare.types = [4, 6]; % analyse trials with effector = 4
+% and effector = 6 separately
+% 2. lfp_tfa_cfg.compare.types = nan; Ignore effector (trials with any
+% effector value are combined)
+lfp_tfa_cfg.compare.effectors = [4];
+
+% which type of choice trials are to be included in the analysis
+% Examples:
+% 1. lfp_tfa_cfg.compare.choice_trials = 0; % analyse only instructed trials
+% 2. lfp_tfa_cfg.compare.choice_trials = 1; % analyse only choice trials
+% 3. lfp_tfa_cfg.compare.choice_trials = [0, 1]; % analyse choice and 
+% instructed trials separately
+% 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
+% and instructed trials are combined)
+lfp_tfa_cfg.compare.choice_trials = 0; 
+
+% reach hands to be included for analysis
+% should be nan or a cell array that contain only values 'R', 'L'
+% Examples:
+% 1. lfp_tfa_cfg.compare.reach_hands = {'L'}; include only those trials in
+% which reach hand is left
+% 2. lfp_tfa_cfg.compare.reach_hands = {'R'}; include only those trials in
+% which reach hand is right
+% 3. lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; analyse the trials in
+% which reach hand is left and right separately
+% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
+% any hand label is combined)
+lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
+
+% reach space to be included for analysis
+% should be nan or a cell array that contain only values 'R', 'L'
+% Examples:
+% 1. lfp_tfa_cfg.compare.reach_hands = {'L'}; include only those trials in
+% which reach hand is left
+% 2. lfp_tfa_cfg.compare.reach_hands = {'R'}; include only those trials in
+% which reach hand is right
+% 3. lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; analyse the trials in
+% which reach hand is left and right separately
+% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
+% any hand label is combined)
+lfp_tfa_cfg.compare.reach_spaces = {'L', 'R'}; 
+
+% hand space combinations to be included from analysis
+% should be a cell array with each element containing the hand and space
+% label to be excluded
+% if no hand-space conditions are to be excluded, leave empty
+% Example:
+% 1. lfp_tfa_cfg.compare.exclude_handspace = {'LR', 'RL'};
+% exclude left hand right space and right hand left space trials
+% 2. lfp_tfa_cfg.compare.exclude_handspace = {'LL', 'RR'};
+% exclude left hand left space and right hand right space trials
+% 3. lfp_tfa_cfg.compare.exclude_handspace = {'RL', 'RR'};
+% exclude right hand left space and right hand right space trials
+lfp_tfa_cfg.compare.exclude_handspace = {};
+
+% perturbations to be included in the analysis
+% should be nan, 0, 1 or [0, 1]
+% Examples:
+% lfp_tfa_cfg.compare.perturbations = 0; consider only those trials with
+% perturbation value = lfp_tfa_cfg.compare.perturbation_groups(0)
+% lfp_tfa_cfg.compare.perturbations = 1; consider only those trials with
+% perturbation value = lfp_tfa_cfg.compare.perturbation_groups(1)
+% lfp_tfa_cfg.compare.perturbations = [0, 1]; consider the trials with
+% perturbation value = lfp_tfa_cfg.compare.perturbation_groups(0) or 
+% lfp_tfa_cfg.compare.perturbation_groups(1) separately
+% lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
+% any perturbation value 
+lfp_tfa_cfg.compare.perturbations = [0, 1]; 
+
+
+%% Time information
 
 % Specify events which mark trial start and end
 lfp_tfa_cfg.trialinfo = struct();
@@ -161,24 +269,6 @@ lfp_tfa_cfg.trialinfo.end_state = lfp_tfa_states.SUCCESS;
 % trial start time = onset time of lfp_tfa_cfg.trialinfo.end_state - 0.5;
 lfp_tfa_cfg.trialinfo.ref_tend = 0;
 
-% reference hemisphere for hand-space labelling
-% can be 'R' (for right hemisphere) or 'L' (for left hemisphere)
-% ref_hemisphere is used for labelling contra and ipsi hand and space
-% set ref_hemisphere to lesioned hemishere for ipsi lesional and contra
-% lesional labeling
-% set ref_hemisphere to recorded hemishere for ipsi lateral and contra
-% lateral labeling
-lfp_tfa_cfg.ref_hemisphere = 'R'; 
-
-% maximum no:of sites to analyse from each session
-% If maxsites < total number of sites in a session, only maxsite number of
-% sites will be analysed
-% Examples:
-% 1. lfp_tfa_cfg.maxsites = 2; only first two sites will be analysed from 
-% each session
-% 1. lfp_tfa_cfg.maxsites = inf; all the sites will be analysed from 
-% each session
-lfp_tfa_cfg.maxsites = inf; % inf = analyse all sites
 
 %% Settings for ft_freqanalysis in FieldTrip
 % Configuration for calculating LFP time frequency spectrogram using
@@ -304,6 +394,8 @@ end
 
 % which perturbation blocks to be considered for baseline power calculation
 % set to 0 for considering only pre-injection blocks
+% in case trials from a single perturbation block is analysed, the same
+% block will be used for baseline calculation
 % Examples: 
 % 1. lfp_tfa_cfg.baseline_perturbation = 0; only perturbation block 0
 % (pre-injection) is used for baseline power calculation
@@ -311,102 +403,26 @@ end
 % 0 (pre-injection) and 2 (post-injection), but is not recommended
 % 3. lfp_tfa_cfg.baseline_perturbation = [2, 3]; combines perturbation blocks
 % 2 and 3
-lfp_tfa_cfg.baseline_perturbation = 0; 
+if length(lfp_tfa_cfg.compare.perturbations) == 1
+    lfp_tfa_cfg.baseline_perturbation = lfp_tfa_cfg.compare.perturbation;
+else
+    lfp_tfa_cfg.baseline_perturbation = 0; % set the perturbation block(s) to be used for computing baseline
+end
 
 % whether to consider choice (1) or instructed trials (0) in baseline power
 % calculation 
+% in case, only either choice/instructed is being analysed, the trials from
+% the analysed choice is used for baseline
 % Examples:
 % 1. lfp_tfa_cfg.baseline_use_choice_trial = 0; % consider only instructed trials
 % 2. lfp_tfa_cfg.baseline_use_choice_trial = 1; % consider only choice trials
 % 3. lfp_tfa_cfg.baseline_use_choice_trial = [0, 1]; % consider both instructed and choice trials
-lfp_tfa_cfg.baseline_use_choice_trial = 0; 
-
-%% Settings for averaging TFR and evoked LFP based on conditions
-
-
-% trial types to be included in the analysis
-% should be a vector of integers specifying the types
-% entries should be same as one of the type specified in the 'type' field
-% in the input LFP data
-% Example: 
-% 1. lfp_tfa_cfg.compare.types = [4, 2]; % analyse trials with type = 4
-% and type = 2 separately
-% 2. lfp_tfa_cfg.compare.types = nan; Ignore trial type (trials with any
-% type value are combined)
-lfp_tfa_cfg.compare.types = [4];
-
-% effectors to be included in the analysis
-% should be a vector of integers specifying the effectors
-% entries should be same as one of the type specified in the 'effector' field
-% in the input LFP data
-% Example: 
-% 1. lfp_tfa_cfg.compare.types = [4, 6]; % analyse trials with effector = 4
-% and effector = 6 separately
-% 2. lfp_tfa_cfg.compare.types = nan; Ignore effector (trials with any
-% effector value are combined)
-lfp_tfa_cfg.compare.effectors = [4];
-
-% which type of choice trials are to be included in the analysis
-% Examples:
-% 1. lfp_tfa_cfg.compare.choice_trials = 0; % analyse only instructed trials
-% 2. lfp_tfa_cfg.compare.choice_trials = 1; % analyse only choice trials
-% 3. lfp_tfa_cfg.compare.choice_trials = [0, 1]; % analyse choice and 
-% instructed trials separately
-% 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
-% and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = 1; 
-
-% reach hands to be included for analysis
-% should be nan or a cell array that contain only values 'R', 'L'
-% Examples:
-% 1. lfp_tfa_cfg.compare.reach_hands = {'L'}; include only those trials in
-% which reach hand is left
-% 2. lfp_tfa_cfg.compare.reach_hands = {'R'}; include only those trials in
-% which reach hand is right
-% 3. lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; analyse the trials in
-% which reach hand is left and right separately
-% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
-% any hand label is combined)
-lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
-
-% reach space to be included for analysis
-% should be nan or a cell array that contain only values 'R', 'L'
-% Examples:
-% 1. lfp_tfa_cfg.compare.reach_hands = {'L'}; include only those trials in
-% which reach hand is left
-% 2. lfp_tfa_cfg.compare.reach_hands = {'R'}; include only those trials in
-% which reach hand is right
-% 3. lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; analyse the trials in
-% which reach hand is left and right separately
-% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
-% any hand label is combined)
-lfp_tfa_cfg.compare.reach_spaces = {'L', 'R'}; 
-
-% hand space combinations to be included from analysis
-% should be a cell array with each element containing the hand and space
-% label to be excluded
-% if no hand-space conditions are to be excluded, leave empty
-% Example:
-% 1. lfp_tfa_cfg.compare.exclude_handspace = {'LR', 'RL'};
-% exclude left hand right space and right hand left space trials
-% 2. lfp_tfa_cfg.compare.exclude_handspace = {'LL', 'RR'};
-% exclude left hand left space and right hand right space trials
-% 
-lfp_tfa_cfg.compare.exclude_handspace = {};
-
-% perturbations to be included in the analysis
-% should be nan, 0, 1 or [0, 1]
-% Examples:
-% lfp_tfa_cfg.compare.perturbations = 0; consider only those trials with
-% perturbation value = lfp_tfa_cfg.compare.perturbation_groups(0)
-% lfp_tfa_cfg.compare.perturbations = 1; consider only those trials with
-% perturbation value = lfp_tfa_cfg.compare.perturbation_groups(1)
-% lfp_tfa_cfg.compare.perturbations = [0, 1]; consider the trials with
-% perturbation value = lfp_tfa_cfg.compare.perturbation_groups(0) or 
-% lfp_tfa_cfg.compare.perturbation_groups(1) separately
-% lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
-% any perturbation value 
-lfp_tfa_cfg.compare.perturbations = [0, 1]; 
+if length(lfp_tfa_cfg.compare.choice_trials) == 1
+    lfp_tfa_cfg.baseline_use_choice_trial = lfp_tfa_cfg.compare.choice_trials;
+else
+    % set choice(1) and/or instructed(0) to be used for computing baseline
+    lfp_tfa_cfg.baseline_use_choice_trial = 0; 
+end
 
 % define the time windows to analyse for LFP TFR and evoked LFP response
 % Must be a Nx4 cell array, N = number of windows to analyse
