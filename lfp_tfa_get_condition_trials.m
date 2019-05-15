@@ -78,7 +78,7 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
                 cond_trials_perturb = cond_trials_perturb | ...
                 ([site_lfp.trials.perturbation] == b);
             end
-        elseif strcmp(condition.perturbation_group, 'allbutone')
+        elseif strcmp(condition.perturbation_group, 'allbutfirst')
             for b = perturbation_values(2:end)
                 cond_trials_perturb = cond_trials_perturb | ...
                 ([site_lfp.trials.perturbation] == b);
