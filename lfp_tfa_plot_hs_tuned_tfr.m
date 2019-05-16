@@ -139,8 +139,10 @@ function lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_fil
             subplottitle = concat_states_tfs.label{1};
             if isfield(avg_tfr(1, hs), 'nsessions')
                 subplottitle = [subplottitle ', nsessions = ' num2str(avg_tfr(1, hs).nsessions)];
+            end
             if isfield(avg_tfr(1, hs), 'nsites')
                 subplottitle = [subplottitle ', nsites = ' num2str(avg_tfr(1, hs).nsites)];
+            end
             if isfield(avg_tfr(1, hs), 'ntrials') && ~isempty(avg_tfr(1, hs).ntrials)
                 subplottitle = [subplottitle ', ntrials = ' num2str(avg_tfr(1, hs).ntrials)];            
             end

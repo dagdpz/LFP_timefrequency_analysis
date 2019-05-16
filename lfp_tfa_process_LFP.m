@@ -146,6 +146,7 @@ function state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
 %                     hs_label = 'LH LS';
 %                 end
 
+
                 start_time = (sites(i).trial(t).TDT_LFPx_tStart); % trial start time
                 fs = sites(i).trial(t).TDT_LFPx_SR; % sample rate
                 LFP = sites(i).trial(t).LFP; % LFP data
