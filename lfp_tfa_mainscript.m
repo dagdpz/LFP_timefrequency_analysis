@@ -16,7 +16,7 @@ settings_filepath = 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\LF
 % analysis won't happen
 % TODO: check if LFP is processed, of not, process LFP even if flag is set
 % to false
-process_LFP = false;
+process_LFP = true;
 
 %% INITIALIZATION
 close all;
