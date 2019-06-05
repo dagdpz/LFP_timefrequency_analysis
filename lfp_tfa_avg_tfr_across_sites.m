@@ -142,9 +142,25 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
         end
 
         % difference between pre- and post-injection
-        if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
-            sites_avg(t).difference = lfp_tfa_compute_diff_tfr(sites_avg(t), lfp_tfa_cfg);
-
+        %if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
+            %sites_avg(t).difference = lfp_tfa_compute_diff_condition_tfr(sites_avg(t), lfp_tfa_cfg.difference);
+            sites_avg(t).difference = [];
+            for diff = 1:size(lfp_tfa_cfg.difference, 1)
+                diff_field = lfp_tfa_cfg.difference{diff, 1};
+                diff_values = lfp_tfa_cfg.difference{diff, 2};
+                % check if both pre- and post- injection blocks exist
+                if strcmp(diff_field, 'perturbation')
+                    if sum(lfp_tfa_cfg.compare.perturbations == [diff_values{:}]) <= 1
+                        continue;                        
+                    end
+                elseif strcmp(diff_field, 'choice')
+                    if sum(lfp_tfa_cfg.compare.choice_trials == [diff_values{:}]) <= 1
+                        continue;
+                    end
+                end
+                sites_avg(t).difference = [sites_avg(t).difference, ...
+                    lfp_tfa_compute_diff_condition_tfr(sites_avg(t), diff_field, diff_values)];
+            end
             % plot Difference TFR
             for dcn = 1:length(sites_avg(t).difference)
                 if ~isempty(sites_avg(t).difference(dcn).hs_tuned_tfs)
@@ -161,7 +177,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
                     end
                 end
             end
-        end
+        %end
         
     end
     

@@ -139,8 +139,24 @@ function sessions_avg = lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg)
         end
         % Difference TFR
         % difference between pre- and post-injection
-        sessions_avg(t).difference = lfp_tfa_compute_diff_tfr(sessions_avg(t), lfp_tfa_cfg);
-
+        %sessions_avg(t).difference = lfp_tfa_compute_diff_condition_tfr(sessions_avg(t), lfp_tfa_cfg.difference);
+        sessions_avg(t).difference = [];
+        for diff = 1:size(lfp_tfa_cfg.difference, 1)
+            diff_field = lfp_tfa_cfg.difference{diff, 1};
+            diff_values = lfp_tfa_cfg.difference{diff, 2};
+            % check if both pre- and post- injection blocks exist
+            if strcmp(diff_field, 'perturbation')
+                if sum(lfp_tfa_cfg.compare.perturbations == [diff_values{:}]) <= 1
+                    continue;                        
+                end
+            elseif strcmp(diff_field, 'choice')
+                if sum(lfp_tfa_cfg.compare.choice_trials == [diff_values{:}]) <= 1
+                    continue;
+                end
+            end
+            sessions_avg(t).difference = [sessions_avg(t).difference, ...
+                lfp_tfa_compute_diff_condition_tfr(sessions_avg(t), diff_field, diff_values)];
+        end
         % plot Difference TFR
         for dcn = 1:length(sessions_avg(t).difference)
             if ~isempty(sessions_avg(t).difference(dcn).hs_tuned_tfs)
