@@ -227,21 +227,38 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 
         end
         
-        % difference between pre- and post-injection
+        sites_tfr(i).difference = [];
+        % difference between conditions
         % check if both pre- and post- injection blocks exist
-        if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
-            sites_tfr(i).difference = lfp_tfa_compute_diff_tfr(sites_tfr(i), lfp_tfa_cfg);
+        %if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
+            %sites_tfr(i).difference = lfp_tfa_compute_diff_condition_tfr(sites_tfr(i), lfp_tfa_cfg.difference);
+            for diff = 1:size(lfp_tfa_cfg.difference, 1)
+                diff_field = lfp_tfa_cfg.difference{diff, 1};
+                diff_values = lfp_tfa_cfg.difference{diff, 2};
+                % check if both pre- and post- injection blocks exist
+                if strcmp(diff_field, 'perturbation')
+                    if sum(lfp_tfa_cfg.compare.perturbations == [diff_values{:}]) > 1
+                        sites_tfr(i).difference = [sites_tfr(i).difference, ...
+                            lfp_tfa_compute_diff_condition_tfr(sites_tfr(i), diff_field, diff_values)];
+                    end
+                elseif strcmp(diff_field, 'choice')
+                    if sum(lfp_tfa_cfg.compare.choice_trials == [diff_values{:}]) > 1
+                        sites_tfr(i).difference = [sites_tfr(i).difference, ...
+                            lfp_tfa_compute_diff_condition_tfr(sites_tfr(i), diff_field, diff_values)];
+                    end
+                end
+            end
             % Plot TFR difference
             for dcn = 1:length(sites_tfr(i).difference)
                 if ~isempty(sites_tfr(i).difference(dcn).hs_tuned_tfs)
-                    plottitle = ['LFP Diff TFR(Post - Pre): Target ' ...
+                    plottitle = [sites_tfr(i).difference(dcn).label ' Target ' ...
                         sites_tfr(i).target, ' (ref_', lfp_tfa_cfg.ref_hemisphere, ...
                         '), Site ', sites_tfr(i).site_ID ];
-                    if sites_tfr(i).difference(dcn).cfg_condition.choice == 0
-                        plottitle = [plottitle ', Instructed trials'];
-                    else
-                        plottitle = [plottitle ', Choice trials'];
-                    end
+%                     if sites_tfr(i).difference(dcn).cfg_condition.choice == 0
+%                         plottitle = [plottitle ', Instructed trials'];
+%                     else
+%                         plottitle = [plottitle ', Choice trials'];
+%                     end
 
                     result_file = fullfile(site_results_folder, ...
                         ['LFP_DiffTFR_' sites_tfr(i).site_ID '_' sites_tfr(i).difference(dcn).label '.png']);
@@ -249,7 +266,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                         lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
                 end
             end
-        end
+        %end
         
         % save mat file for each site
         site_tfr = sites_tfr(i);
@@ -370,7 +387,24 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         % Difference TFR for session
         % check if both pre- and post- injection blocks exist
         if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
-            session_avg(t).difference = lfp_tfa_compute_diff_tfr(session_avg(t), lfp_tfa_cfg);
+            %session_avg(t).difference = lfp_tfa_compute_diff_tfr(session_avg(t), lfp_tfa_cfg);
+            session_avg(t).difference = [];
+            for diff = 1:size(lfp_tfa_cfg.difference, 1)
+                diff_field = lfp_tfa_cfg.difference{diff, 1};
+                diff_values = lfp_tfa_cfg.difference{diff, 2};
+                % check if both pre- and post- injection blocks exist
+                if strcmp(diff_field, 'perturbation')
+                    if sum(lfp_tfa_cfg.compare.perturbations == [diff_values{:}]) <= 1
+                        continue;                        
+                    end
+                elseif strcmp(diff_field, 'choice')
+                    if sum(lfp_tfa_cfg.compare.choice_trials == [diff_values{:}]) <= 1
+                        continue;
+                    end
+                end
+                session_avg(t).difference = [session_avg(t).difference, ...
+                    lfp_tfa_compute_diff_condition_tfr(session_avg(t), diff_field, diff_values)];
+            end
             % plot average TFR difference across sites for this session
             for dcn = 1:length(session_avg(t).difference)
                 if ~isempty(session_avg(t).difference(dcn).hs_tuned_tfs)
