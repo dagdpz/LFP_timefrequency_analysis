@@ -50,6 +50,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
         for cn = 1:length(lfp_tfa_cfg.conditions)
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
             sites_avg(t).condition(cn).hs_tuned_tfs = struct();
+            sites_avg(t).condition(cn).cfg_condition = lfp_tfa_cfg.conditions(cn);
             sites_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
             nsites = 0;
             for i = 1:length(lfp_tfr.session)  
