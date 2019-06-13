@@ -142,43 +142,30 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
             end        
         end
 
-        % difference between pre- and post-injection
-        %if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
-            %sites_avg(t).difference = lfp_tfa_compute_diff_condition_tfr(sites_avg(t), lfp_tfa_cfg.difference);
-            sites_avg(t).difference = [];
-            for diff = 1:size(lfp_tfa_cfg.difference, 1)
-                diff_field = lfp_tfa_cfg.difference{diff, 1};
-                diff_values = lfp_tfa_cfg.difference{diff, 2};
-                % check if both pre- and post- injection blocks exist
-                if strcmp(diff_field, 'perturbation')
-                    if sum(lfp_tfa_cfg.compare.perturbations == [diff_values{:}]) <= 1
-                        continue;                        
-                    end
-                elseif strcmp(diff_field, 'choice')
-                    if sum(lfp_tfa_cfg.compare.choice_trials == [diff_values{:}]) <= 1
-                        continue;
-                    end
-                end
-                sites_avg(t).difference = [sites_avg(t).difference, ...
-                    lfp_tfa_compute_diff_condition_tfr(sites_avg(t), diff_field, diff_values)];
-            end
-            % plot Difference TFR
-            for dcn = 1:length(sites_avg(t).difference)
-                if ~isempty(sites_avg(t).difference(dcn).hs_tuned_tfs)
-                    if isfield(sites_avg(t).difference(dcn).hs_tuned_tfs,... 
-                            'powspctrm')
-                        plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
-                        ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
-                        sites_avg(t).difference(dcn).label];
-                        result_file = fullfile(results_fldr, ...
-                            ['LFP_DiffTFR_' lfp_tfa_cfg.compare.targets{t} ...
-                            '_' sites_avg(t).difference(dcn).label '.png']);
-                        lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_avg(t).difference(dcn).hs_tuned_tfs, ...
-                            lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
-                    end
+        % difference between conditions
+        sites_avg(t).difference = [];
+        for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
+            diff_condition = lfp_tfa_cfg.diff_condition{diff};
+            sites_avg(t).difference = [sites_avg(t).difference, ...
+                lfp_tfa_compute_difference_condition_tfr(sites_avg(t).condition, diff_condition)];
+        end
+        % plot Difference TFR
+        for dcn = 1:length(sites_avg(t).difference)
+            if ~isempty(sites_avg(t).difference(dcn).hs_tuned_tfs)
+                if isfield(sites_avg(t).difference(dcn).hs_tuned_tfs,... 
+                        'powspctrm')
+                    plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
+                    ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
+                    sites_avg(t).difference(dcn).label];
+                    result_file = fullfile(results_fldr, ...
+                        ['LFP_DiffTFR_' lfp_tfa_cfg.compare.targets{t} ...
+                        '_' 'diff_condition' num2str(dcn) '.png']);
+                        %sites_avg(t).difference(dcn).label '.png']);
+                    lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_avg(t).difference(dcn).hs_tuned_tfs, ...
+                        lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
                 end
             end
-        %end
+        end
         
     end
     

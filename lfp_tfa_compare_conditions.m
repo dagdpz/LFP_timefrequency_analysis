@@ -137,12 +137,11 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
                     end 
 
                     i = i + 1;
-                    condition_label = [type_label, '_', eff_label, '_', ...
-                        ch_label, '_', p_label];
                     cmp_conditions(i).type = type;
                     cmp_conditions(i).effector = eff;
                     cmp_conditions(i).choice = ch;
                     cmp_conditions(i).perturbation = perturbations(p);
+                    condition_label = lfp_tfa_get_condition_label(cmp_conditions(i), 'long');
                     if ~isempty(perturbation_groups)
                         cmp_conditions(i).perturbation_group = ...
                             perturbation_groups(p);

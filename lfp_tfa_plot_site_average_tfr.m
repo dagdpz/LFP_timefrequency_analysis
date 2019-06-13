@@ -229,43 +229,31 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         
         sites_tfr(i).difference = [];
         % difference between conditions
-        % check if both pre- and post- injection blocks exist
-        %if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
-            %sites_tfr(i).difference = lfp_tfa_compute_diff_condition_tfr(sites_tfr(i), lfp_tfa_cfg.difference);
-            for diff = 1:size(lfp_tfa_cfg.difference, 1)
-                diff_field = lfp_tfa_cfg.difference{diff, 1};
-                diff_values = lfp_tfa_cfg.difference{diff, 2};
-                % check if both pre- and post- injection blocks exist
-                if strcmp(diff_field, 'perturbation')
-                    if sum(lfp_tfa_cfg.compare.perturbations == [diff_values{:}]) > 1
-                        sites_tfr(i).difference = [sites_tfr(i).difference, ...
-                            lfp_tfa_compute_diff_condition_tfr(sites_tfr(i), diff_field, diff_values)];
-                    end
-                elseif strcmp(diff_field, 'choice')
-                    if sum(lfp_tfa_cfg.compare.choice_trials == [diff_values{:}]) > 1
-                        sites_tfr(i).difference = [sites_tfr(i).difference, ...
-                            lfp_tfa_compute_diff_condition_tfr(sites_tfr(i), diff_field, diff_values)];
-                    end
-                end
-            end
-            % Plot TFR difference
-            for dcn = 1:length(sites_tfr(i).difference)
-                if ~isempty(sites_tfr(i).difference(dcn).hs_tuned_tfs)
-                    plottitle = [sites_tfr(i).difference(dcn).label ' Target ' ...
-                        sites_tfr(i).target, ' (ref_', lfp_tfa_cfg.ref_hemisphere, ...
-                        '), Site ', sites_tfr(i).site_ID ];
+        for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
+            diff_condition = lfp_tfa_cfg.diff_condition{diff};
+            sites_tfr(i).difference = [sites_tfr(i).difference, ...
+                lfp_tfa_compute_difference_condition_tfr(sites_tfr(i).condition, diff_condition)];
+        end
+        % Plot TFR difference
+        for dcn = 1:length(sites_tfr(i).difference)
+            if ~isempty(sites_tfr(i).difference(dcn).hs_tuned_tfs)
+                plottitle = [' Target ' ...
+                    sites_tfr(i).target, ' (ref_', lfp_tfa_cfg.ref_hemisphere, ...
+                    '), Site ', sites_tfr(i).site_ID ...
+                    sites_tfr(i).difference(dcn).label ];
 %                     if sites_tfr(i).difference(dcn).cfg_condition.choice == 0
 %                         plottitle = [plottitle ', Instructed trials'];
 %                     else
 %                         plottitle = [plottitle ', Choice trials'];
 %                     end
 
-                    result_file = fullfile(site_results_folder, ...
-                        ['LFP_DiffTFR_' sites_tfr(i).site_ID '_' sites_tfr(i).difference(dcn).label '.png']);
-                    lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).difference(dcn).hs_tuned_tfs, ...
-                        lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
-                end
+                result_file = fullfile(site_results_folder, ...
+                    ['LFP_DiffTFR_' sites_tfr(i).site_ID '_' ...
+                    'diff_condition' num2str(dcn) '.png']);%sites_tfr(i).difference(dcn).label '.png']);
+                lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).difference(dcn).hs_tuned_tfs, ...
+                    lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
             end
+        end
         %end
         
         % save mat file for each site
@@ -285,6 +273,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
     % average each target separately
     for t = 1:length(targets)
         session_avg(t).target = targets{t};
+        session_avg(t).session = states_lfp(1).session;
         % loop through conditions
         for cn = 1:length(site_conditions) 
             % condition-wise session average tfs
@@ -365,7 +354,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 else
                     injection = 'Post';
                 end
-                plottitle = ['LFP TFR (' injection '): Target = ' session_avg(t).condition(cn).target ...
+                plottitle = ['LFP TFR (' injection '): Target = ' session_avg(t).target ...
                     ', (ref_', lfp_tfa_cfg.ref_hemisphere, ') ',  ...
                     'Session ', session_avg(t).condition(cn).session, ...
                     'Perturbation ', num2str(site_conditions(cn).perturbation_group{1})];
@@ -375,7 +364,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(results_folder_tfr, ...
-                                ['LFP_TFR_' session_avg(t).condition(cn).target '_'...
+                                ['LFP_TFR_' session_avg(t).target '_'...
                                 session_avg(t).condition(cn).session '_' site_conditions(cn).label '.png']);
                 lfp_tfa_plot_hs_tuned_tfr_multiple_img(session_avg(t).condition(cn).hs_tuned_tfs, ...
                             lfp_tfa_cfg, plottitle, result_file);
@@ -389,26 +378,17 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
             %session_avg(t).difference = lfp_tfa_compute_diff_tfr(session_avg(t), lfp_tfa_cfg);
             session_avg(t).difference = [];
-            for diff = 1:size(lfp_tfa_cfg.difference, 1)
-                diff_field = lfp_tfa_cfg.difference{diff, 1};
-                diff_values = lfp_tfa_cfg.difference{diff, 2};
-                % check if both pre- and post- injection blocks exist
-                if strcmp(diff_field, 'perturbation')
-                    if sum(lfp_tfa_cfg.compare.perturbations == [diff_values{:}]) <= 1
-                        continue;                        
-                    end
-                elseif strcmp(diff_field, 'choice')
-                    if sum(lfp_tfa_cfg.compare.choice_trials == [diff_values{:}]) <= 1
-                        continue;
-                    end
-                end
+            % difference between conditions
+            for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
+                diff_condition = lfp_tfa_cfg.diff_condition{diff};
                 session_avg(t).difference = [session_avg(t).difference, ...
-                    lfp_tfa_compute_diff_condition_tfr(session_avg(t), diff_field, diff_values)];
+                    lfp_tfa_compute_difference_condition_tfr(session_avg(t).condition, diff_condition)];
             end
+            
             % plot average TFR difference across sites for this session
             for dcn = 1:length(session_avg(t).difference)
                 if ~isempty(session_avg(t).difference(dcn).hs_tuned_tfs)
-                    plottitle = ['LFP Diff TFR (Post - Pre): Target ' session_avg(t).difference(dcn).target ...
+                    plottitle = ['LFP Diff TFR: Target ' session_avg(t).target ...
                         '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
                         'Session ', session_avg(t).difference(dcn).session];
                     if session_avg(t).difference(dcn).cfg_condition.choice == 0
@@ -417,8 +397,10 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                         plottitle = [plottitle 'Choice trials'];
                     end
                     result_file = fullfile(results_folder_tfr, ...
-                                    ['LFP_DiffTFR_' session_avg(t).difference(dcn).target '_'...
-                                    session_avg(t).difference(dcn).session '_' session_avg(t).difference(dcn).label '.png']);
+                                    ['LFP_DiffTFR_' session_avg(t).target '_' ...
+                                    session_avg(t).difference(dcn).session '_' ...
+                                    'diff_condition' num2str(dcn) '.png']); 
+                                    %session_avg(t).difference(dcn).label '.png']);
                     lfp_tfa_plot_hs_tuned_tfr_multiple_img(session_avg(t).difference(dcn).hs_tuned_tfs, ...
                                 lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
 
