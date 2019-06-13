@@ -53,12 +53,11 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
     % if different sessions have different perturbation groups
     if nargin > 1
         perturbation_groups = varargin{1};
-
-        % default perturbation groups based on perturbation input
-    elseif sum (perturbations == [0, 1])
-        perturbation_groups = {0, 'all'};
+    % default perturbation groups based on perturbation input
     elseif perturbations == 0
         perturbation_groups = {0};
+    else%if sum (perturbations == [0, 1])
+        perturbation_groups = {};%{0, 'all'};
     end
     % commented on 08052019, each session has its own perturbation group
     %perturbation_groups = lfp_tfa_cfg.compare.perturbation_groups;
@@ -144,7 +143,10 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
                     cmp_conditions(i).effector = eff;
                     cmp_conditions(i).choice = ch;
                     cmp_conditions(i).perturbation = perturbations(p);
-                    cmp_conditions(i).perturbation_group = perturbation_groups(p);
+                    if ~isempty(perturbation_groups)
+                        cmp_conditions(i).perturbation_group = ...
+                            perturbation_groups(p);
+                    end
                     cmp_conditions(i).hs_labels = hs_labels;
                     cmp_conditions(i).reach_hands = reach_hands;
                     cmp_conditions(i).reach_spaces = reach_spaces;
