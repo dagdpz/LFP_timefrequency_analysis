@@ -46,10 +46,10 @@ switch cfg_condition.effector
 end
 
 switch cfg_condition.choice
-    case 0
+    case 1
         ch='Choice';
         chs='Choi';
-    case 1
+    case 0
         ch='Instructed';
         chs='Instr';
     case 'diff1'
