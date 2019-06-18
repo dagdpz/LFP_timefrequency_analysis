@@ -40,7 +40,8 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    figure;
+    h = figure;
+    set(h, 'position', [100, 100,900, 675]);
     hold on
     
     % colorbar title
@@ -195,7 +196,7 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
     %cm(1,:,:) = [1,1,1];
     colormap(cm);
     
-    saveas(gca, results_file);
+    export_fig(h, results_file);
 
 end
 

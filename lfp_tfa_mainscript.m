@@ -6,7 +6,7 @@
 %clear; 
 
 % file containing settings for LFP analysis
-settings_filepath = 'C:\Users\snair\MATLAB\LFP_timefrequency_analysis\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Magnus.m';
+settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Magnus.m';
 
 % whether the LFP should be processed (true) or not (false)
 % if the LFP for the sessions to analyse has already been processed, and no
@@ -78,6 +78,7 @@ try
     end
     %% loop through each processed session for analysis
     for i = 1:length(sessions_info)
+        %% LFP time frequequency analsis
         % clear variables
         clear session_proc_lfp session_lfp;
 

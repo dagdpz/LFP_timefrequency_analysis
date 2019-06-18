@@ -71,7 +71,7 @@ switch cfg_condition.perturbation
 end
 
 condition_label=[typ, ' ', eff, ' ', ch, ' ', pert];
-condition_label_short=[typs, effs, ' ', effs, ' ', chs, ' ', perts];
+condition_label_short=[typs, effs, ' ', chs, ' ', perts];
 
 if strcmp(label_length, 'short')
     condition_label = condition_label_short;
