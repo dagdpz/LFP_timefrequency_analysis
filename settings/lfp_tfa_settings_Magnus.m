@@ -199,7 +199,7 @@ lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
     'choice', {0, 1}}};
 
-% combined difference of conditions
+% combined difference of conditions (not used)
 lfp_tfa_cfg.combined_difference = {'perturbation', 'choice'; ...
     'choice', 'perturbation'};
 
