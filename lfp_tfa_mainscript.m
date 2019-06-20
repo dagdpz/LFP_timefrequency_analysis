@@ -6,7 +6,7 @@
 %clear; 
 
 % file containing settings for LFP analysis
-settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Magnus.m';
+settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\PPC_pulv_eye_hand\lfp_tfa_settings_v1.m';
 
 % whether the LFP should be processed (true) or not (false)
 % if the LFP for the sessions to analyse has already been processed, and no
