@@ -187,7 +187,7 @@ lfp_tfa_cfg.compare.perturbations = [0, 1];
 % lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % This computes the difference between choice = 1 and choice = 0 (instructed) trials when other conditions (eg. task type, perturbation) remains the same. 
 % lfp_tfa_cfg.diff_condition(1) = {{'type_eff', {[4 4], [4 6]}}};
-% This computes the difference between given task types trials when other conditions (eg. task type, perturbation) remains the same. 
+% This computes the difference between given task types trials when other conditions (eg. choice, perturbation) remains the same. 
 % lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
 %    'choice', {0, 1}}};
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
@@ -195,13 +195,9 @@ lfp_tfa_cfg.compare.perturbations = [0, 1];
 lfp_tfa_cfg.diff_condition = {};
 lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
-%lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
+%lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 6]}}};
 lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
     'choice', {0, 1}}};
-
-% combined difference of conditions
-lfp_tfa_cfg.combined_difference = {'perturbation', 'choice'; ...
-    'choice', 'perturbation'};
 
 %% Time information
 
