@@ -1,4 +1,4 @@
-function results_fldr = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
+function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
 
 % lfp_tfa_process_LFP - function to read in the processed lfp and
 % compute the time frequency spectrogram for each trial
@@ -43,17 +43,21 @@ function results_fldr = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
 %     fprintf('Reading processed LFP data \n');
 %     session = load(lfp_tfa_cfg.data_filepath);
     
-    sites = session_lfp.sites;
+    load(session_info.Input, 'sites');
     
     % prepare results folder
-    results_fldr = fullfile(lfp_tfa_cfg.session_results_fldr);
+    results_fldr = fullfile(session_info.proc_results_fldr);
     if ~exist(results_fldr, 'dir')
         mkdir(results_fldr);
     end
     
-    % struct to save data
+    % struct to save data for a site
     site_lfp = struct();
     
+    % structure array to store lfp data for all sites 
+    % to be used for cross power spectrum calculation
+    allsites_lfp = [];    
+       
     % for future use
 %     usable_sites_table = table;
 %     if ~isempty(lfp_tfa_cfg.sites_info)
@@ -75,13 +79,17 @@ function results_fldr = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
         fprintf('Processing site, %s\n', sites(i).site_ID);
         % for future use
         % get 'Set' entry from usable_sites_table
-%         state_lfp(i).dataset = usable_sites_table(...
+%         site_lfp.dataset = usable_sites_table(...
 %             strcmp(usable_sites_table.Site_ID, sites(i).site_ID), :).Set(1);
         site_lfp.session = sites(i).site_ID(1:12);
         site_lfp.site_ID = sites(i).site_ID;
         site_lfp.target = sites(i).target;
         site_lfp.recorded_hemisphere = upper(sites(i).target(end));
         site_lfp.ref_hemisphere = lfp_tfa_cfg.ref_hemisphere;
+        site_lfp.xpos = sites(i).grid_x;
+        site_lfp.ypos = sites(i).grid_y;
+        site_lfp.zpos = sites(i).electrode_depth;
+
         % now loop through each trial for this site
         comp_trial = 0; % iterator for completed trials
         for t = 1:length(sites(i).trial)
@@ -179,10 +187,7 @@ function results_fldr = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
     
                 % get state onset times and onset samples - test and delete
                 site_lfp.trials(comp_trial).states = struct();
-%                 if i > 1 %&& strcmp(state_lfp(i).session,  state_lfp(i-1).session)
-%                     site_lfp.trials(comp_trial).states = ...
-%                         state_lfp(i-1).trials(comp_trial).states;
-%                 else
+
                     for s = 1:length(sites(i).trial(t).states)
                         % get state ID
                         state_id = sites(i).trial(t).states(s);
@@ -210,19 +215,6 @@ function results_fldr = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
                 site_lfp.trials(comp_trial).trialperiod = [trial_start_t, ...
                     trial_end_t];
                 
-                % get baseline samples - should baseline be computed within
-                % processing? - check and delete if not required
-%                 states_lfp(i).trials(comp_trial).baseline = struct();
-%                 states_lfp(i).trials(comp_trial).baseline.ref_t = ...
-%                     sites(i).trial(t).states_onset(sites(i).trial(t).states == baseline.ref_state);
-%                 states_lfp(i).trials(comp_trial).baseline.start_t = ...
-%                     states_lfp(i).trials(comp_trial).baseline.ref_t + baseline.period(1);
-%                 states_lfp(i).trials(comp_trial).baseline.end_t = ...
-%                     states_lfp(i).trials(comp_trial).baseline.ref_t + baseline.period(2);
-%                 states_lfp(i).trials(comp_trial).baseline.start_s = ...
-%                     max(1, sample(states_lfp(i).trials(comp_trial).baseline.start_t));
-%                 states_lfp(i).trials(comp_trial).baseline.end_s = ...
-%                     min(length(timestamps), sample(states_lfp(i).trials(comp_trial).baseline.end_t));
                 
             end
         end
@@ -240,10 +232,42 @@ function results_fldr = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
         site_lfp = lfp_tfa_compute_site_baseline( site_lfp, lfp_tfa_cfg );
         
         % save data
-        results_mat = fullfile(results_fldr, [site_lfp.site_ID '.mat']);
+        results_mat = fullfile(results_fldr, ['site_lfp_pow_' site_lfp.site_ID '.mat']);
         %site_lfp = state_lfp(i);
         save(results_mat, 'site_lfp', '-v7.3');
+        
+        % accumulate lfp for all sites
+        site_lfp.trials = rmfield(site_lfp.trials, 'tfs');
+        allsites_lfp = [allsites_lfp, site_lfp];
+        
     end  
+    
+    % calculate cross power spectrum between sites
+    % prepare results folder
+    results_fldr = fullfile(session_info.proc_results_fldr, 'crossspectrum');
+    if ~exist(results_fldr, 'dir')
+        mkdir(results_fldr);
+    end
+    % loop through each site
+    for i = 1:length(allsites_lfp)-1
+        site1_lfp = allsites_lfp(i);
+        % pair a site
+        for j = i+1:length(allsites_lfp)
+            site2_lfp = allsites_lfp(j);
+            fprintf('Computing cross power spectrum for site pair %s - %s\n', ...
+                site1_lfp.site_ID, site2_lfp.site_ID);
+            sitepair_crosspow = lfp_tfa_compute_sitepair_csd(site1_lfp, site2_lfp, lfp_tfa_cfg);
+            % save data
+            results_mat = fullfile(results_fldr, ['sites_crosspow_', sitepair_crosspow.sites{1} '-' sitepair_crosspow.sites{2} '.mat']);
+            save(results_mat, 'site_lfp', '-v7.3');
+            
+            % compute ppc between sitepair
+            % get the trial conditions for this session
+            conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
+                {session_info.Preinj_blocks, session_info.Postinj_blocks});
+            sitepair_sync = lfp_tfa_sitepair_averaged_sync(sitepair_crosspow, conditions, lfp_tfa_cfg);
+        end
+    end        
 
 end
 

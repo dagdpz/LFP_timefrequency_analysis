@@ -104,6 +104,16 @@ lfp_tfa_cfg.session_info(9) = ...
 %            'Preinj_blocks',  0, ...
 %            'Postinj_blocks', 'allbutfirst');
 
+% analyses to be done 
+% should be a cell array of strings which indicate which kind of analyses
+% should be performed on LFP
+% Currently supported analyses are 'tfs', 'evoked', 'pow', and 'sync'
+% 'tfs' - LFP time frequency spectrogram average for given conditions and time windows
+% 'evoked' - LFP evoked response average for given conditions and time windows
+% 'pow' - LFP power spectrum average for given conditions and epochs
+% 'sync' - LFP-LFP phase synchronization measure for given conditions and
+% time windows
+lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow', 'sync'};
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -113,6 +123,15 @@ lfp_tfa_cfg.session_info(9) = ...
 % Example:
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
 lfp_tfa_cfg.compare.targets = {'MIP_R', 'MIP_L'}; 
+
+% target pairs to be included for LFP-LFP sychronization
+% should be a 1xN cell array of 1x2 cell array of strings which indicate
+% the target pairs between which the LFP-LFP phase synchronization should
+% be calculated - valid only if LFP-LFP phase sync should be calculated
+if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
+    lfp_tfa_cfg.compare.target_pairs = {{'MIP_R', 'MIP_R'}, {'MIP_R', 'MIP_L'}, ...
+        {'MIP_L', 'MIP_L'}}; 
+end
 
 % reference hemisphere for hand-space labelling
 % can be 'R' (for right hemisphere) or 'L' (for left hemisphere)
@@ -165,7 +184,7 @@ lfp_tfa_cfg.compare.effectors = [4];
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = [0, 1]; 
+lfp_tfa_cfg.compare.choice_trials = 0; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -240,13 +259,9 @@ lfp_tfa_cfg.compare.perturbations = [0, 1];
 lfp_tfa_cfg.diff_condition = {};
 lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
-lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
-lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
+%lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
+lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
     'choice', {0, 1}}};
-
-% combined difference of conditions
-lfp_tfa_cfg.combined_difference = {'perturbation', 'choice'; ...
-    'choice', 'perturbation'};
 
 %% Time information
 
@@ -353,7 +368,11 @@ lfp_tfa_cfg.tfr.tapsmofrq       = [];
 % window length decreases with frequency
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
 
-
+%% settings for LFP-LFP sync analysis
+% measure of LFP-LFP phase synchronization
+% can be 'ppc', 'plv', 
+% entry will be used as cfg.method for performing ft_connectivityanalysis
+lfp_tfa_cfg.sync.measure = 'ppc';
 
 %% Settings to detect noisy trials
 % configuration for lfp noise rejection
