@@ -135,7 +135,7 @@ try
         end
         
         % Calculate the session-wise average of LFP-LFP phase sync
-        if any(strcmp(lfp_tfa_cfg.anaylses, 'tfs')) && ...
+        if any(strcmp(lfp_tfa_cfg.anaylses, 'sync')) && ...
                 strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions')
             sessions_info(i).avg_sync_results = lfp_tfa_avg_sitepairs_sync(sessions_info(i), lfp_tfa_cfg);
         end
