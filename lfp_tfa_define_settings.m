@@ -80,6 +80,15 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
     lfp_tfa_cfg.proc_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'Processed LFP'];
     % folder to save LFP analysis results
     lfp_tfa_cfg.analyse_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'LFP Analysis'];
+    % folder to store LFP-LFP sync results
+    lfp_tfa_cfg.lfp_sync_folder = [lfp_tfa_cfg.analyse_lfp_folder filesep 'Condition_based_Sync'];
+    % folder to store session-wise analysis results
+    for i = 1:length(lfp_tfa_cfg.session_info)
+        lfp_tfa_cfg.session_info(i).session = ...
+            [lfp_tfa_cfg.session_info(i).Monkey, '_', lfp_tfa_cfg.session_info(i).Date];
+        lfp_tfa_cfg.session_info(i).lfp_sync_results_fldr = [lfp_tfa_cfg.analyse_lfp_folder ...
+            filesep 'Condition_based_Sync' filesep lfp_tfa_cfg.session_info(i).session];
+    end
 
     % save settings struct
     save(fullfile(lfp_tfa_cfg.root_results_fldr, ['lfp_tfa_settings_ver_' num2str(lfp_tfa_cfg.version) '.mat']), ...
