@@ -8,7 +8,7 @@ lfp_tfa_cfg = [];
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
 % eg: 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\20190506\ver_SN_0.2'
-lfp_tfa_cfg.version = 'Magnus';
+lfp_tfa_cfg.version = 'Magnus_LFP_check_MIP';
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
@@ -17,10 +17,10 @@ lfp_tfa_cfg.info_filepath = 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactiv
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
 % used for analysis
-lfp_tfa_cfg.use_datasets = [31];
+lfp_tfa_cfg.use_datasets = [3];
 
 % absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'Y:\Personal\Sarath\Results\LFP_TFA_Results';
+lfp_tfa_cfg.results_folder = 'Y:\Projects\PhysiologicalRecording\Data\Magnus\LFP';
 
 % info about sessions to be analysed
 % should be a 1 x N struct, N = number of sessions to analyse
@@ -35,19 +35,20 @@ lfp_tfa_cfg.results_folder = 'Y:\Personal\Sarath\Results\LFP_TFA_Results';
 %       specified, all post-injection blocks will be combined; if
 %       'allbutfirst', all blocks from the second post-injection block will
 %       be combined)
-lfp_tfa_cfg.session_info(1) = ...
+
+  lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Magnus', ...
-           'Date',          '20190124', ...
-           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190124\sites_Magnus_20190124.mat', ...
+           'Date',          '20190208', ...
+           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_control_20190208\sites_Magnus_20190208.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 3);
-lfp_tfa_cfg.session_info(2) = ...
-    struct('Monkey',        'Magnus', ...
-           'Date',          '20190314', ...
-           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190314\sites_Magnus_20190314.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 3);
+           'Postinj_blocks', [2 3 4]);  
        
+       lfp_tfa_cfg.session_info(2) = ...
+    struct('Monkey',        'Magnus', ...
+           'Date',          '20190320', ...
+           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_control_20190320\sites_Magnus_20190320.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', [2 3]); 
        
 % To add a new session to analyse, increment the counter by 1 and add a new
 % value into the lfp_tfa_cfg.session_info struct
@@ -120,7 +121,7 @@ lfp_tfa_cfg.compare.effectors = [6];
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = [0, 1]; 
+lfp_tfa_cfg.compare.choice_trials = [0]; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -187,18 +188,21 @@ lfp_tfa_cfg.compare.perturbations = [0, 1];
 % lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % This computes the difference between choice = 1 and choice = 0 (instructed) trials when other conditions (eg. task type, perturbation) remains the same. 
 % lfp_tfa_cfg.diff_condition(1) = {{'type_eff', {[4 4], [4 6]}}};
-% This computes the difference between given task types trials when other conditions (eg. choice, perturbation) remains the same. 
+% This computes the difference between given task types trials when other conditions (eg. task type, perturbation) remains the same. 
 % lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
 %    'choice', {0, 1}}};
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
 lfp_tfa_cfg.diff_condition = {};
 lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
-lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
-%lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 6]}}};
-lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
-    'choice', {0, 1}}};
+% lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
+% lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
+% lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
+%     'choice', {0, 1}}};
 
+% combined difference of conditions
+lfp_tfa_cfg.combined_difference = {'perturbation', 'choice'; ...
+    'choice', 'perturbation'};
 
 %% Time information
 
@@ -408,8 +412,9 @@ end
 % 
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
-lfp_tfa_cfg.analyse_states = {lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
-                             lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};
+lfp_tfa_cfg.analyse_states = {lfp_tfa_states.FIX_HOL,    'fxh',      0,   0.5;...
+                             lfp_tfa_states.DEL_PER,    'del',    0,   0.5;
+                             lfp_tfa_states.REWARD,    'rwd'    0,  0.5};
 
 % define the states to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
@@ -441,7 +446,7 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
 % consider those sites with atleast 5 trials for each condition
 % lfp_tfa_cfg.mintrials_percondition = 5; 
 % By condition, we mean a combination of choice/instr, pre/post-injection, type and effector, hand-space
- lfp_tfa_cfg.mintrials_percondition = 0;
+ lfp_tfa_cfg.mintrials_percondition = 5;
 
 % method to be used for baseline normalization
 % can be 'zscore', 'relchange', 'subtraction', 'division'
