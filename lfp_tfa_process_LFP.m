@@ -90,7 +90,7 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
         site_lfp.ypos = sites(i).grid_y;
         site_lfp.zpos = sites(i).electrode_depth;
 
-        % now loop through each trial for this site
+        %% now loop through each trial for this site
         comp_trial = 0; % iterator for completed trials
         for t = 1:length(sites(i).trial)
             completed = sites(i).trial(t).completed;
@@ -222,7 +222,7 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
         %%% Noise rejection - should this be included within processing check this? %%%
         %state_filt_lfp(i) = lfp_tfa_reject_noisy_lfp( state_lfp(i), lfp_tfa_cfg.noise );
         
-        % Time frequency spectrogram calculation
+        %% Time frequency spectrogram calculation
         site_lfp = lfp_tfa_compute_site_tfr( site_lfp, lfp_tfa_cfg );
         
         % Noise rejection
@@ -242,32 +242,34 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
         
     end  
     
-    % calculate cross power spectrum between sites
-    % prepare results folder
-    results_fldr = fullfile(session_info.proc_results_fldr, 'crossspectrum');
-    if ~exist(results_fldr, 'dir')
-        mkdir(results_fldr);
-    end
-    % loop through each site
-    for i = 1:length(allsites_lfp)-1
-        site1_lfp = allsites_lfp(i);
-        % pair a site
-        for j = i+1:length(allsites_lfp)
-            site2_lfp = allsites_lfp(j);
-            fprintf('Computing cross power spectrum for site pair %s - %s\n', ...
-                site1_lfp.site_ID, site2_lfp.site_ID);
-            sitepair_crosspow = lfp_tfa_compute_sitepair_csd(site1_lfp, site2_lfp, lfp_tfa_cfg);
-            % save data
-            results_mat = fullfile(results_fldr, ['sites_crosspow_', sitepair_crosspow.sites{1} '-' sitepair_crosspow.sites{2} '.mat']);
-            save(results_mat, 'site_lfp', '-v7.3');
-            
-            % compute ppc between sitepair
-            % get the trial conditions for this session
-            conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
-                {session_info.Preinj_blocks, session_info.Postinj_blocks});
-            sitepair_sync = lfp_tfa_sitepair_averaged_sync(sitepair_crosspow, conditions, lfp_tfa_cfg);
+    %% calculate cross power spectrum between sites
+    if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
+        % prepare results folder
+        results_fldr = fullfile(session_info.proc_results_fldr, 'crossspectrum');
+        if ~exist(results_fldr, 'dir')
+            mkdir(results_fldr);
         end
-    end        
+        % loop through each site
+        for i = 1:length(allsites_lfp)-1
+            site1_lfp = allsites_lfp(i);
+            % pair a site
+            for j = i+1:length(allsites_lfp)
+                site2_lfp = allsites_lfp(j);
+                fprintf('Computing cross power spectrum for site pair %s - %s\n', ...
+                    site1_lfp.site_ID, site2_lfp.site_ID);
+                sitepair_crosspow = lfp_tfa_compute_sitepair_csd(site1_lfp, site2_lfp, lfp_tfa_cfg);
+                % save data
+                results_mat = fullfile(results_fldr, ['sites_crosspow_', sitepair_crosspow.sites{1} '-' sitepair_crosspow.sites{2} '.mat']);
+                save(results_mat, 'site_lfp', '-v7.3');
+
+                % compute ppc between sitepair
+                % get the trial conditions for this session
+                conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
+                    {session_info.Preinj_blocks, session_info.Postinj_blocks});
+                sitepair_sync = lfp_tfa_sitepair_averaged_sync(sitepair_crosspow, conditions, lfp_tfa_cfg);
+            end
+        end  
+    end
 
 end
 
