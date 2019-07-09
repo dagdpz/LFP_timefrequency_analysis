@@ -8,7 +8,7 @@ lfp_tfa_cfg = [];
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
 % eg: 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\20190506\ver_SN_0.2'
-lfp_tfa_cfg.version = 'Linus_inactivation';
+lfp_tfa_cfg.version = 'Magnus';
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
@@ -36,62 +36,17 @@ lfp_tfa_cfg.results_folder = 'Y:\Personal\Sarath\Results\LFP_TFA_Results';
 %       'allbutfirst', all blocks from the second post-injection block will
 %       be combined)
 lfp_tfa_cfg.session_info(1) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20170622', ...
-           'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170622.mat', ...
-           'Preinj_blocks',  [], ...
-           'Postinj_blocks', 'all');
-% lfp_tfa_cfg.session_info(2) = ...
-%     struct('Monkey',        'Lin', ...
-%            'Date',          '20170629', ...
-%            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170629.mat', ...
-%            'Preinj_blocks',  0, ...
-%            'Postinj_blocks', 'allbutfirst');
-% lfp_tfa_cfg.session_info(3) = ...
-%     struct('Monkey',        'Lin', ...
-%            'Date',          '20170707', ...
-%            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170707.mat', ...
-%            'Preinj_blocks',  0, ...
-%            'Postinj_blocks', 'allbutfirst');
-% lfp_tfa_cfg.session_info(4) = ...
-%     struct('Monkey',        'Lin', ...
-%            'Date',          '20170713', ...
-%            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170713.mat', ...
-%            'Preinj_blocks',  0, ...
-%            'Postinj_blocks', 'allbutfirst');
-% lfp_tfa_cfg.session_info(5) = ...
-%     struct('Monkey',        'Lin', ...
-%            'Date',          '20170720', ...
-%            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170720.mat', ...
-%            'Preinj_blocks',  0, ...
-%            'Postinj_blocks', 'allbutfirst');
-% lfp_tfa_cfg.session_info(6) = ...
-%     struct('Monkey',        'Lin', ...
-%            'Date',          '20170802', ...
-%            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170802.mat', ...
-%            'Preinj_blocks',  0, ...
-%            'Postinj_blocks', 'allbutfirst');
-%        
-% lfp_tfa_cfg.session_info(7) = ...
-%     struct('Monkey',        'Lin', ...
-%            'Date',          '20170804', ...
-%            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170804.mat', ...
-%            'Preinj_blocks',  0, ...
-%            'Postinj_blocks', 'allbutfirst');
-%        
-% lfp_tfa_cfg.session_info(8) = ...
-%     struct('Monkey',        'Lin', ...
-%            'Date',          '20170818', ...
-%            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170818.mat', ...
-%            'Preinj_blocks',  0, ...
-%            'Postinj_blocks', 'allbutfirst');
-%        
-% lfp_tfa_cfg.session_info(9) = ...
-%     struct('Monkey',        'Lin', ...
-%            'Date',          '20171012', ...
-%            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20171012.mat', ...
-%            'Preinj_blocks',  0, ...
-%            'Postinj_blocks', 'allbutfirst');
+    struct('Monkey',        'Magnus', ...
+           'Date',          '20190124', ...
+           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190124\sites_Magnus_20190124.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 3);
+lfp_tfa_cfg.session_info(2) = ...
+    struct('Monkey',        'Magnus', ...
+           'Date',          '20190314', ...
+           'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190314\sites_Magnus_20190314.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 3);
        
        
 % To add a new session to analyse, increment the counter by 1 and add a new
@@ -104,16 +59,6 @@ lfp_tfa_cfg.session_info(1) = ...
 %            'Preinj_blocks',  0, ...
 %            'Postinj_blocks', 'allbutfirst');
 
-% what kind of analyses should be done on LFP
-% should be a cell array of strings which indicate which kind of analyses
-% should be performed on LFP
-% Currently supported analyses are 'tfs', 'evoked', 'pow', and 'sync'
-%       'tfs'       - LFP time frequency spectrogram average for given conditions and time windows
-%       'evoked'    - LFP evoked response average for given conditions and time windows
-%       'pow'       - LFP power spectrum average for given conditions and epochs
-%       'sync'      - LFP-LFP phase synchronization measure for given conditions and
-%           time windows
-lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow', 'syncspctrm'};
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -122,16 +67,7 @@ lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow', 'syncspctrm'};
 % Those targets which are not in the analysed sessions will be ignored
 % Example:
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
-lfp_tfa_cfg.compare.targets = {'MIP_R', 'MIP_L'}; 
-
-% target pairs to be included for LFP-LFP sychronization
-% should be a 1xN cell array of 1x2 cell array of strings which indicate
-% the target pairs between which the LFP-LFP phase synchronization should
-% be calculated - valid only if LFP-LFP phase sync should be calculated
-if any(strcmp(lfp_tfa_cfg.analyses, 'sync') | strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
-    lfp_tfa_cfg.compare.target_pairs = {{'MIP_R', 'MIP_R'}, {'MIP_R', 'MIP_L'}, ...
-        {'MIP_L', 'MIP_L'}}; 
-end
+lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L'}; 
 
 % reference hemisphere for hand-space labelling
 % can be 'R' (for right hemisphere) or 'L' (for left hemisphere)
@@ -174,7 +110,7 @@ lfp_tfa_cfg.compare.types = [4];
 % and effector = 6 separately
 % 2. lfp_tfa_cfg.compare.types = nan; Ignore effector (trials with any
 % effector value are combined)
-lfp_tfa_cfg.compare.effectors = [4];
+lfp_tfa_cfg.compare.effectors = [6];
 
 % which type of choice trials are to be included in the analysis
 % Examples:
@@ -184,7 +120,7 @@ lfp_tfa_cfg.compare.effectors = [4];
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = 0; 
+lfp_tfa_cfg.compare.choice_trials = [0, 1]; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -202,17 +138,17 @@ lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
 % reach space to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
 % Examples:
-% 1. lfp_tfa_cfg.compare.reach_spaces = {'L'}; include only those trials in
-% which acquired target is on left
+% 1. lfp_tfa_cfg.compare.reach_hands = {'L'}; include only those trials in
+% which reach hand is left
 % 2. lfp_tfa_cfg.compare.reach_hands = {'R'}; include only those trials in
-% which acquired target is on right
+% which reach hand is right
 % 3. lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; analyse the trials in
-% which acquired target is on left and on right separately
-% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore space label (trial with
-% any acquired target position is combined)
+% which reach hand is left and right separately
+% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
+% any hand label is combined)
 lfp_tfa_cfg.compare.reach_spaces = {'L', 'R'}; 
 
-% hand space combinations to be excluded from analysis
+% hand space combinations to be included from analysis
 % should be a cell array with each element containing the hand and space
 % label to be excluded
 % if no hand-space conditions are to be excluded, leave empty
@@ -237,7 +173,7 @@ lfp_tfa_cfg.compare.exclude_handspace = {};
 % lfp_tfa_cfg.compare.perturbation_groups(1) separately
 % lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
 % any perturbation value 
-lfp_tfa_cfg.compare.perturbations = 1; 
+lfp_tfa_cfg.compare.perturbations = [0, 1]; 
 
 % differences in conditions to be analysed
 % add new entries for further difference calculations
@@ -248,20 +184,21 @@ lfp_tfa_cfg.compare.perturbations = 1;
 % Examples:
 % lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % This computes the difference between trials with perturbation = 1 (post-injection) and perturbation = 0 (pre-injection) when other conditions (eg. task type, choice) remains the same. 
-% lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
+% lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % This computes the difference between choice = 1 and choice = 0 (instructed) trials when other conditions (eg. task type, perturbation) remains the same. 
-% lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 6]}}};
-% This computes the difference between given task types trials when other conditions (eg. task type, perturbation) remains the same. 
+% lfp_tfa_cfg.diff_condition(1) = {{'type_eff', {[4 4], [4 6]}}};
+% This computes the difference between given task types trials when other conditions (eg. choice, perturbation) remains the same. 
 % lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
 %    'choice', {0, 1}}};
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
 lfp_tfa_cfg.diff_condition = {};
-% lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
-% lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
-% lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
-% lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
-%     'choice', {0, 1}}};
+lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
+%lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 6]}}};
+lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
+    'choice', {0, 1}}};
+
 
 %% Time information
 
@@ -368,12 +305,7 @@ lfp_tfa_cfg.tfr.tapsmofrq       = [];
 % window length decreases with frequency
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
 
-%% settings for LFP-LFP sync analysis
-% measure of LFP-LFP phase synchronization
-% can be only 'ppc' currently
-% 'ppc' calculates pairwise phase consistency
-% entry will be used as cfg.method for performing ft_connectivityanalysis
-lfp_tfa_cfg.sync.measure = 'ppc';
+
 
 %% Settings to detect noisy trials
 % configuration for lfp noise rejection
@@ -440,7 +372,7 @@ end
 % 3. lfp_tfa_cfg.baseline_perturbation = [2, 3]; combines perturbation blocks
 % 2 and 3
 if length(lfp_tfa_cfg.compare.perturbations) == 1
-    lfp_tfa_cfg.baseline_perturbation = lfp_tfa_cfg.compare.perturbations;
+    lfp_tfa_cfg.baseline_perturbation = lfp_tfa_cfg.compare.perturbation;
 else
     lfp_tfa_cfg.baseline_perturbation = 0; % set the perturbation block(s) to be used for computing baseline
 end
@@ -479,7 +411,7 @@ end
 lfp_tfa_cfg.analyse_states = {lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
                              lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};
 
-% define the epochs to analyse for LFP power spectrum
+% define the states to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
 % Each row corresponds to one epoch and contain following elements
 % 1. Identifier of state to which the epoch is referred, see lfp_tfa_global_states, Example:  lfp_tfa_states.CUE_ON
