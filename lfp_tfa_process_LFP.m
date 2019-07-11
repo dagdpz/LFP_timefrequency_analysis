@@ -229,7 +229,7 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
         site_lfp = lfp_tfa_reject_noisy_lfp_trials( site_lfp, lfp_tfa_cfg.noise );
         
         % Baseline power calculation
-        site_lfp = lfp_tfa_compute_site_baseline( site_lfp, lfp_tfa_cfg );
+        site_lfp = lfp_tfa_compute_site_baseline( site_lfp, session_info, lfp_tfa_cfg );
         
         % save data
         results_mat = fullfile(results_fldr, ['site_lfp_pow_' site_lfp.site_ID '.mat']);
@@ -240,9 +240,13 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
         site_lfp.trials = rmfield(site_lfp.trials, 'tfs');
         allsites_lfp = [allsites_lfp, site_lfp];
         
-    end  
+    end
     
-    %% calculate cross power spectrum between sites
+    % save allsites_lfp
+    results_mat = fullfile(results_fldr, 'allsites_lfp.mat');
+    save(results_mat, 'allsites_lfp', '-v7.3');
+    
+    %% calculate cross power spectrum between sites and sync measure spectrogram
     if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
         % prepare results folder
         results_fldr = fullfile(session_info.proc_results_fldr, 'crossspectrum');
@@ -262,11 +266,30 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
                 results_mat = fullfile(results_fldr, ['sites_crosspow_', sitepair_crosspow.sites{1} '-' sitepair_crosspow.sites{2} '.mat']);
                 save(results_mat, 'site_lfp', '-v7.3');
 
-                % compute ppc between sitepair
+                % compute ppc spectrogram between sitepair
                 % get the trial conditions for this session
                 conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
                     {session_info.Preinj_blocks, session_info.Postinj_blocks});
-                sitepair_sync = lfp_tfa_sitepair_averaged_sync(sitepair_crosspow, conditions, lfp_tfa_cfg);
+                sitepair_sync = lfp_tfa_sitepair_averaged_sync(sitepair_crosspow, conditions, lfp_tfa_cfg);                
+            end
+        end  
+    end
+    
+    %% calculate sync measure spectrum
+    if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
+        % loop through each site
+        for i = 1:length(allsites_lfp)-1
+            site1_lfp = allsites_lfp(i);
+            % pair a site
+            for j = i+1:length(allsites_lfp)
+                site2_lfp = allsites_lfp(j);
+                fprintf('Computing sync spectrum for site pair %s - %s\n', ...
+                    site1_lfp.site_ID, site2_lfp.site_ID);
+                % compute ppc spectrum between sitepair
+                % get the trial conditions for this session
+                conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
+                    {session_info.Preinj_blocks, session_info.Postinj_blocks});
+                sitepair_syncspctrm = lfp_tfa_sitepair_avg_syncspctrum(site1_lfp, site2_lfp, conditions, lfp_tfa_cfg);                
             end
         end  
     end

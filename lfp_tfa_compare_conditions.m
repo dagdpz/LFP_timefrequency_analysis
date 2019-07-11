@@ -142,9 +142,20 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
                     cmp_conditions(i).choice = ch;
                     cmp_conditions(i).perturbation = perturbations(p);
                     condition_label = lfp_tfa_get_condition_label(cmp_conditions(i), 'long');
+                    % pre-injection
                     if ~isempty(perturbation_groups)
-                        cmp_conditions(i).perturbation_group = ...
-                            perturbation_groups(p);
+                        if cmp_conditions(i).perturbation == 0
+                            if ~isempty(perturbation_groups(1))
+                                cmp_conditions(i).perturbation_group = ...
+                                    perturbation_groups(1);
+                            end
+                        end
+                        if cmp_conditions(i).perturbation == 1
+                            if ~isempty(perturbation_groups(2))
+                                cmp_conditions(i).perturbation_group = ...
+                                    perturbation_groups(2);
+                            end
+                        end
                     end
                     cmp_conditions(i).hs_labels = hs_labels;
                     cmp_conditions(i).reach_hands = reach_hands;
