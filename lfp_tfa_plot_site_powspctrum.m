@@ -209,7 +209,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
 
 
                         % hand-space labels
-                        for hs = 1:length(hs_labels)
+                        for hs = 1:size(lfp_tfa_cfg.analyse_epochs, 2)
                             % epochs
                             for ep = 1:size(lfp_tfa_cfg.analyse_epochs, 1)
                                 if ~isempty(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean)
@@ -255,8 +255,8 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             
             % average TFR across sites for a session
             if isfield(session_avg(t).condition(cn).hs_tuned_power, 'mean')
-                for hs = 1:length(hs_labels)
-                    for ep = 1:size(lfp_tfa_cfg.analyse_epochs, 1)
+                for hs = 1:size(session_avg(t).condition(cn).hs_tuned_power, 2)
+                    for ep = 1:size(session_avg(t).condition(cn).hs_tuned_power, 1)
                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
                             session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean / isite;
                         session_avg(t).condition(cn).hs_tuned_tfs(ep, hs).nsites = isite;

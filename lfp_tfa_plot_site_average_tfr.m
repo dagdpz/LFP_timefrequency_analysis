@@ -119,10 +119,15 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 % loop through states to analyse 
 
                 for st = 1:size(analyse_states, 1)
-                    state_id = analyse_states{st, 1};
-                    state_name = analyse_states{st, 2};
-                    state_ref_tstart = analyse_states{st, 3};
-                    state_ref_tend = analyse_states{st, 4};
+                    
+                    if strcmp(analyse_states{st, 1}, 'combined')
+                        continue;
+                    end
+                    
+                    state_id = analyse_states{st, 2};
+                    state_name = analyse_states{st, 3};
+                    state_ref_tstart = analyse_states{st, 4};
+                    state_ref_tend = analyse_states{st, 5};
                     
                     state_tfs.powspctrm = {}; % power spectrogram
                     state_tfs.time = {}; % timebins fo spectrogram
@@ -288,8 +293,8 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                             isfield(sites_tfr(i).condition(cn).hs_tuned_tfs, 'powspctrm')
                             isite = isite + 1;                                
                             
-                            for hs = 1:length(hs_labels)
-                                for st = 1:size(lfp_tfa_cfg.analyse_states, 1)                        
+                            for hs = 1:size(sites_tfr(i).condition(cn).hs_tuned_tfs, 2)
+                                for st = 1:size(sites_tfr(i).condition(cn).hs_tuned_tfs, 1)                        
                                     if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm)
                                         if isite == 1
                                             session_avg(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
@@ -338,8 +343,8 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             end
             % average TFR across sites for a session
             if isfield(session_avg(t).condition(cn).hs_tuned_tfs, 'powspctrm') 
-                for hs = 1:length(hs_labels)
-                    for st = 1:size(analyse_states,1)
+                for hs = 1:size(session_avg(t).condition(cn).hs_tuned_tfs, 2)
+                    for st = 1:size(session_avg(t).condition(cn).hs_tuned_tfs, 1)
                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm = ...
                             session_avg(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm / isite;
                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).nsites = isite;

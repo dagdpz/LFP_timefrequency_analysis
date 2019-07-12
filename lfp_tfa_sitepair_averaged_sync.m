@@ -116,6 +116,11 @@ function [sitepair_sync] = lfp_tfa_sitepair_averaged_sync( sitepair_crosspow, si
                 % loop through states to analyse 
 
                 for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
+                    
+                    if strcmp(lfp_tfa_cfg.analyse_states{st, 1}, 'combined')
+                        continue;
+                    end
+                    
                     state_id = lfp_tfa_cfg.analyse_states{st, 1};
                     state_name = lfp_tfa_cfg.analyse_states{st, 2};
                     state_ref_tstart = lfp_tfa_cfg.analyse_states{st, 3};
