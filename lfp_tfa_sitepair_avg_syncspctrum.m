@@ -34,7 +34,8 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_avg_syncspctrum( site1_lfp, 
     warning ('off', 'MATLAB:hg:willberemoved');
 
     % make a folder to save figures
-    results_folder_session = fullfile(lfp_tfa_cfg.analyse_lfp_folder, 'Condition_based_Syncspectrum', site1_lfp.session);
+    results_folder_session = lfp_tfa_cfg.session_info...
+        (strcmp([lfp_tfa_cfg.session_info.session], site1_lfp.session)).lfp_syncspctrm_results_fldr;
     if ~exist(results_folder_session, 'dir')
         mkdir(results_folder_session);
     end
@@ -128,12 +129,31 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_avg_syncspctrum( site1_lfp, 
                     % LFP data
                     trial_lfp = [site1_lfp.trials(t).lfp_data; site2_lfp.trials(t).lfp_data];
                     trial_time = site1_lfp.trials(t).time; % same for both sites
+                    trial_epoch_lfp = trial_lfp(:, trial_time >= epoch_start_t & ...
+                        trial_time <= epoch_end_t);
+                    trial_epoch_timestamps = trial_time(trial_time >= epoch_start_t & ...
+                        trial_time <= epoch_end_t);
+%                     if lfp_tfa_cfg.tfr.foi(1) < ceil(1/(epoch_reftend - epoch_reftstart))
+%                         trial_epoch_lfp_zeropad = zeros(size(trial_epoch_lfp, 1), ...
+%                             round(fs/lfp_tfa_cfg.tfr.foi(1)));
+%                         trial_epoch_time_zeropad = zeros(1, ...
+%                             round(fs/lfp_tfa_cfg.tfr.foi(1)));
+%                         trial_epoch_lfp_zeropad(:,1:size(trial_epoch_lfp, 2)) = trial_epoch_lfp;
+%                         trial_epoch_lfp = trial_epoch_lfp_zeropad;
+%                         trial_epoch_time_zeropad(1:length(trial_epoch_timestamps)) = ...
+%                             trial_epoch_timestamps;
+%                         trial_epoch_time_zeropad(length(trial_epoch_timestamps) + 1:end) = ...
+%                             (1/fs) : (1/fs) : (1/fs) * ...
+%                             (length(trial_epoch_time_zeropad) - length(trial_epoch_timestamps));
+%                         trial_epoch_time_zeropad(length(trial_epoch_timestamps) + 1:end) = ...
+%                             trial_epoch_time_zeropad(length(trial_epoch_timestamps) + 1:end) + ...
+%                             trial_epoch_timestamps(end);
+%                         trial_epoch_timestamps = trial_epoch_time_zeropad;
+%                     end                        
                     epoch_lfp.trial = [epoch_lfp.trial, ...
-                        trial_lfp(:, trial_time >= epoch_start_t & ...
-                        trial_time <= epoch_end_t)];  
+                        trial_epoch_lfp];  
                     epoch_lfp.time = [epoch_lfp.time, ...
-                        trial_time(trial_time >= epoch_start_t & ...
-                        trial_time <= epoch_end_t) - state_onset_t];                    
+                        trial_epoch_timestamps - state_onset_t];                    
                     
                 end
                 
@@ -158,11 +178,10 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_avg_syncspctrum( site1_lfp, 
                     cfg.method              = 'mtmfft';
                     cfg.output              = 'powandcsd';
                     cfg.taper               = 'hanning';
-                    cfg.pad                 = 'nextpow2';
-                    cfg.foi                 = lfp_tfa_cfg.tfr.foi(...
-                        lfp_tfa_cfg.tfr.foi > min_freq);   % frequencies of interest
+                    cfg.foilim              = [2 120];   % frequencies of interest
+                    cfg.pad                 = 0.5;
                     %cfg.t_ftimwin          = ones(length(cfg.foi),1).*0.5; %lfp_tfa_cfg.tfr.t_ftimwin;           % number of cycles per time window
-                    cfg.keeptrials         = 'yes';
+                    cfg.keeptrials          = 'yes';
                     epoch_tfr               = ft_freqanalysis(cfg, epoch_lfp); 
                     
                     % calculate LFP-LFP phase sync average

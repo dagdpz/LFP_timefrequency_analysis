@@ -140,8 +140,14 @@ try
         
         % Calculate the session-wise average of LFP-LFP phase sync
         if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) && ...
-                strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions')
+                any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
             sessions_info(i).avg_sync_results = lfp_tfa_avg_sitepairs_sync(sessions_info(i), lfp_tfa_cfg);
+        end
+        
+        % Calculate the session-wise average of LFP-LFP phase sync spectrum
+        if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm')) && ...
+                any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
+            sessions_info(i).avg_syncspctrm_results = lfp_tfa_avg_sitepairs_syncspctrm(sessions_info(i), lfp_tfa_cfg);
         end
         
     end
