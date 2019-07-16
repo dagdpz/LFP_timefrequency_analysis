@@ -47,12 +47,16 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
     % colorbar title
     if strcmp(lfp_tfa_cfg.baseline_method, 'zscore')
         cbtitle = 'Z-score';
+        imscale = [-1, 1];
     elseif strcmp(lfp_tfa_cfg.baseline_method, 'division')
         cbtitle = 'P / \mu';
-    elseif strcmp(lfp_tfa_cfg.baseline_method, 'subraction')
+        imscale = [0, 2];
+    elseif strcmp(lfp_tfa_cfg.baseline_method, 'subtraction')
         cbtitle = 'P - \mu';
+        imscale = [0 1e-8];
     elseif strcmp(lfp_tfa_cfg.baseline_method, 'relchange')
         cbtitle = '(P - \mu) / \mu';
+        imscale = [-1, 1];
     end
     
     % offset samples
@@ -77,18 +81,6 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
 
             state_info = struct();
             for st = 1:size(avg_tfr, 1)
-
-                concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
-                    avg_tfr(st, hs).powspctrm);
-                concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
-                    avg_tfr(st, hs).time];
-                % append nans to separate the states
-                if st < size(avg_tfr, 1)
-                    concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
-                        nan(1, length(concat_states_tfs.freq), 100/25));
-                    concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
-                        nan(1, 100/25)];
-                end
                 
                 % state timing information
                 % state onset sample number
@@ -108,18 +100,25 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
                 % state onset, start and finish samples for further states
                 % offset from previous state window
                 if st > 1
-                    state_info(st).start_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).start_s + (st-1)*(100/25);
-                    state_info(st).finish_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).finish_s + (st-1)*(100/25);
-                    state_info(st).onset_s = length(avg_tfr(st-1, hs).time) + ...
-                        state_info(st).onset_s + (st-1)*(100/25);
+                    state_info(st).start_s = length(concat_states_tfs.state_time) + ...
+                        state_info(st).start_s;
+                    state_info(st).finish_s = length(concat_states_tfs.state_time) + ...
+                        state_info(st).finish_s;
+                    state_info(st).onset_s = length(concat_states_tfs.state_time) + ...
+                        state_info(st).onset_s;
                 end
+
+                concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
+                    avg_tfr(st, hs).powspctrm, ...
+                    nan(1, length(concat_states_tfs.freq), 100/25));
+                concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
+                    avg_tfr(st, hs).time, nan(1, 100/25)];
+                              
                 
                 imagesc(linspace(state_info(st).start_s, state_info(st).finish_s, ...
                     state_info(st).finish_s - state_info(st).start_s + 1), ...
                     linspace(1, length(avg_tfr(st, hs).freq), length(avg_tfr(st, hs).freq)), ...
-                    squeeze(avg_tfr(st, hs).powspctrm) ,[-1 1]);
+                    squeeze(avg_tfr(st, hs).powspctrm) , imscale);
                 
                 % horizontal lines to separate frequency bands
                 for f = [2, 4, 8, 12, 18, 32, 80]
@@ -132,8 +131,7 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
 
             end
             concat_states_tfs.time = 1:1:size(concat_states_tfs.powspctrm, 3);
-            state_onsets = find(concat_states_tfs.state_time(1:end-1) .* ...
-                concat_states_tfs.state_time(2:end) <= 0);
+            state_onsets = find(concat_states_tfs.state_time == 0);
             state_samples = sort([state_info.start_s, state_info.onset_s, ...
                 state_info.finish_s]);
 
@@ -155,8 +153,11 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
             set(gca,'xtick',state_samples)
             for so = state_onsets
                 line([so so], ylim, 'color', 'k'); 
-                state_name = avg_tfr(state_onsets == so, hs).state_name;
-                text(so+1, 10, state_name, 'fontsize', 8);
+                if isfield(avg_tfr(state_onsets == so, hs), 'state_name') && ...
+                        ~isempty(avg_tfr(state_onsets == so, hs).state_name)
+                    state_name = avg_tfr(state_onsets == so, hs).state_name;
+                    text(so+1, 10, state_name, 'fontsize', 8);
+                end
             end
             set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 7)
             set(gca, 'xticklabelrotation', 45)

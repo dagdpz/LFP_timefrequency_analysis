@@ -63,17 +63,19 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
     %perturbation_groups = lfp_tfa_cfg.compare.perturbation_groups;
     
     hands = lfp_tfa_cfg.compare.reach_hands;
+    if isnan(hands), hands = {'any'}; end    
     spaces = lfp_tfa_cfg.compare.reach_spaces; 
+    if isnan(spaces), spaces = {'any'}; end
     
     % hand-space labels to be excluded
-    exclude_handpsace = {};
+    exclude_handspace = {};
     if isfield(lfp_tfa_cfg.compare, 'exclude_handspace')
-        exclude_handpsace = lfp_tfa_cfg.compare.exclude_handspace;
+        exclude_handspace = lfp_tfa_cfg.compare.exclude_handspace;
     end
     % assign hand space labels
-    hs_labels = cell(1, length(hands)*length(spaces) - length(exclude_handpsace));
-    reach_hands = cell(1, length(hands)*length(spaces) - length(exclude_handpsace));
-    reach_spaces = cell(1, length(hands)*length(spaces) - length(exclude_handpsace));
+    hs_labels = cell(1, length(hands)*length(spaces) - length(exclude_handspace));
+    reach_hands = cell(1, length(hands)*length(spaces) - length(exclude_handspace));
+    reach_spaces = cell(1, length(hands)*length(spaces) - length(exclude_handspace));
     hs_idx = 0;
     for h = 1:length(hands)
         if strcmp(hands{h},'R') || strcmp(hands{h},'L')
@@ -83,23 +85,23 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
                 hand_label = 'CH';
             end
         else
-            hand_label = [hands{h}, 'H'];
+            hand_label = [hands{h} 'H'];
         end
         for s = 1:length(spaces)
             % check if this hand space label should be excluded
             hs_label = [hands{h}, spaces{s}];
-            if ~isempty(exclude_handpsace) && ...
+            if ~isempty(exclude_handspace) && ...
                     any(strcmp(lfp_tfa_cfg.compare.exclude_handspace, hs_label))
                 continue;
             end
-            if strcmp(spaces{s},'R') || strcmp(spaces{s},'L')
+            if (strcmp(spaces{s},'R') || strcmp(spaces{s},'L'))
                 if strcmp(spaces{s},lfp_tfa_cfg.ref_hemisphere)
                     space_label = 'IS';
                 else
                     space_label = 'CS';
                 end
             else
-                space_label = [spaces{s}, 'S'];
+                space_label = [spaces{s} 'S'];
             end
             hs_idx = hs_idx + 1;
             reach_hands{hs_idx} = hands{h};

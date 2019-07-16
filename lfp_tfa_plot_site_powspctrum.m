@@ -81,8 +81,17 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 % get trial indices for this condition
                 cond_trials = lfp_tfa_get_condition_trials(states_lfp(i), site_conditions(cn));
                 % get trial indices for this condition and hand-space label
-                cond_trials = cond_trials & ...
-                    strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
+                if ~strcmp(site_conditions(cn).reach_hands{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({states_lfp(i).trials.reach_hand}, ...
+                        site_conditions(cn).reach_hands{hs});
+                end
+                if ~strcmp(site_conditions(cn).reach_spaces{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({states_lfp(i).trials.reach_space}, ...
+                        site_conditions(cn).reach_spaces{hs});
+                end
+                
                 sites_pow(i).condition(cn).ntrials(hs) = sum(cond_trials);
 
                 fprintf('Condition %s - %s\n', site_conditions(cn).label, hs_labels{hs});

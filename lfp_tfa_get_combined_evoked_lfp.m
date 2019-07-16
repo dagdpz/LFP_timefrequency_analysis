@@ -67,7 +67,7 @@ for t = 1:length(trials_lfp)
     if strcmp(spacing, 'random') % randomly spaced windows
         window_spacing = round(length(lfp_time)/nwindows);
         window_start_idx = 1:window_spacing:...
-            length(lfp_time);
+            length(lfp_time) - nsamples_window;
         
         % loop through each window
         for w = 1:length(window_start_idx)

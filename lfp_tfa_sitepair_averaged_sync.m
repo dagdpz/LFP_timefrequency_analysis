@@ -93,8 +93,17 @@ function [sitepair_sync] = lfp_tfa_sitepair_averaged_sync( sitepair_crosspow, si
                 cond_trials = lfp_tfa_get_condition_trials(sitepair_crosspow, site_conditions(cn));
                 % get the trial indices which satisfy the given hand-space
                 % label for the given condition
-                cond_trials = cond_trials & ...
-                    strcmp({sitepair_crosspow.trials.hndspc_lbl}, hs_labels(hs));
+                if ~strcmp(site_conditions(cn).reach_hands{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({sitepair_crosspow.trials.reach_hand}, ...
+                        site_conditions(cn).reach_hands{hs});
+                end
+                if ~strcmp(site_conditions(cn).reach_spaces{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({sitepair_crosspow.trials.reach_space}, ...
+                        site_conditions(cn).reach_spaces{hs});
+                end
+                
                 sitepair_sync.condition(cn).ntrials(hs) = sum(cond_trials);
 
                 fprintf('Condition %s - %s\n', site_conditions(cn).label, hs_labels{hs});
@@ -121,10 +130,10 @@ function [sitepair_sync] = lfp_tfa_sitepair_averaged_sync( sitepair_crosspow, si
                         continue;
                     end
                     
-                    state_id = lfp_tfa_cfg.analyse_states{st, 1};
-                    state_name = lfp_tfa_cfg.analyse_states{st, 2};
-                    state_ref_tstart = lfp_tfa_cfg.analyse_states{st, 3};
-                    state_ref_tend = lfp_tfa_cfg.analyse_states{st, 4};
+                    state_id = lfp_tfa_cfg.analyse_states{st, 2};
+                    state_name = lfp_tfa_cfg.analyse_states{st, 3};
+                    state_ref_tstart = lfp_tfa_cfg.analyse_states{st, 4};
+                    state_ref_tend = lfp_tfa_cfg.analyse_states{st, 5};
                     
                     state_freq = sitepair_crosspow.trials(1).csd;                    
                     state_freq.powspctrm = {}; % power spectrogram

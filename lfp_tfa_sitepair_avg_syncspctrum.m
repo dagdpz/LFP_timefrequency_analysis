@@ -76,8 +76,17 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_avg_syncspctrum( site1_lfp, 
             % trial conditions are same for both sites
             cond_trials = lfp_tfa_get_condition_trials(site1_lfp, site_conditions(cn));
             % get trial indices for this condition and hand-space label
-            cond_trials = cond_trials & ...
-                strcmp({site1_lfp.trials.hndspc_lbl}, hs_labels(hs));
+            if ~strcmp(site_conditions(cn).reach_hands{hs}, 'any')
+                cond_trials = cond_trials & ...
+                    strcmp({site1_lfp.trials.reach_hand}, ...
+                    site_conditions(cn).reach_hands{hs});
+            end
+            if ~strcmp(site_conditions(cn).reach_spaces{hs}, 'any')
+                cond_trials = cond_trials & ...
+                    strcmp({site1_lfp.trials.reach_space}, ...
+                    site_conditions(cn).reach_spaces{hs});
+            end
+                
             sitepair_syncspctrm.condition(cn).ntrials(hs) = sum(cond_trials);
 
             fprintf('Condition %s - %s\n', site_conditions(cn).label, hs_labels{hs});

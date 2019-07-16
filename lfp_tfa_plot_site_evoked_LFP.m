@@ -88,8 +88,17 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                 % get trial indices for the given condition
                 cond_trials = lfp_tfa_get_condition_trials(site_lfp(i), site_conditions(cn));
                 % filter trials by hand-space labels
-                cond_trials = cond_trials & ...
-                    strcmp({site_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
+                if ~strcmp(site_conditions(cn).reach_hands{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({states_lfp(i).trials.reach_hand}, ...
+                        site_conditions(cn).reach_hands{hs});
+                end
+                if ~strcmp(site_conditions(cn).reach_spaces{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({states_lfp(i).trials.reach_space}, ...
+                        site_conditions(cn).reach_spaces{hs});
+                end
+                
                 sites_evoked(i).condition(cn).ntrials(hs) = sum(cond_trials);
 
                 fprintf('Condition %s - %s\n', site_conditions(cn).label, hs_labels{hs});
@@ -221,10 +230,13 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                                     % struct to store average evoked LFP across sites
                                     session_avg(t).condition(cn).hs_tuned_evoked(st, hs).hs_label = ...
                                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).hs_label;
-                                    session_avg(t).condition(cn).hs_tuned_evoked(st, hs).state = ...
-                                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state;
-                                    session_avg(t).condition(cn).hs_tuned_evoked(st, hs).state_name = ...
-                                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state_name;
+                                    if isfield(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs), 'state') && ...
+                                            isfield(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs), 'state_name')
+                                        session_avg(t).condition(cn).hs_tuned_evoked(st, hs).state = ...
+                                            sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state;
+                                        session_avg(t).condition(cn).hs_tuned_evoked(st, hs).state_name = ...
+                                            sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state_name;
+                                    end
                                     session_avg(t).condition(cn).condition = site_conditions(cn);
                                     session_avg(t).condition(cn).label = site_conditions(cn).label;
                                     session_avg(t).condition(cn).session = site_lfp(i).session;

@@ -37,6 +37,11 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
 
     % number of offset samples to divide between time windows
     noffset = 100;
+    
+    % number of subplots required
+    nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
+    nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
+    
     % loop through handspace
     for hs = 1:size(evoked_lfp, 2)
         if ~isempty([evoked_lfp(:,hs).mean]) &&  ~isempty([evoked_lfp(:,hs).std])
@@ -87,7 +92,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 state_info.finish_s]);
 
             % now plot
-            subplot(2,2,hs)
+            subplot(nhandlabels, nspacelabels, hs)
             hold on;
             plot(concat_states_lfp.mean, 'b');
             plot(concat_states_lfp.mean + concat_states_lfp.std, 'r--');
@@ -97,7 +102,8 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             set(gca,'xtick',state_samples)
             for so = state_onsets
                 line([so so], ylim, 'color', 'k'); 
-                if ~isempty(evoked_lfp(state_onsets == so, hs).state_name)
+                if isfield(evoked_lfp(state_onsets == so, hs), 'state_name') && ...
+                        ~isempty(evoked_lfp(state_onsets == so, hs).state_name)
                     state_name = evoked_lfp(state_onsets == so, hs).state_name;
                     ypos = ylim;
                     ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;

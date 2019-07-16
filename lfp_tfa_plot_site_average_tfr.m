@@ -83,7 +83,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 
             % hand-space tuning of LFP
             hs_labels = site_conditions(cn).hs_labels;
-            
+                         
             % store details of condition analysed
             sites_tfr(i).condition(cn).label = site_conditions(cn).label;
             sites_tfr(i).condition(cn).cfg_condition = site_conditions(cn);
@@ -96,8 +96,17 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 cond_trials = lfp_tfa_get_condition_trials(states_lfp(i), site_conditions(cn));
                 % get the trial indices which satisfy the given hand-space
                 % label for the given condition
-                cond_trials = cond_trials & ...
-                    strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
+                if ~strcmp(site_conditions(cn).reach_hands{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({states_lfp(i).trials.reach_hand}, ...
+                        site_conditions(cn).reach_hands{hs});
+                end
+                if ~strcmp(site_conditions(cn).reach_spaces{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({states_lfp(i).trials.reach_space}, ...
+                        site_conditions(cn).reach_spaces{hs});
+                end
+                
                 sites_tfr(i).condition(cn).ntrials(hs) = sum(cond_trials);
 
                 fprintf('Condition %s - %s\n', site_conditions(cn).label, hs_labels{hs});
@@ -121,84 +130,29 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 for st = 1:size(analyse_states, 1)
                     
                     if strcmp(analyse_states{st, 1}, 'combined')
-                        continue;
+                        state_tfs = lfp_tfa_get_combined_tfs(states_lfp(i), ...
+                            cond_trials, analyse_states(st, :), lfp_tfa_cfg);
                     end
                     
-                    state_id = analyse_states{st, 2};
-                    state_name = analyse_states{st, 3};
-                    state_ref_tstart = analyse_states{st, 4};
-                    state_ref_tend = analyse_states{st, 5};
-                    
-                    state_tfs.powspctrm = {}; % power spectrogram
-                    state_tfs.time = {}; % timebins fo spectrogram
-                    state_tfs.freq = {}; % freq bins
-                    % loop through trials
-                    for t = find(cond_trials)
-                        % get the state information for this trial
-                        states          = states_lfp(i).trials(t).states;
-                        state_onset_t   = states([states(:).id] == ...
-                            state_id).onset_t;
-                        state_start_t   = states([states(:).id] == ...
-                            state_id).onset_t + state_ref_tstart;
-                        state_end_t     = states([states(:).id] == ...
-                            state_id).onset_t + state_ref_tend;
-                        % sampling frequency
-                        fs = states_lfp(i).trials(t).fsample;
-                        
-                        % crop the tfs for this state
-                        state_tfs.powspctrm = [state_tfs.powspctrm, ...
-                            states_lfp(i).trials(t).tfs.powspctrm(1, :, ...
-                            (states_lfp(i).trials(t).tfs.time >= state_start_t & ...
-                            states_lfp(i).trials(t).tfs.time <= state_end_t))];
-                        % time bins
-                        state_tfs.time = [state_tfs.time, ...
-                            states_lfp(i).trials(t).tfs.time(1, ...
-                            (states_lfp(i).trials(t).tfs.time >= state_start_t & ...
-                            states_lfp(i).trials(t).tfs.time <= state_end_t)) - state_onset_t];
-                        % freq bins
-                        state_tfs.freq = [state_tfs.freq states_lfp(i).trials(t).tfs.freq]; 
-                        state_tfs.cfg = states_lfp(i).trials(t).tfs.cfg;
-
-                    end
-
-                    % find number of time bins in power
-                    % spectrogram
-                    ntimebins = min(cellfun('length', state_tfs.time));
-                    nfreqbins = numel(state_tfs.freq);
-                    % crop each tfs to the ntimebins
-                    for k = 1:length(state_tfs.powspctrm)
-                        state_tfs.powspctrm{k} = state_tfs.powspctrm{k}(1,:,1:ntimebins);
-                        state_tfs.time{k} = state_tfs.time{k}(1:ntimebins);
-                    end
-
-                    % average power spectrum for each state
-                    arr_state_pow = zeros(1, nfreqbins, ntimebins);
+                    if strcmp(analyse_states{st, 1}, 'single')
+                        state_tfs = lfp_tfa_get_state_tfs(states_lfp(i), ...
+                            cond_trials, analyse_states(st, :), lfp_tfa_cfg);
+                    end                                       
 
                     if ~isempty(state_tfs.powspctrm)
-
-                        % find the average TFS for each state
-                        arr_state_pow = cat(1, state_tfs.powspctrm{:});
-                        state_tfs.powspctrm_rawmean = nanmean(arr_state_pow, 1);
-
-                        % baseline normalization
-                        cfg_baseline.method = lfp_tfa_cfg.baseline_method;
-                        baseline_cnd_idx = [states_lfp(i).baseline.perturbation] == ...
-                            lfp_tfa_cfg.baseline_perturbation & [states_lfp(i).baseline.choice] == ...
-                            lfp_tfa_cfg.baseline_use_choice_trial;
-                        cfg_baseline.mean = states_lfp(i).baseline(baseline_cnd_idx).pow_mean;
-                        cfg_baseline.std = states_lfp(i).baseline(baseline_cnd_idx).pow_std;
-                        state_tfs.powspctrm_normmean = lfp_tfa_baseline_normalization(...
-                            state_tfs.powspctrm_rawmean, cfg_baseline); 
 
                         % save average tfs for this condition, hand-space
                         % label, and state
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm = state_tfs.powspctrm_normmean;
-                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time = state_tfs.time{1};
-                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq = state_tfs.freq{1}; 
+                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm_raw = state_tfs.powspctrm_rawmean;
+                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time = state_tfs.time;
+                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq = state_tfs.freq; 
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).cfg = state_tfs.cfg;
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).hs_label = hs_labels(hs);
-                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state = state_id;
-                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state_name = state_name;
+                        if isfield(state_tfs, 'state_id') && isfield(state_tfs, 'state_name')
+                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state = state_tfs.state_id;
+                            sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state_name = state_tfs.state_name;
+                        end
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).trials = find(cond_trials);
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).ntrials = length(find(cond_trials));
                     end
@@ -325,8 +279,11 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                                         % store session tfs
                                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).freq = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq;
                                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).hs_label = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).hs_label;
-                                        session_avg(t).condition(cn).hs_tuned_tfs(st, hs).state = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state;
-                                        session_avg(t).condition(cn).hs_tuned_tfs(st, hs).state_name = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state_name;
+                                        if isfield(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs), 'state') && ...
+                                                isfield(sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs), 'state_name')
+                                            session_avg(t).condition(cn).hs_tuned_tfs(st, hs).state = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state;
+                                            session_avg(t).condition(cn).hs_tuned_tfs(st, hs).state_name = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state_name;
+                                        end
                                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).cfg = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).cfg;
                                         session_avg(t).condition(cn).cfg_condition = site_conditions(cn);
                                         session_avg(t).condition(cn).label = site_conditions(cn).label;
