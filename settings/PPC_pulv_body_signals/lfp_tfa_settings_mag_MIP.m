@@ -40,15 +40,15 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\PhysiologicalRecording\Data\Magnus\LFP
     struct('Monkey',        'Magnus', ...
            'Date',          '20190208', ...
            'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_control_20190208\sites_Magnus_20190208.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', [2 3 4]);  
+           'Preinj_blocks',  [0 2 3 4], ...
+           'Postinj_blocks', []);  
        
        lfp_tfa_cfg.session_info(2) = ...
     struct('Monkey',        'Magnus', ...
            'Date',          '20190320', ...
            'Input',         'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_control_20190320\sites_Magnus_20190320.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', [2 3]); 
+           'Preinj_blocks',  [0 2 3], ...
+           'Postinj_blocks', []); 
        
 % To add a new session to analyse, increment the counter by 1 and add a new
 % value into the lfp_tfa_cfg.session_info struct
@@ -60,6 +60,16 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\PhysiologicalRecording\Data\Magnus\LFP
 %            'Preinj_blocks',  0, ...
 %            'Postinj_blocks', 'allbutfirst');
 
+% what kind of analyses should be done on LFP
+% should be a cell array of strings which indicate which kind of analyses
+% should be performed on LFP
+% Currently supported analyses are 'tfs', 'evoked', 'pow', and 'sync'
+%       'tfs'       - LFP time frequency spectrogram average for given conditions and time windows
+%       'evoked'    - LFP evoked response average for given conditions and time windows
+%       'pow'       - LFP power spectrum average for given conditions and epochs
+%       'sync'      - LFP-LFP phase synchronization measure for given conditions and
+%           time windows
+lfp_tfa_cfg.analyses = {'evoked', 'pow'};
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -174,7 +184,7 @@ lfp_tfa_cfg.compare.exclude_handspace = {};
 % lfp_tfa_cfg.compare.perturbation_groups(1) separately
 % lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
 % any perturbation value 
-lfp_tfa_cfg.compare.perturbations = [0, 1]; 
+lfp_tfa_cfg.compare.perturbations = [0]; 
 
 % differences in conditions to be analysed
 % add new entries for further difference calculations
@@ -194,7 +204,7 @@ lfp_tfa_cfg.compare.perturbations = [0, 1];
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
 lfp_tfa_cfg.diff_condition = {};
-lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+% lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
@@ -376,7 +386,7 @@ end
 % 3. lfp_tfa_cfg.baseline_perturbation = [2, 3]; combines perturbation blocks
 % 2 and 3
 if length(lfp_tfa_cfg.compare.perturbations) == 1
-    lfp_tfa_cfg.baseline_perturbation = lfp_tfa_cfg.compare.perturbation;
+    lfp_tfa_cfg.baseline_perturbation = lfp_tfa_cfg.compare.perturbations;
 else
     lfp_tfa_cfg.baseline_perturbation = 0; % set the perturbation block(s) to be used for computing baseline
 end
@@ -413,8 +423,8 @@ end
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
 lfp_tfa_cfg.analyse_states = {lfp_tfa_states.FIX_HOL,    'fxh',      0,   0.5;...
-                             lfp_tfa_states.DEL_PER,    'del',    0,   0.5;
-                             lfp_tfa_states.REWARD,    'rwd'    0,  0.5};
+                             lfp_tfa_states.DEL_PER,    'del',    0,   0.5};
+                            
 
 % define the states to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
