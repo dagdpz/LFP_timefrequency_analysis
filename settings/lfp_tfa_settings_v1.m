@@ -200,7 +200,7 @@ lfp_tfa_cfg.compare.choice_trials = 0;
 % which reach hand is left and right separately
 % 4. lfp_tfa_cfg.compare.reach_hands = {'any'}; ignore hand label (trial with
 % any hand label is combined)
-lfp_tfa_cfg.compare.reach_hands = {'L', 'R', 'any'};
+lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
 
 % reach space to be included for analysis
 % should be a cell array that contain only values 'R', 'L', or 'any'
@@ -213,7 +213,7 @@ lfp_tfa_cfg.compare.reach_hands = {'L', 'R', 'any'};
 % which acquired target is on left and on right separately
 % 4. lfp_tfa_cfg.compare.reach_hands = {'any'}; ignore space label (trial with
 % any acquired target position is combined)
-lfp_tfa_cfg.compare.reach_spaces = {'L', 'R', 'any'}; 
+lfp_tfa_cfg.compare.reach_spaces = {'L', 'R'}; 
 
 % hand space combinations to be excluded from analysis
 % should be a cell array with each element containing the hand and space
