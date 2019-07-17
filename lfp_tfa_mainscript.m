@@ -95,8 +95,10 @@ try
         session_proc_lfp = [];
         for file = {sites_lfp_files.name}
             %fprintf('Reading processed LFP for site %s\n', file{1});
-            load(fullfile(sessions_info(i).proc_results_fldr, file{1}))
-            session_proc_lfp = [session_proc_lfp site_lfp];
+            if ~strcmp(file{1}, 'allsites_lfp.mat')
+                load(fullfile(sessions_info(i).proc_results_fldr, file{1}))
+                session_proc_lfp = [session_proc_lfp site_lfp];
+            end            
         end
 
         lfp_tfa_cfg.data_filepath = lfp_datafiles{i};
@@ -107,7 +109,7 @@ try
                 ~isempty(sessions_info(i).Preinj_blocks)
             lfp_tfa_cfg.perturbation_groups = ...
                 [lfp_tfa_cfg.perturbation_groups sessions_info(i).Preinj_blocks];
-        elseif any(lfp_tfa_cfg.compare.perturbation == 0)            
+        elseif any(lfp_tfa_cfg.compare.perturbations == 0)            
             lfp_tfa_cfg.perturbation_groups = [lfp_tfa_cfg.perturbation_groups 0];            
         end
         % postinjection blocks for this session
@@ -138,8 +140,14 @@ try
         
         % Calculate the session-wise average of LFP-LFP phase sync
         if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) && ...
-                strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions')
+                any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
             sessions_info(i).avg_sync_results = lfp_tfa_avg_sitepairs_sync(sessions_info(i), lfp_tfa_cfg);
+        end
+        
+        % Calculate the session-wise average of LFP-LFP phase sync spectrum
+        if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm')) && ...
+                any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
+            sessions_info(i).avg_syncspctrm_results = lfp_tfa_avg_sitepairs_syncspctrm(sessions_info(i), lfp_tfa_cfg);
         end
         
     end

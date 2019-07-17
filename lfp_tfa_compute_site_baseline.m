@@ -1,4 +1,4 @@
-function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, lfp_tfa_cfg )
+function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, lfp_tfa_cfg )
 
 % lfp_tfa_compute_baseline_power - Computes mean and stddev of baseline power according to
 % the given configuration
@@ -49,7 +49,8 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, lfp_tfa_cfg )
     % structure to store baseline
     baseline = struct();        
     % baseline conditions
-    perturbation = unique([site_lfp.trials.perturbation]);
+    perturbation = unique([lfp_tfa_cfg.compare.perturbations]);
+    perturbation_blocks = unique([site_lfp.trials.perturbation]);
     choice = unique([site_lfp.trials.choice_trial]);
     % loop through each baseline condition
     cnd = 1;
@@ -62,8 +63,20 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, lfp_tfa_cfg )
             % loop through trial
             for t = 1:length( site_lfp.trials )
                 trial = site_lfp.trials(t);
+                if p == 0
+                    blocks = session_info.Preinj_blocks;
+                elseif p == 1
+                    blocks = session_info.Postinj_blocks;
+                    if strcmp(blocks, 'all')
+                        blocks = perturbation_blocks(perturbation_blocks ~= 0);
+                    elseif strcmp(blocks, 'allbutfirst')
+                        blocks = perturbation_blocks(perturbation_blocks ~= 0);
+                        blocks = blocks(2:end);
+                    end
+                end
+                
                 % whether this trial should be considered for baseline calculation
-                consider_trial = ~(trial.noisy) & sum(trial.perturbation == p) ...
+                consider_trial = ~(trial.noisy) & sum(trial.perturbation == blocks) ...
                     & sum(trial.choice_trial == c);
                 if consider_trial 
                     if strcmp(lfp_tfa_cfg.baseline_ref_state, '') && strcmp(lfp_tfa_cfg.baseline_ref_period , 'trial')

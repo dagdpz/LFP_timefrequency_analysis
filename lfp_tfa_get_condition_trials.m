@@ -67,29 +67,25 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
 %     postinj_perturb = unique(perturbations(perturbations ~= 0));
     cond_trials_perturb = zeros(1, length(site_lfp.trials));
     if ~isnan(condition.perturbation)
-%         if condition.perturbation == 0 % pre-injection
-%             perturbation_values = 0;
-%         else % post-injection
-%             perturbation_values = unique(perturbations(perturbations ~= 0));
-%         end
         perturbation_values = unique([site_lfp.trials.perturbation]);
-        
-        if strcmp(condition.perturbation_group, 'all')
-            for b = perturbation_values
-                cond_trials_perturb = cond_trials_perturb | ...
-                ([site_lfp.trials.perturbation] == b);
+        if condition.perturbation == 1%post-injection
+            if strcmp(condition.perturbation_group, 'all')
+                perturbation_values = perturbation_values(perturbation_values ~= 0);
+            elseif strcmp(condition.perturbation_group, 'allbutfirst')
+                perturbation_values = perturbation_values(perturbation_values ~= 0);
+                perturbation_values = perturbation_values(2:end);
+            else
+                perturbation_values = condition.perturbation_group{1};
             end
-        elseif strcmp(condition.perturbation_group, 'allbutfirst')
-            for b = perturbation_values(2:end)
-                cond_trials_perturb = cond_trials_perturb | ...
-                ([site_lfp.trials.perturbation] == b);
-            end
-        else 
-            for b = condition.perturbation_group{1}
-                cond_trials_perturb = cond_trials_perturb | ...
-                ([site_lfp.trials.perturbation] == b);
-            end
+        elseif condition.perturbation == 0 % pre-injection
+            perturbation_values = condition.perturbation_group{1};
         end
+        
+        for b = perturbation_values
+            cond_trials_perturb = cond_trials_perturb | ...
+                ([site_lfp.trials.perturbation] == b);
+        end
+            
     end
     if isnan(condition.perturbation) % ignore perturbation
         cond_trials_perturb = ones(1, length(site_lfp.trials));
