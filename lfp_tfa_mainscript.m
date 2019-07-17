@@ -7,7 +7,7 @@
 
 % file containing settings for LFP analysis
 
-settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
+settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Magnus_rest.m';
 
 
 % whether the LFP should be processed (true) or not (false)

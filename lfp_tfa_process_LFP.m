@@ -117,8 +117,10 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
                 % reach space         
                 if sign(real(tar_pos) - real(fix_pos)) == -1
                     reach_space = 'L'; 
-                else
+                elseif sign(real(tar_pos) - real(fix_pos)) == 1
                     reach_space = 'R';
+                else
+                    reach_space = 'N';
                 end
                 
                 % reach hand

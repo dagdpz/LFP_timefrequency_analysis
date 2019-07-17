@@ -113,7 +113,7 @@ lfp_tfa_cfg.session_info(1) = ...
 %       'pow'       - LFP power spectrum average for given conditions and epochs
 %       'sync'      - LFP-LFP phase synchronization measure for given conditions and
 %           time windows
-lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow', 'syncspctrm'};
+lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow'};
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -476,8 +476,9 @@ end
 % 
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
-lfp_tfa_cfg.analyse_states = {lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
-                             lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};
+lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
+                             'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5; ...
+                             'combined', [lfp_tfa_states.CUE_ON lfp_tfa_states.REA_INI], 0.5, 2, 'random'};                    
 
 % define the epochs to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
