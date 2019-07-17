@@ -145,7 +145,7 @@ lfp_tfa_cfg.maxsites = inf; % inf = analyse all sites
 
 % random seed for random number generator for reproducibility
 % set to a non negative integer below 2^32
-lfp_tfa_cfg.random_seed = 0;
+lfp_tfa_cfg.random_seed = rng;
 
 %% Settings for averaging TFR and evoked LFP based on conditions
 
@@ -182,7 +182,7 @@ lfp_tfa_cfg.compare.effectors = [0];
 lfp_tfa_cfg.compare.choice_trials = 0; 
 
 % reach hands to be included for analysis
-% should be nan or a cell array that contain only values 'R', 'L'
+% should be 'any' or a cell array that contain only values 'R', 'L'
 % Examples:
 % 1. lfp_tfa_cfg.compare.reach_hands = {'L'}; include only those trials in
 % which reach hand is left
@@ -190,12 +190,12 @@ lfp_tfa_cfg.compare.choice_trials = 0;
 % which reach hand is right
 % 3. lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; analyse the trials in
 % which reach hand is left and right separately
-% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
+% 4. lfp_tfa_cfg.compare.reach_hands = 'any'; ignore hand label (trial with
 % any hand label is combined)
-lfp_tfa_cfg.compare.reach_hands = nan;
+lfp_tfa_cfg.compare.reach_hands = {'any'};
 
 % reach space to be included for analysis
-% should be nan or a cell array that contain only values 'R', 'L'
+% should be 'any' or a cell array that contain only values 'R', 'L'
 % Examples:
 % 1. lfp_tfa_cfg.compare.reach_spaces = {'L'}; include only those trials in
 % which acquired target is on left
@@ -203,9 +203,9 @@ lfp_tfa_cfg.compare.reach_hands = nan;
 % which acquired target is on right
 % 3. lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; analyse the trials in
 % which acquired target is on left and on right separately
-% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore space label (trial with
+% 4. lfp_tfa_cfg.compare.reach_hands = 'any'; ignore space label (trial with
 % any acquired target position is combined)
-lfp_tfa_cfg.compare.reach_spaces = nan; 
+lfp_tfa_cfg.compare.reach_spaces = {'any'}; 
 
 % hand space combinations to be excluded from analysis
 % should be a cell array with each element containing the hand and space
@@ -267,7 +267,7 @@ lfp_tfa_cfg.trialinfo = struct();
 % Example:
 % lfp_tfa_cfg.trialinfo.start_state = lfp_tfa_states.FIX_ACQ; reference for 
 % trial start is the onset of fixation acquisition
-lfp_tfa_cfg.trialinfo.start_state = lfp_tfa_states.FIX_ACQ;
+lfp_tfa_cfg.trialinfo.start_state = lfp_tfa_states.INI_TRI;
 
 % offset to be considered from the onset of
 % trial start reference state for calculating the trial start time
@@ -283,7 +283,7 @@ lfp_tfa_cfg.trialinfo.ref_tstart = -0;
 % Example:
 % lfp_tfa_cfg.trialinfo.end_state = lfp_tfa_states.TAR_HOL; reference for 
 % trial start is the onset of target hold
-lfp_tfa_cfg.trialinfo.end_state = lfp_tfa_states.SUCCESS;
+lfp_tfa_cfg.trialinfo.end_state = lfp_tfa_states.TRI_END;
 
 % offset to be considered from the onset of
 % trial end reference state for calculating the trial end time

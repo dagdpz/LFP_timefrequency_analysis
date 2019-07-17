@@ -39,8 +39,8 @@ lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Lin', ...
            'Date',          '20170622', ...
            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20170622.mat', ...
-           'Preinj_blocks',  [], ...
-           'Postinj_blocks', 'all');
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 'allbutfirst');
 % lfp_tfa_cfg.session_info(2) = ...
 %     struct('Monkey',        'Lin', ...
 %            'Date',          '20170629', ...
@@ -152,6 +152,9 @@ lfp_tfa_cfg.ref_hemisphere = 'R';
 % each session
 lfp_tfa_cfg.maxsites = inf; % inf = analyse all sites
 
+% random seed for random number generator for reproducibility
+lfp_tfa_cfg.random_seed = rng;
+
 %% Settings for averaging TFR and evoked LFP based on conditions
 
 % trial types to be included in the analysis
@@ -195,12 +198,12 @@ lfp_tfa_cfg.compare.choice_trials = 0;
 % which reach hand is right
 % 3. lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; analyse the trials in
 % which reach hand is left and right separately
-% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore hand label (trial with
+% 4. lfp_tfa_cfg.compare.reach_hands = {'any'}; ignore hand label (trial with
 % any hand label is combined)
-lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
+lfp_tfa_cfg.compare.reach_hands = {'L', 'R', 'any'};
 
 % reach space to be included for analysis
-% should be nan or a cell array that contain only values 'R', 'L'
+% should be a cell array that contain only values 'R', 'L', or 'any'
 % Examples:
 % 1. lfp_tfa_cfg.compare.reach_spaces = {'L'}; include only those trials in
 % which acquired target is on left
@@ -208,9 +211,9 @@ lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
 % which acquired target is on right
 % 3. lfp_tfa_cfg.compare.reach_hands = {'L', 'R'}; analyse the trials in
 % which acquired target is on left and on right separately
-% 4. lfp_tfa_cfg.compare.reach_hands = nan; ignore space label (trial with
+% 4. lfp_tfa_cfg.compare.reach_hands = {'any'}; ignore space label (trial with
 % any acquired target position is combined)
-lfp_tfa_cfg.compare.reach_spaces = {'L', 'R'}; 
+lfp_tfa_cfg.compare.reach_spaces = {'L', 'R', 'any'}; 
 
 % hand space combinations to be excluded from analysis
 % should be a cell array with each element containing the hand and space
@@ -237,7 +240,7 @@ lfp_tfa_cfg.compare.exclude_handspace = {};
 % lfp_tfa_cfg.compare.perturbation_groups(1) separately
 % lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
 % any perturbation value 
-lfp_tfa_cfg.compare.perturbations = 1; 
+lfp_tfa_cfg.compare.perturbations = [0, 1]; 
 
 % differences in conditions to be analysed
 % add new entries for further difference calculations
@@ -257,7 +260,7 @@ lfp_tfa_cfg.compare.perturbations = 1;
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
 lfp_tfa_cfg.diff_condition = {};
-% lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
@@ -477,8 +480,7 @@ end
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
 lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
-                             'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5; ...
-                             'combined', [lfp_tfa_states.CUE_ON lfp_tfa_states.REA_INI], 0.5, 2, 'random'};                    
+                             'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};                    
 
 % define the epochs to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse

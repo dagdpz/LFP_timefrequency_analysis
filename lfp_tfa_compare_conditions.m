@@ -63,9 +63,7 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
     %perturbation_groups = lfp_tfa_cfg.compare.perturbation_groups;
     
     hands = lfp_tfa_cfg.compare.reach_hands;
-    if isnan(hands), hands = {'any'}; end    
     spaces = lfp_tfa_cfg.compare.reach_spaces; 
-    if isnan(spaces), spaces = {'any'}; end
     
     % hand-space labels to be excluded
     exclude_handspace = {};
