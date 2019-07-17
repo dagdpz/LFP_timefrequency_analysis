@@ -471,7 +471,7 @@ end
 % 
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
-lfp_tfa_cfg.analyse_states = {'combined', [lfp_tfa_states.INI_TRI lfp_tfa_states.TRI_END], 0.5, 10, 'random'};                    
+lfp_tfa_cfg.analyse_states = {'combined', [lfp_tfa_states.INI_TRI lfp_tfa_states.TRI_END], 0.5, 10, 'uniform'};                    
 
 % define the epochs to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
