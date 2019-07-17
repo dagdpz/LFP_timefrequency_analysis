@@ -53,9 +53,10 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
     % loop through each site
     for i = 1:length(site_lfp) 
 
+        rng(lfp_tfa_cfg.random_seed); % set random seed for reproducibility
         
         % folder to save sitewise results
-        site_results_folder = fullfile(results_folder_evoked, site_lfp(i).site_ID);
+        site_results_folder = fullfile(results_folder_evoked, 'sites');
         if ~exist(site_results_folder, 'dir')
             mkdir(site_results_folder);
         end
@@ -127,7 +128,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                     if strcmp(analyse_states{st, 1}, 'single')
                         state_tfs = lfp_tfa_get_state_evoked_lfp(cond_trials_lfp, ...
                             analyse_states(st, :));
-                    else
+                    elseif strcmp(analyse_states{st, 1}, 'combined')
                         state_tfs = lfp_tfa_get_combined_evoked_lfp(cond_trials_lfp, ...
                             analyse_states(st, :));
                     end                        
@@ -200,8 +201,8 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                     if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked) && ...
                         isfield(sites_evoked(i).condition(cn).hs_tuned_evoked, 'mean')
                         isite = isite + 1;
-                        for hs = 1:length(hs_labels)
-                            for st = 1:size(analyse_states,1)
+                        for hs = 1:size(sites_evoked(i).condition(cn).hs_tuned_evoked, 2)
+                            for st = 1:size(sites_evoked(i).condition(cn).hs_tuned_evoked, 1)
                                 if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean)
 
                                     if isite == 1
@@ -258,7 +259,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                             session_avg(t).condition(cn).hs_tuned_evoked(st, hs).mean / isite;
                         session_avg(t).condition(cn).hs_tuned_evoked(st, hs).std = ...
                             session_avg(t).condition(cn).hs_tuned_evoked(st, hs).std / isite;
-                        session_avg(t).condition(cn).hs_tuned_tfs(st, hs).nsites = isite;
+                        session_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsites = isite;
                     end
                 end
             end           

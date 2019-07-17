@@ -65,16 +65,19 @@ for t = 1:length(trials_lfp)
     end
     
     if strcmp(spacing, 'random') % randomly spaced windows
+                   
         window_spacing = round(length(lfp_time)/nwindows);
         window_start_idx = 1:window_spacing:...
             length(lfp_time) - nsamples_window;
-        
+        window_start_idx = window_start_idx(1:nwindows);
+                
         % loop through each window
         for w = 1:length(window_start_idx)
             window_sample_idx = lfp_sample_idx(window_start_idx(w) + round(nsamples_window/2):min(window_start_idx(w) + ...
-                window_spacing - round(nsamples_window/2) - 1, length(lfp_time)));
+                window_spacing - round(nsamples_window/2), length(lfp_time) - round(nsamples_window/2)));
             % pick a random sample as window middle
-            window_mid_idx = randsample(window_sample_idx, 1);
+            window_mid_idx = round((window_sample_idx(end) - window_sample_idx(1)) ...
+                * rand) + window_sample_idx(1);%randsample(window_sample_idx, 1, true);
             %if p_window > rand % a window occurs
                 % evoked LFP for this window
                 combined_evoked_lfp.lfp = [combined_evoked_lfp.lfp, ...

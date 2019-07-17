@@ -57,13 +57,14 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
     perturbation_groups = lfp_tfa_cfg.perturbation_groups;
     % get the trial conditions for this session
     site_conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, perturbation_groups);
-    
+        
     % loop through each site
     for i = 1:length(states_lfp)
         
+        rng(lfp_tfa_cfg.random_seed); % set random seed for reproducibility        
         
         % folder to save sitewise results
-        site_results_folder = fullfile(results_folder_tfr, states_lfp(i).site_ID);
+        site_results_folder = fullfile(results_folder_tfr, 'sites');
         if ~exist(site_results_folder, 'dir')
             mkdir(site_results_folder);
         end

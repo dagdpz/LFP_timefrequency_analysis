@@ -143,6 +143,10 @@ lfp_tfa_cfg.ref_hemisphere = 'R';
 % each session
 lfp_tfa_cfg.maxsites = inf; % inf = analyse all sites
 
+% random seed for random number generator for reproducibility
+% set to a non negative integer below 2^32
+lfp_tfa_cfg.random_seed = 0;
+
 %% Settings for averaging TFR and evoked LFP based on conditions
 
 % trial types to be included in the analysis
@@ -467,7 +471,7 @@ end
 % 
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
-lfp_tfa_cfg.analyse_states = {'combined', [lfp_tfa_states.INI_TRI lfp_tfa_states.TRI_END], 0.5, 4, 'random'};                    
+lfp_tfa_cfg.analyse_states = {'combined', [lfp_tfa_states.INI_TRI lfp_tfa_states.TRI_END], 0.5, 10, 'random'};                    
 
 % define the epochs to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
@@ -513,7 +517,7 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
 % P_norm(t,f) = (P(t, f)) / (mu_P(f))
 % Example:
 % lfp_tfa_cfg.baseline_method = 'relchange';
-lfp_tfa_cfg.baseline_method = 'subtraction';
+lfp_tfa_cfg.baseline_method = 'zscore';
 
 % flag to indicate if LFP TFR average should be computed - for future use
 % Set to 0 if LFP TFR average should not be computed, else set to 1
