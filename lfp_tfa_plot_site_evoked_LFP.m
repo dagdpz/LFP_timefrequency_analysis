@@ -1,4 +1,4 @@
-function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_states, lfp_tfa_cfg ) 
+function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_states, lfp_tfa_cfg ) 
 
 % lfp_tfa_plot_average_evoked_LFP  - plots average evoked LFP for
 % different hand-space tuning conditions for each site and across all sites
@@ -44,26 +44,27 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
     % condition based Evoked
     sites_evoked = struct();
     session_evoked = struct();
-    session_evoked.session = states_lfp(1).session;
+    session_evoked.session = site_lfp(1).session;
     % perturbation groups for this session
     perturbation_groups = lfp_tfa_cfg.perturbation_groups;
     % get trial conditions for this session
     site_conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, perturbation_groups);
     
     % loop through each site
-    for i = 1:length(states_lfp) 
+    for i = 1:length(site_lfp) 
 
+        rng(lfp_tfa_cfg.random_seed); % set random seed for reproducibility
         
         % folder to save sitewise results
-        site_results_folder = fullfile(results_folder_evoked, states_lfp(i).site_ID);
+        site_results_folder = fullfile(results_folder_evoked, 'sites');
         if ~exist(site_results_folder, 'dir')
             mkdir(site_results_folder);
         end
         % struct to store condition-wise evoked
         sites_evoked(i).condition = struct();
-        sites_evoked(i).site_ID = states_lfp(i).site_ID;
-        sites_evoked(i).session = states_lfp(i).session;
-        sites_evoked(i).target = states_lfp(i).target;
+        sites_evoked(i).site_ID = site_lfp(i).site_ID;
+        sites_evoked(i).session = site_lfp(i).session;
+        sites_evoked(i).target = site_lfp(i).target;
         % flag to indicate if this site should be used for
         % averaging based on minimum no:of trials per condition
         sites_evoked(i).use_for_avg = 1;
@@ -75,7 +76,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
             hs_labels = site_conditions(cn).hs_labels;
 
             % num sites
-            nsites = length(states_lfp);                 
+            nsites = length(site_lfp);                 
             
             % store details of analysed condition
             sites_evoked(i).condition(cn).label = site_conditions(cn).label;
@@ -86,22 +87,31 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
             % loop through hand space labels
             for hs = 1:length(hs_labels)
                 % get trial indices for the given condition
-                cond_trials = lfp_tfa_get_condition_trials(states_lfp(i), site_conditions(cn));
+                cond_trials = lfp_tfa_get_condition_trials(site_lfp(i), site_conditions(cn));
                 % filter trials by hand-space labels
-                cond_trials = cond_trials & ...
-                    strcmp({states_lfp(i).trials.hndspc_lbl}, hs_labels(hs));
+                if ~strcmp(site_conditions(cn).reach_hands{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({site_lfp(i).trials.reach_hand}, ...
+                        site_conditions(cn).reach_hands{hs});
+                end
+                if ~strcmp(site_conditions(cn).reach_spaces{hs}, 'any')
+                    cond_trials = cond_trials & ...
+                        strcmp({site_lfp(i).trials.reach_space}, ...
+                        site_conditions(cn).reach_spaces{hs});
+                end
+                
                 sites_evoked(i).condition(cn).ntrials(hs) = sum(cond_trials);
 
                 fprintf('Condition %s - %s\n', site_conditions(cn).label, hs_labels{hs});
                 fprintf('Total number of trials %g\n', sum(cond_trials));
 
                 sites_evoked(i).condition(cn).noisytrials(hs) = ...
-                    sum(cond_trials & [states_lfp(i).trials.noisy]); 
+                    sum(cond_trials & [site_lfp(i).trials.noisy]); 
 
                 % consider only non noisy trials
                 fprintf('Number of noisy trials %g\n', sum(cond_trials ...
-                    & [states_lfp(i).trials.noisy]));
-                cond_trials = cond_trials & ~[states_lfp(i).trials.noisy];
+                    & [site_lfp(i).trials.noisy]));
+                cond_trials = cond_trials & ~[site_lfp(i).trials.noisy];
 
                 % check if the site contains a specified minimum number
                 % of trials for all conditions
@@ -112,59 +122,31 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
 
                 % loop through time windows around the states to analyse
                 for st = 1:size(analyse_states, 1)
-                    state_id = analyse_states{st, 1};
-                    state_name = analyse_states{st, 2};
-                    state_reftstart = analyse_states{st, 3};
-                    state_reftend = analyse_states{st, 4};
                     
-                    state_tfs.time = {}; % timebins fo spectrogram
-                    state_tfs.freq = {}; % freq bins
-                    state_tfs.lfp = {}; % evoked LFP response
-
-                    for t = find(cond_trials)
-                        
-                        states          = states_lfp(i).trials(t).states;
-                        state_onset_t   = states([states(:).id] == ...
-                            state_id).onset_t;
-                        state_start_t   = states([states(:).id] == ...
-                            state_id).onset_t + state_reftstart;
-                        state_end_t     = states([states(:).id] == ...
-                            state_id).onset_t + state_reftend;
-                        
-                        % evoked LFP for this state
-                        state_tfs.lfp = [state_tfs.lfp, ...
-                            states_lfp(i).trials(t).lfp_data(...
-                            (states_lfp(i).trials(t).time >= state_start_t & ...
-                            states_lfp(i).trials(t).time <= state_end_t))];
-                        % timestamps
-                        state_tfs.lfp_time = states_lfp(i).trials(t).time(...
-                            (states_lfp(i).trials(t).time >= state_start_t & ...
-                            states_lfp(i).trials(t).time <= state_end_t)) - state_onset_t;
-
-                    end
+                    cond_trials_lfp = site_lfp(i).trials(cond_trials);
+                    
+                    if strcmp(analyse_states{st, 1}, 'single')
+                        state_tfs = lfp_tfa_get_state_evoked_lfp(cond_trials_lfp, ...
+                            analyse_states(st, :));
+                    elseif strcmp(analyse_states{st, 1}, 'combined')
+                        state_tfs = lfp_tfa_get_combined_evoked_lfp(cond_trials_lfp, ...
+                            analyse_states(st, :));
+                    end                        
 
 
                     if ~isempty(state_tfs.lfp)
 
-                        % evoked LFP average
-                        % crop each lfp to same number of samples
-                        nsamples = min(cellfun('length', state_tfs.lfp));
-                        for k = 1:length(state_tfs.lfp)
-                            state_tfs.lfp{k} = state_tfs.lfp{k}(1:nsamples);
-                        end
-                        state_tfs.lfp_time = state_tfs.lfp_time(1:nsamples);
-                        arr_state_lfp = vertcat(state_tfs.lfp{:});
-                        evoked_state_lfp_mean = nanmean(arr_state_lfp, 1);
-                        evoked_state_lfp_std = nanstd(arr_state_lfp, 0, 1);
-
                         % save evoked LFP
-                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean = evoked_state_lfp_mean;
-                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std = evoked_state_lfp_std; 
+                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).lfp = state_tfs.lfp;
+                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean = state_tfs.mean;
+                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std = state_tfs.std; 
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time = state_tfs.lfp_time;
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).trials = find(cond_trials);
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).hs_label = hs_labels(hs);
-                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state = state_id;
-                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state_name = state_name;
+                        if isfield(state_tfs, 'state_id') && isfield(state_tfs, 'state_name')
+                            sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state = state_tfs.state_id;
+                            sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state_name = state_tfs.state_name;
+                        end
 
                     end
 
@@ -201,7 +183,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
     % Average across sites for a session
     session_avg = struct();
     % targets for this session
-    targets = unique({states_lfp.target});
+    targets = unique({site_lfp.target});
     % average each target separately
     for t = 1:length(targets)
         session_avg(t).target = targets{t};
@@ -211,7 +193,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
             isite = 0;
             for i = 1:length(sites_evoked)
                 % if the site's target is same as target being considered
-                if ~strcmp(states_lfp(i).target, targets{t})
+                if ~strcmp(site_lfp(i).target, targets{t})
                     continue;
                 end
                 if sites_evoked(i).use_for_avg
@@ -219,8 +201,8 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
                     if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked) && ...
                         isfield(sites_evoked(i).condition(cn).hs_tuned_evoked, 'mean')
                         isite = isite + 1;
-                        for hs = 1:length(hs_labels)
-                            for st = 1:size(analyse_states,1)
+                        for hs = 1:size(sites_evoked(i).condition(cn).hs_tuned_evoked, 2)
+                            for st = 1:size(sites_evoked(i).condition(cn).hs_tuned_evoked, 1)
                                 if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean)
 
                                     if isite == 1
@@ -249,14 +231,17 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
                                     % struct to store average evoked LFP across sites
                                     session_avg(t).condition(cn).hs_tuned_evoked(st, hs).hs_label = ...
                                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).hs_label;
-                                    session_avg(t).condition(cn).hs_tuned_evoked(st, hs).state = ...
-                                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state;
-                                    session_avg(t).condition(cn).hs_tuned_evoked(st, hs).state_name = ...
-                                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state_name;
+                                    if isfield(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs), 'state') && ...
+                                            isfield(sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs), 'state_name')
+                                        session_avg(t).condition(cn).hs_tuned_evoked(st, hs).state = ...
+                                            sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state;
+                                        session_avg(t).condition(cn).hs_tuned_evoked(st, hs).state_name = ...
+                                            sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state_name;
+                                    end
                                     session_avg(t).condition(cn).condition = site_conditions(cn);
                                     session_avg(t).condition(cn).label = site_conditions(cn).label;
-                                    session_avg(t).condition(cn).session = states_lfp(i).session;
-                                    session_avg(t).condition(cn).target = states_lfp(i).target;
+                                    session_avg(t).condition(cn).session = site_lfp(i).session;
+                                    session_avg(t).condition(cn).target = site_lfp(i).target;
                                     session_avg(t).condition(cn).nsites = nsites;
                                 end
 
@@ -274,7 +259,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_
                             session_avg(t).condition(cn).hs_tuned_evoked(st, hs).mean / isite;
                         session_avg(t).condition(cn).hs_tuned_evoked(st, hs).std = ...
                             session_avg(t).condition(cn).hs_tuned_evoked(st, hs).std / isite;
-                        session_avg(t).condition(cn).hs_tuned_tfs(st, hs).nsites = isite;
+                        session_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsites = isite;
                     end
                 end
             end           

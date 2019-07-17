@@ -36,10 +36,14 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
     
     cm = colormap(othercolor('BrBG4', size(avg_lfp_psd, 1)));
     
+    % number of subplots required
+    nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
+    nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
+    
     % loop through handspace
     for hs = 1:size(avg_lfp_psd, 2)
         if ~isempty([avg_lfp_psd(:,hs).mean] )       
-            subplot(2,2,hs)
+            subplot(nhandlabels,nspacelabels,hs)
             for ep = 1:size(avg_lfp_psd, 1)
                 % check if no trials exist for this epoch and HS
                 if ~isempty(avg_lfp_psd(ep, hs).mean)
