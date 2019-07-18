@@ -11,6 +11,8 @@ spacing = state{5};
 combined_tfs.powspctrm = {}; % power spectrogram
 combined_tfs.time = {}; % timebins fo spectrogram
 combined_tfs.freq = {}; % freq bins
+combined_tfs.state = [];
+combined_tfs.state_name = '';
 
 for t = 1:find(cond_trials)
 

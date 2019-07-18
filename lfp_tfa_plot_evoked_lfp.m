@@ -33,7 +33,8 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    figure;
+    h = figure;
+    set(h, 'position', [100, 100,900, 675]);
 
     % number of offset samples to divide between time windows
     noffset = 100;
@@ -129,7 +130,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
     end
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
-    saveas(gca, results_file);
+    export_fig(h, results_file);
 
 end
 

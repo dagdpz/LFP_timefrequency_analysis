@@ -212,7 +212,7 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_avg_syncspctrum( site1_lfp, 
         end
 
         % plot site average power spectrum
-        if ~isempty(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp)
+        if ~isempty(fieldnames(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp))
 
             plottitle = sprintf('LFP-LFP Sync spectrum Session: %s, Targets %s-%s (ref: %s), %s', sitepair_syncspctrm.session, sitepair_syncspctrm.targets{:}, ...
                 lfp_tfa_cfg.ref_hemisphere, site_conditions(cn).label);

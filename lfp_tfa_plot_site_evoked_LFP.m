@@ -81,7 +81,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
             % store details of analysed condition
             sites_evoked(i).condition(cn).label = site_conditions(cn).label;
             sites_evoked(i).condition(cn).cfg_condition = site_conditions(cn);
-            sites_evoked(i).condition(cn).hs_tuned_tfs = struct(); 
+            sites_evoked(i).condition(cn).hs_tuned_evoked = struct(); 
             sites_evoked(i).condition(cn).ntrials = zeros(1,length(hs_labels));        
 
             % loop through hand space labels
@@ -156,13 +156,13 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
             
             % plots
             % Evoked LFP
-            if ~isempty(sites_evoked(i).condition(cn).hs_tuned_evoked)
+            if ~isempty(fieldnames(sites_evoked(i).condition(cn).hs_tuned_evoked))
                 plottitle = ['Site ID: ', sites_evoked(i).site_ID ', Target = ' ...
                     sites_evoked(i).target '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
-                    '(Perturb ' num2str(site_conditions(cn).perturbation_group{1}) '), '];
+                    site_conditions(cn).label '), '];
                 if site_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
-                else
+                elseif site_conditions(cn).choice == 1
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(site_results_folder, ...
@@ -189,7 +189,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
         session_avg(t).target = targets{t};
         % conditions
         for cn = 1:length(site_conditions)
-            session_avg(t).condition(cn).hs_tuned_evoked = [];
+            session_avg(t).condition(cn).hs_tuned_evoked = struct();
             isite = 0;
             for i = 1:length(sites_evoked)
                 % if the site's target is same as target being considered
@@ -264,13 +264,13 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                 end
             end           
             % plot average evoked LFP across sites for this session
-            if ~isempty(session_avg(t).condition(cn).hs_tuned_evoked)
+            if ~isempty(fieldnames(session_avg(t).condition(cn).hs_tuned_evoked))
                 plottitle = ['Session: ', session_avg(t).condition(cn).session ', Target = ' ...
                     session_avg(t).condition(cn).target ' (ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
-                    'Perturb ' num2str(site_conditions(cn).perturbation_group{1}) ', '];
+                    site_conditions(cn).label ', '];
                 if site_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
-                else
+                elseif site_conditions(cn).choice == 1
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(results_folder_evoked, ['LFP_Evoked_' ...

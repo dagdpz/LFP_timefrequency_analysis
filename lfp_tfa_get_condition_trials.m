@@ -85,9 +85,8 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
             cond_trials_perturb = cond_trials_perturb | ...
                 ([site_lfp.trials.perturbation] == b);
         end
+        
+        cond_trials = cond_trials & cond_trials_perturb;
             
     end
-    if isnan(condition.perturbation) % ignore perturbation
-        cond_trials_perturb = ones(1, length(site_lfp.trials));
-    end
-    cond_trials = cond_trials & cond_trials_perturb;
+    
