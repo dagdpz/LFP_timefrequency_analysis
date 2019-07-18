@@ -163,7 +163,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             end
             
             % plot site average power spectrum
-            if ~isempty(sites_pow(i).condition(cn).hs_tuned_power)
+            if ~isempty(fieldnames(sites_pow(i).condition(cn).hs_tuned_power))
 
                 plottitle = ['Site ID: ', sites_pow(i).site_ID ...
                     ', Target = ' sites_pow(i).target ' (ref_' lfp_tfa_cfg.ref_hemisphere '), ' ...
@@ -201,7 +201,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     for t = 1:length(targets)
         session_avg(t).target = targets{t};
         for cn = 1:length(site_conditions)
-            session_avg(t).condition(cn).hs_tuned_power = [];
+            session_avg(t).condition(cn).hs_tuned_power = struct();
             % variable to store no:of sites with trials satisfying this
             % condition
             isite = 0;            
@@ -274,7 +274,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             end 
             
             % plot average power spectrum across sites for this session
-            if ~isempty(session_avg(t).condition(cn).hs_tuned_power)
+            if ~isempty(fieldnames(session_avg(t).condition(cn).hs_tuned_power))
                 plottitle = ['Session: ', session_avg(t).condition(cn).session ...
                     ', Target = ' session_avg(t).condition(cn).target '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
                     'Perturb ' num2str(site_conditions(cn).perturbation_group{1}) ', '];

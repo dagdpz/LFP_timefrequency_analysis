@@ -45,28 +45,32 @@ switch cfg_condition.effector
         effs='cfr';
 end
 
-switch cfg_condition.choice
-    case 1
-        ch='Choice';
-        chs='Choi';
-    case 0
-        ch='Instructed';
-        chs='Instr';
-    case 'diff1'
-        ch='(Instructed - Choice)';
-        chs = '(Instr - Choi)';      
+if isnan(cfg_condition.choice)
+    ch = 'All choice';
+    chs = 'Allch';
+elseif cfg_condition.choice == 1
+    ch='Choice';
+    chs='Choi';
+elseif cfg_condition.choice == 0
+    ch='Instructed';
+    chs='Instr';
+elseif strcmp(cfg_condition.choice, 'diff1')
+    ch='(Instructed - Choice)';
+    chs = '(Instr - Choi)';      
 end 
 
-switch cfg_condition.perturbation
-    case 0
-        pert='Pre-injection';
-        perts='Pre';
-    case 1
-        pert='Post-injection';
-        perts='Post';
-    case 'diff1'
-        pert='(Post-injection - Pre-injection)';
-        perts = '(Post - Pre)';      
+if isnan( cfg_condition.perturbation)
+    pert = 'All perturbation';
+    perts = 'Allperturb';
+elseif cfg_condition.perturbation == 0
+    pert='Pre-injection';
+    perts='Pre';
+elseif cfg_condition.perturbation ==  1
+    pert='Post-injection';
+    perts='Post';
+elseif strcmp(cfg_condition.perturbation,  'diff1')
+    pert='(Post-injection - Pre-injection)';
+    perts = '(Post - Pre)';    
         
 end
 

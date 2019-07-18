@@ -95,6 +95,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             for hs = 1:length(hs_labels)
                 % get the trial indices which satisfy the given condition
                 cond_trials = lfp_tfa_get_condition_trials(states_lfp(i), site_conditions(cn));
+                                
                 % get the trial indices which satisfy the given hand-space
                 % label for the given condition
                 if ~strcmp(site_conditions(cn).reach_hands{hs}, 'any')
@@ -164,18 +165,18 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 
             
             % plot TFR
-            if ~isempty(sites_tfr(i).condition(cn).hs_tuned_tfs)
+            if ~isempty(fieldnames(sites_tfr(i).condition(cn).hs_tuned_tfs))
                 if site_conditions(cn).perturbation == 0
                     injection = 'Pre';
-                else
+                elseif site_conditions(cn).perturbation == 1
                     injection = 'Post';
                 end
                 plottitle = ['LFP TFR (' injection '): Site ' sites_tfr(i).site_ID ...
                     ', Target ' sites_tfr(i).target '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
-                    '(Perturbation ' num2str(site_conditions(cn).perturbation_group{1}) ')'];
+                    site_conditions(cn).label];
                 if site_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
-                else
+                elseif site_conditions(cn).choice == 1
                     plottitle = [plottitle 'Choice trials'];
                 end
                 
@@ -196,7 +197,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         end
         % Plot TFR difference
         for dcn = 1:length(sites_tfr(i).difference)
-            if ~isempty(sites_tfr(i).difference(dcn).hs_tuned_tfs)
+            if ~isempty(fieldnames(sites_tfr(i).difference(dcn).hs_tuned_tfs))
                 plottitle = [' Target ' ...
                     sites_tfr(i).target, ' (ref_', lfp_tfa_cfg.ref_hemisphere, ...
                     '), Site ', sites_tfr(i).site_ID ...
@@ -237,7 +238,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         % loop through conditions
         for cn = 1:length(site_conditions) 
             % condition-wise session average tfs
-            session_avg(t).condition(cn).hs_tuned_tfs = [];
+            session_avg(t).condition(cn).hs_tuned_tfs = struct();
             isite = 0;
             for i = 1:length(states_lfp)
                 if strcmp(states_lfp(i).target, targets{t})
@@ -312,26 +313,22 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             
             % plot average TFR for this condition and target
             if ~isempty(session_avg(t).condition(cn).hs_tuned_tfs)
-                if site_conditions(cn).perturbation == 0
-                    injection = 'Pre';
-                else
-                    injection = 'Post';
+                if isfield(session_avg(t).condition(cn).hs_tuned_tfs, 'powspctrm') 
+                    plottitle = ['LFP TFR: Target = ' session_avg(t).target ...
+                        ', (ref_', lfp_tfa_cfg.ref_hemisphere, ') ',  ...
+                        'Session ', session_avg(t).condition(cn).session, ...
+                        ' ', site_conditions(cn).label];
+                    if site_conditions(cn).choice == 0
+                        plottitle = [plottitle 'Instructed trials'];
+                    elseif site_conditions(cn).choice == 1
+                        plottitle = [plottitle 'Choice trials'];
+                    end
+                    result_file = fullfile(results_folder_tfr, ...
+                                    ['LFP_TFR_' session_avg(t).target '_'...
+                                    session_avg(t).condition(cn).session '_' site_conditions(cn).label '.png']);
+                    lfp_tfa_plot_hs_tuned_tfr_multiple_img(session_avg(t).condition(cn).hs_tuned_tfs, ...
+                                lfp_tfa_cfg, plottitle, result_file);
                 end
-                plottitle = ['LFP TFR (' injection '): Target = ' session_avg(t).target ...
-                    ', (ref_', lfp_tfa_cfg.ref_hemisphere, ') ',  ...
-                    'Session ', session_avg(t).condition(cn).session, ...
-                    ' ', site_conditions(cn).label];
-                if site_conditions(cn).choice == 0
-                    plottitle = [plottitle 'Instructed trials'];
-                else
-                    plottitle = [plottitle 'Choice trials'];
-                end
-                result_file = fullfile(results_folder_tfr, ...
-                                ['LFP_TFR_' session_avg(t).target '_'...
-                                session_avg(t).condition(cn).session '_' site_conditions(cn).label '.png']);
-                lfp_tfa_plot_hs_tuned_tfr_multiple_img(session_avg(t).condition(cn).hs_tuned_tfs, ...
-                            lfp_tfa_cfg, plottitle, result_file);
-
             end
         
         end
@@ -350,7 +347,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
             
             % plot average TFR difference across sites for this session
             for dcn = 1:length(session_avg(t).difference)
-                if ~isempty(session_avg(t).difference(dcn).hs_tuned_tfs)
+                if ~isempty(fieldnames(session_avg(t).difference(dcn).hs_tuned_tfs))
                     plottitle = ['LFP Diff TFR: Target ' session_avg(t).target ...
                         '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
                         'Session ', session_avg(t).difference(dcn).session, ...

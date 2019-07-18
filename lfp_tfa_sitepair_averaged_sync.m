@@ -220,7 +220,7 @@ function [sitepair_sync] = lfp_tfa_sitepair_averaged_sync( sitepair_crosspow, si
 
             
             % plot TFR
-            if ~isempty(sitepair_sync.condition(cn).hs_tuned_sync)
+            if ~isempty(fieldnames(sitepair_sync.condition(cn).hs_tuned_sync))
                 plottitle = sprintf('LFP-LFP Sync Session: %s, Targets %s-%s (ref: %s), %s', sitepair_sync.session, sitepair_sync.targets{:}, ...
                     lfp_tfa_cfg.ref_hemisphere, site_conditions(cn).label);
                 result_file = fullfile(sitepair_results_folder, ...
@@ -240,7 +240,7 @@ function [sitepair_sync] = lfp_tfa_sitepair_averaged_sync( sitepair_crosspow, si
         end
         % Plot TFR difference
         for dcn = 1:length(sitepair_sync.difference)
-            if ~isempty(sitepair_sync.difference(dcn).hs_tuned_sync)
+            if ~isempty(fieldnames(sitepair_sync.difference(dcn).hs_tuned_sync))
                 plottitle = sprintf('LFP Diff Sync Session: %s, Targets %s-%s (ref: %s), %s', sitepair_sync.session, sitepair_sync.targets{:}, ...
                     lfp_tfa_cfg.ref_hemisphere, sitepair_sync.difference(dcn).label );
 %                     if sites_tfr(i).difference(dcn).cfg_condition.choice == 0

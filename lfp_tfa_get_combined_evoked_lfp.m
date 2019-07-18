@@ -10,6 +10,8 @@ spacing = state{5};
 
 combined_evoked_lfp.time = {}; % timestamps
 combined_evoked_lfp.lfp = {}; % evoked LFP response
+combined_evoked_lfp.state = [];
+combined_evoked_lfp.state_name = '';
 
 for t = 1:length(trials_lfp)
 
