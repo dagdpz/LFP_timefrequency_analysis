@@ -74,6 +74,12 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
             trial_lfp_pow = lfp_tfs.powspctrm(1,:,...
                 lfp_tfs.time >= trial.trialperiod(1) & ...
                 lfp_tfs.time <= trial.trialperiod(2));
+            trial_pow_tbins = lfp_tfs.time(...
+                lfp_tfs.time >= trial.trialperiod(1) & ...
+                lfp_tfs.time <= trial.trialperiod(2));
+            trial_pow_timestep = trial_pow_tbins(2) - trial_pow_tbins(1);
+            trial_pow_fbins = lfp_tfs.freq;
+            tsample = 1/trial.fsample;
 
             fs = trial.fsample;
             ts = 1/fs;
@@ -281,7 +287,7 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
         end
         figure;
         % concatenated raw LFP and LFP derivative
-        subplot(221);
+        subplot(321);
         hold on
         plot(arr_concat_site_lfp)
         line(xlim, [site_lfp_mean site_lfp_mean], 'color', 'k');
@@ -301,7 +307,7 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
             %annotation('textbox', [1 0.6 0.1 0.3], 'String', block_ann);
         end
         %saveas(gca, fullfile(results_folder_noise, [states_lfp(i).site_ID '_concat_LFP.png']));
-        subplot(223);
+        subplot(323);
         hold on
         plot(arr_concat_diff_lfp)
         line(xlim, [lfp_diff_mean lfp_diff_mean], 'color', 'k');
@@ -318,9 +324,20 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
             %block_ann = ['Block ', unq_blocks(b), ' ntrials = ' num2str(block_ntrials(b)), ' nrejected = ' num2str(block_nrejtrials(b))];
             %annotation('textbox', [1 0.6 0.1 0.3], 'String', block_ann);
         end
-        subplot(222)
+        subplot(322)
         hold on;
-        h = histogram(arr_concat_site_lfp);
+        hr = histogram(arr_concat_site_lfp);
+        
+        subplot(324)
+        hold on;
+        hd = histogram(arr_concat_diff_lfp);
+        
+        % plot concatenated spectrogram
+        arr_concat_lfp_pow = cat(3, concat_site_lfp_pow{:});
+        x = 1:trial_pow_timestep: trial_pow_timestep * (size(arr_concat_lfp_pow, 3) - 1);
+        subplot(3,2,[5 6])
+        imagesc(x, trial_pow_fbins(end:1), squeeze(arr_concat_lfp_pow));
+        axis xy
 
         saveas(gca, fullfile(results_folder_noise, [site_lfp.site_ID '_concat_raw_and_deriv_LFP.png']));
 

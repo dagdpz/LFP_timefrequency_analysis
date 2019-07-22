@@ -7,7 +7,7 @@
 
 % file containing settings for LFP analysis
 
-settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Magnus_rest.m';
+settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
 
 
 % whether the LFP should be processed (true) or not (false)
@@ -177,6 +177,10 @@ if length(sessions_info) > 1
     if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
         lfp_tfa_avg_sessions_sync(sessions_info, lfp_tfa_cfg);
     end
+    % LFP-LFP phase sync
+    if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
+        lfp_tfa_avg_sessions_syncspctrm(sessions_info, lfp_tfa_cfg);
+    end
     end
     % average site averages
     if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sites'))
@@ -201,6 +205,10 @@ if length(sessions_info) > 1
         % LFP-LFP phase sync
         if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
             lfp_tfa_avg_sitepairs_sync(sessions_info, lfp_tfa_cfg);
+        end
+        % LFP-LFP phase sync spectrum
+        if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
+            lfp_tfa_avg_sitepairs_syncspctrm(sessions_info, lfp_tfa_cfg);
         end
     end
 end

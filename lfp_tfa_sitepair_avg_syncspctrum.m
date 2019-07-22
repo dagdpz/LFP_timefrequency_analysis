@@ -35,7 +35,7 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_avg_syncspctrum( site1_lfp, 
 
     % make a folder to save figures
     results_folder_session = lfp_tfa_cfg.session_info...
-        (strcmp([lfp_tfa_cfg.session_info.session], site1_lfp.session)).lfp_syncspctrm_results_fldr;
+        (strcmp({lfp_tfa_cfg.session_info.session}, site1_lfp.session)).lfp_syncspctrm_results_fldr;
     if ~exist(results_folder_session, 'dir')
         mkdir(results_folder_session);
     end

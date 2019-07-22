@@ -89,9 +89,9 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
         lfp_tfa_cfg.session_info(i).proc_results_fldr = ...
                 fullfile(lfp_tfa_cfg.proc_lfp_folder, lfp_tfa_cfg.session_info(i).session);
         lfp_tfa_cfg.session_info(i).lfp_sync_results_fldr = [lfp_tfa_cfg.analyse_lfp_folder ...
-            filesep 'Condition_based_Sync' filesep lfp_tfa_cfg.session_info(i).session];
+            filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_Sync' ];
         lfp_tfa_cfg.session_info(i).lfp_syncspctrm_results_fldr = [lfp_tfa_cfg.analyse_lfp_folder ...
-            filesep 'Condition_based_Syncspectrum' filesep lfp_tfa_cfg.session_info(i).session];
+            filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_Syncspectrum' ];
     end
 
     % save settings struct

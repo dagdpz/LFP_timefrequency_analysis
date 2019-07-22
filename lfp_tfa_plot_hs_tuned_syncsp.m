@@ -32,7 +32,8 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    figure;
+    h = figure;
+    set(h, 'position', [100, 100,900, 675]);
     
     cm = colormap(othercolor('BrBG4', size(avg_hs_tuned_syncsp, 1)));
        
@@ -75,9 +76,11 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
                 subplottitle = avg_hs_tuned_syncsp(ep, hs).hs_label{1};
                 if isfield(avg_hs_tuned_syncsp(1, hs), 'nsessions')
                     subplottitle = [subplottitle ' (nsessions = ' num2str(avg_hs_tuned_syncsp(1, hs).nsessions) ')'];
-                elseif isfield(avg_hs_tuned_syncsp(1, hs), 'trials')
+                end
+                if isfield(avg_hs_tuned_syncsp(1, hs), 'trials')
                     subplottitle = [subplottitle ' (ntrials = ' num2str(length(avg_hs_tuned_syncsp(1, hs).trials)) ')'];
-                elseif isfield(avg_hs_tuned_syncsp(1, hs), 'nsites')
+                end
+                if isfield(avg_hs_tuned_syncsp(1, hs), 'nsites')
                     subplottitle = [subplottitle ' (nsites = ' num2str(avg_hs_tuned_syncsp(1, hs).nsites) ')'];
                 end
             end
@@ -88,7 +91,7 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
         
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
-    saveas(gca, results_file);
+    export_fig(h, results_file);
 
 end
 
