@@ -129,9 +129,17 @@ if ~isempty(combined_tfs.powspctrm)
 
     % baseline normalization
     cfg_baseline.method = lfp_tfa_cfg.baseline_method;
-    baseline_cnd_idx = [site_lfp.baseline.perturbation] == ...
-        lfp_tfa_cfg.baseline_perturbation & [site_lfp.baseline.choice] == ...
-        lfp_tfa_cfg.baseline_use_choice_trial;
+    if isnan(lfp_tfa_cfg.baseline_perturbation)
+        baseline_cnd_idx = isnan([site_lfp.baseline.perturbation]);
+    end
+    if isnan(lfp_tfa_cfg.baseline_use_choice_trial)
+        baseline_cnd_idx = baseline_cnd_idx & isnan([site_lfp.baseline.choice]);
+    end
+    if ~isnan(lfp_tfa_cfg.baseline_perturbation) && ~isnan(lfp_tfa_cfg.baseline_use_choice_trial)
+        baseline_cnd_idx = [site_lfp.baseline.perturbation] == ...
+            lfp_tfa_cfg.baseline_perturbation & [site_lfp.baseline.choice] == ...
+            lfp_tfa_cfg.baseline_use_choice_trial;
+    end
     cfg_baseline.mean = site_lfp.baseline(baseline_cnd_idx).pow_mean;
     cfg_baseline.std = site_lfp.baseline(baseline_cnd_idx).pow_std;
     combined_tfs.powspctrm_normmean = lfp_tfa_baseline_normalization(...

@@ -54,6 +54,7 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
         for cn = 1:length(lfp_tfa_cfg.conditions)
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
             sites_avg(t).condition(cn).hs_tuned_evoked = struct();
+            sites_avg(t).condition(cn).cfg_condition = lfp_tfa_cfg.conditions(cn);
             sites_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
             nsites = 0;
             for i = 1:length(lfp_evoked.session) 
@@ -145,6 +146,32 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
                 end
             end            
         end
+        
+        % difference between conditions
+%         sites_avg(t).difference = [];
+%         for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
+%             diff_condition = lfp_tfa_cfg.diff_condition{diff};
+%             sites_avg(t).difference = [sites_avg(t).difference, ...
+%                 lfp_tfa_compute_diff_condition_evoked(sites_avg(t).condition, diff_condition)];
+%         end
+%         % plot Difference TFR
+%         for dcn = 1:length(sites_avg(t).difference)
+%             if ~isempty(sites_avg(t).difference(dcn).hs_tuned_evoked)
+%                 if isfield(sites_avg(t).difference(dcn).hs_tuned_evoked,... 
+%                         'mean')
+%                     plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
+%                     ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
+%                     sites_avg(t).difference(dcn).label];
+%                     result_file = fullfile(results_fldr, ...
+%                         ['LFP_DiffEvoked_' lfp_tfa_cfg.compare.targets{t} ...
+%                         '_' 'diff_condition' num2str(dcn) '.png']);
+%                         %sites_avg(t).difference(dcn).label '.png']);
+%                     lfp_tfa_plot_evoked_lfp(sites_avg(t).difference(dcn).hs_tuned_evoked, ...
+%                         lfp_tfa_cfg, plottitle, result_file);
+%                 end
+%             end
+%         end
+        
     end
     % save session average tfs
     save(fullfile(results_fldr, 'LFP_Evoked_sites_average.mat'), 'sites_avg');

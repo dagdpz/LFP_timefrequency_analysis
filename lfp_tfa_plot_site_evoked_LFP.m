@@ -125,12 +125,17 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                     
                     cond_trials_lfp = site_lfp(i).trials(cond_trials);
                     
-                    if strcmp(analyse_states{st, 1}, 'single')
-                        state_tfs = lfp_tfa_get_state_evoked_lfp(cond_trials_lfp, ...
-                            analyse_states(st, :));
-                    elseif strcmp(analyse_states{st, 1}, 'combined')
+                    if strcmp(analyse_states{st, 1}, 'combined')
                         state_tfs = lfp_tfa_get_combined_evoked_lfp(cond_trials_lfp, ...
                             analyse_states(st, :));
+                    elseif strcmp(analyse_states{st, 1}, 'ecg')
+%                         state_tfs = lfp_tfa_get_ECG_triggered_evoked(cond_trials_lfp, ...
+%                             analyse_states(st, :));
+                        state_tfs = lfp_tfa_get_ECG_based_STA(cond_trials_lfp, ...
+                            site_lfp(i).site_ID, analyse_states(st, :));
+                    else 
+                        state_tfs = lfp_tfa_get_state_evoked_lfp(cond_trials_lfp, ...
+                            analyse_states(st, :));                    
                     end                        
 
 
@@ -274,7 +279,8 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(results_folder_evoked, ['LFP_Evoked_' ...
-                    session_avg(t).condition(cn).session '_' site_conditions(cn).label '.png']);
+                    session_avg(t).condition(cn).session '_' ...
+                    session_avg(t).condition(cn).target '_' site_conditions(cn).label '.png']);
                 lfp_tfa_plot_evoked_lfp (session_avg(t).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
                     plottitle, result_file);
             end

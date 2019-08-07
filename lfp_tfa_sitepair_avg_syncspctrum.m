@@ -187,23 +187,41 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_avg_syncspctrum( site1_lfp, 
                     cfg.method              = 'mtmfft';
                     cfg.output              = 'powandcsd';
                     cfg.taper               = 'hanning';
-                    cfg.foilim              = [2 120];   % frequencies of interest
-                    cfg.pad                 = 0.5;
+                    cfg.foi                 = unique(round(lfp_tfa_cfg.tfr.foi));   % frequencies of interest
+                    cfg.pad                 = 1;
                     %cfg.t_ftimwin          = ones(length(cfg.foi),1).*0.5; %lfp_tfa_cfg.tfr.t_ftimwin;           % number of cycles per time window
                     cfg.keeptrials          = 'yes';
-                    epoch_tfr               = ft_freqanalysis(cfg, epoch_lfp); 
+                    epoch_tfr               = ft_freqanalysis(cfg, epoch_lfp);                    
                     
                     % calculate LFP-LFP phase sync average
                     cfg = [];
                     cfg.method              = lfp_tfa_cfg.sync.measure;
-                    epoch_sync              = ft_connectivityanalysis(cfg, epoch_tfr);                    
+                    epoch_sync              = ft_connectivityanalysis(cfg, epoch_tfr);    
+                    
+                    % save csd for this condition and hand-space label
+                    if ~isempty(epoch_tfr.crsspctrm)
+                        epoch_tfr = rmfield(epoch_tfr, 'powspctrm');
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).csd = epoch_tfr;
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).csd.crsspctrm_abs_mean = ...
+                            squeeze(nanmean(abs(epoch_tfr.crsspctrm), 1));
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).csd.crsspctrm_abs_std = ...
+                            squeeze(nanstd(abs(epoch_tfr.crsspctrm), 0, 1));
+                        
+                    end
                     
                     
-                    % save LFP power spectrum
-                    sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc = epoch_sync;
-                    sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).trials = find(cond_trials);
-                    sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).hs_label = hs_labels(hs);
-                    sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).epoch_name = epoch_name;
+                    if ~isempty(epoch_sync.ppcspctrm)
+
+                        % save average sync for this condition, hand-space
+                        % label, and state
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc = epoch_sync;
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm = single(epoch_sync.ppcspctrm);
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.freq = single(epoch_sync.freq); 
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).hs_label = hs_labels(hs);
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).epoch_name = epoch_name;
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).trials = find(cond_trials);
+                        sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ntrials = length(find(cond_trials));
+                    end
 
                 end
 
@@ -211,7 +229,7 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_avg_syncspctrum( site1_lfp, 
 
         end
 
-        % plot site average power spectrum
+        % plot LFP-LFP sync spectrum
         if ~isempty(fieldnames(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp))
 
             plottitle = sprintf('LFP-LFP Sync spectrum Session: %s, Targets %s-%s (ref: %s), %s', sitepair_syncspctrm.session, sitepair_syncspctrm.targets{:}, ...
@@ -220,6 +238,14 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_avg_syncspctrum( site1_lfp, 
                 ['LFP-LFP_syncspctrm_' sitepair_syncspctrm.sites{1} '-' sitepair_syncspctrm.sites{2} '_condition' num2str(cn) '.png']); %site_conditions(cn).label
             lfp_tfa_plot_hs_tuned_syncsp(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp, ...
                 lfp_tfa_cfg, plottitle, result_file);
+        
+            % plot cross power spectrum
+            plottitle_crs = sprintf('LFP-LFP cross spectrum Session: %s, Targets %s-%s (ref: %s), %s', sitepair_syncspctrm.session, sitepair_syncspctrm.targets{:}, ...
+                lfp_tfa_cfg.ref_hemisphere, site_conditions(cn).label);
+            result_file_crs = fullfile(sitepair_results_folder, ...
+                ['LFP-LFP_crsspctrm_' sitepair_syncspctrm.sites{1} '-' sitepair_syncspctrm.sites{2} '_condition' num2str(cn) '.png']); %site_conditions(cn).label
+            lfp_tfa_plot_hs_tuned_csd(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp, ...
+                lfp_tfa_cfg, plottitle_crs, result_file_crs);
         end
 
     end

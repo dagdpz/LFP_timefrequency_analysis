@@ -1,5 +1,8 @@
 function condition_label = lfp_tfa_get_condition_label(cfg_condition, label_length)
 
+if isnan(cfg_condition.type)
+    cfg_condition.type = 'any';
+end
 switch cfg_condition.type
     case 1
         typ='Fixation';
@@ -19,33 +22,43 @@ switch cfg_condition.type
     case 6
         typ='S2S';
         typs='S2';
+    case inf
+        typ='All types';
+        typs='Alltyp';
 end
 
-switch cfg_condition.effector
-    case 0
-        eff='saccades';
-        effs='sac';
-    case 1
-        eff='free_gaze_reaches';
-        effs='fgr';
-    case 2
-        eff='joint';
-        effs='joi';
-    case 3
-        eff='diss_saccades';
-        effs='dsa';
-    case 4
-        eff='diss_reaches';
-        effs='dre';
-    case 5
-        eff='sen_reaches';
-        effs='sen';
-    case 6
-        eff='central_fix_reaches';
-        effs='cfr';
+eff='All effectors';
+effs='Alleff';
+if ~isnan(cfg_condition.effector)
+    switch cfg_condition.effector
+        case 0
+            eff='saccades';
+            effs='sac';
+        case 1
+            eff='free_gaze_reaches';
+            effs='fgr';
+        case 2
+            eff='joint';
+            effs='joi';
+        case 3
+            eff='diss_saccades';
+            effs='dsa';
+        case 4
+            eff='diss_reaches';
+            effs='dre';
+        case 5
+            eff='sen_reaches';
+            effs='sen';
+        case 6
+            eff='central_fix_reaches';
+            effs='cfr';
+        case inf
+            eff='All effectors';
+            effs='Alleff';
+    end
 end
 
-if isnan(cfg_condition.choice)
+if isnan(cfg_condition.choice) || isinf(cfg_condition.choice)
     ch = 'All choice';
     chs = 'Allch';
 elseif cfg_condition.choice == 1
@@ -59,7 +72,7 @@ elseif strcmp(cfg_condition.choice, 'diff1')
     chs = '(Instr - Choi)';      
 end 
 
-if isnan( cfg_condition.perturbation)
+if isinf( cfg_condition.perturbation) || isinf(cfg_condition.perturbation)
     pert = 'All perturbation';
     perts = 'Allperturb';
 elseif cfg_condition.perturbation == 0

@@ -32,7 +32,8 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    figure;
+    h = figure;
+    set(h, 'position', [100, 100,900, 675]);
     
     cm = colormap(othercolor('BrBG4', size(avg_lfp_psd, 1)));
     
@@ -53,17 +54,17 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
 
                     hold on;
 
-                    plot(avg_lfp_psd(ep, hs).freq, 10*log10(avg_lfp_psd(ep, hs).mean), ...
+                    plot(1:numel(avg_lfp_psd(ep, hs).freq), 10*log10(avg_lfp_psd(ep, hs).mean), ...
                         'Color', cm(ep,:));                
 
 
                 end
                 % log y axis ticks
-                set(gca, 'xtick', (avg_lfp_psd(ep, hs).freq([1:8:numel(avg_lfp_psd(ep, hs).freq)])));
+                set(gca, 'xtick', [1:8:numel(avg_lfp_psd(ep, hs).freq)]);
                 set(gca, 'xticklabel', ...
                     round((avg_lfp_psd(ep, hs).freq([1:8:numel(avg_lfp_psd(ep, hs).freq)]))), ...
                     'fontsize', 8);
-                set(gca, 'xlim', [avg_lfp_psd(ep, hs).freq(1) avg_lfp_psd(ep, hs).freq(end)]);
+                set(gca, 'xlim', [1 numel(avg_lfp_psd(ep, hs).freq)]);
                 % set y-axis (power) limits in dB
                 set(gca, 'ylim', [-100 -40]);
                 set(gca, 'box', 'on');                
@@ -85,7 +86,7 @@ function lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results
         
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
-    saveas(gca, results_file);
+    export_fig(h, results_file);
 
 end
 

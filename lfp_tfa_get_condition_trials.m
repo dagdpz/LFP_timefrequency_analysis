@@ -44,18 +44,23 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     cond_trials = ones(1, length(site_lfp.trials));
+    
+    % first check if the trial was completed
+    cond_trials = cond_trials & ...
+        ([site_lfp.trials.noisy] == 0);
+    
     % filter by type
-    if ~isnan(condition.type)
+    if ~isnan(condition.type) && ~isinf(condition.type)
         cond_trials = cond_trials & ...
             ([site_lfp.trials.type] == condition.type);
     end
     % filter by effector
-    if ~isnan(condition.effector)
+    if ~isnan(condition.effector) && ~isinf(condition.effector)
         cond_trials = cond_trials & ...
             ([site_lfp.trials.effector] == condition.effector);
     end
     % filter by choice
-    if ~isnan(condition.choice)
+    if ~isnan(condition.choice) && ~isinf(condition.choice)
         cond_trials = cond_trials & ...
             ([site_lfp.trials.choice_trial] == condition.choice);
     end
@@ -66,7 +71,7 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
 %     preinj_perturb = 0;
 %     postinj_perturb = unique(perturbations(perturbations ~= 0));
     cond_trials_perturb = zeros(1, length(site_lfp.trials));
-    if ~isnan(condition.perturbation)
+    if ~isnan(condition.perturbation) && ~isinf(condition.perturbation)
         perturbation_values = unique([site_lfp.trials.perturbation]);
         if condition.perturbation == 1%post-injection
             if strcmp(condition.perturbation_group, 'all')

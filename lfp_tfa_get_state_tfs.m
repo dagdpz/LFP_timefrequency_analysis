@@ -1,9 +1,9 @@
 function state_tfs = lfp_tfa_get_state_tfs(site_lfp, cond_trials, state, lfp_tfa_cfg)
 
-state_id = state{2};
-state_name = state{3};
-state_ref_tstart = state{4};
-state_ref_tend = state{5};
+state_id = state{1};
+state_name = state{2};
+state_ref_tstart = state{3};
+state_ref_tend = state{4};
 
 state_tfs.powspctrm = {}; % power spectrogram
 state_tfs.time = {}; % timebins fo spectrogram

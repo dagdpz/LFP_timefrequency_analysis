@@ -1,6 +1,6 @@
-function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle, results_file, varargin )
-%lfp_tfa_plot_hs_tuned_tfr  - Plots the LFP time frequency spectrogram 
-%averages for different hand-space conditions to be compared
+function lfp_tfa_plot_hs_tuned_crsspctrm( avg_hs_tuned_sync, lfp_tfa_cfg, plottitle, results_file, varargin )
+%lfp_tfa_plot_hs_tuned_tfr  - Plots the LFP-LFP phase synchronization
+%spectrogram averages for different hand-space conditions to be compared
 %
 % USAGE:
 %   lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file )
@@ -20,6 +20,7 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
 %       results_file    - path to filename to store the resulting image
 %       varargin        - colormap to be used (default = 'jet', can be any 
 %       standard colormap additionally supported is 'bluewhitered')
+%                       - image scale to be used (1x2 double)
 %
 % REQUIRES:	bluewhitered
 %
@@ -40,10 +41,31 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
     
+
+    % get plot settings
+    % default plot settings
+    plot_settings.cmap = 'jet';
+    plot_settings.imscale = [-1, 1];
+    def_fields = fieldnames(plot_settings);
+    
+    if nargin > 4
+        user_settings = struct(varargin{:});
+        user_fields = fieldnames(user_settings);
+        for f = 1:length(user_fields)
+            if any(strcmp(def_fields, user_fields{f}))
+                plot_settings().(user_fields{f}) = user_settings().(user_fields{f});
+            else
+                error('Incorrect parameter name: %s', user_fields{f});
+            end
+        end
+    end
+    
+    
     h = figure;
-    set(h, 'position', [100, 100,900, 675]);
+    set(h,'position',[100,100,900,675])
     hold on
     
+    % colorbar title
     % colorbar title
     if strcmp(lfp_tfa_cfg.baseline_method, 'zscore')
         cbtitle = 'Z-score';
@@ -66,72 +88,84 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
     nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
     
     % loop through handspace
-    for hs = 1:size(avg_tfr, 2)
+    for hs = 1:size(avg_hs_tuned_sync, 2)
         % check if no trials exist for this condition and HS
-        if ~isempty(cat(3, avg_tfr(:, hs).powspctrm))
+        if isfield(cat(2, avg_hs_tuned_sync(:, hs).csd), 'crsspctrm_abs_mean_norm')
+            csd =  cat(2, avg_hs_tuned_sync(:, hs).csd);
+        else
+            continue;
+        end
+        if ~isempty(cat(3, csd.crsspctrm_abs_mean_norm))
             % concatenate tfs for different state windows for plotting
-            concat_states_tfs = struct();
-            concat_states_tfs.powspctrm = [];
-            concat_states_tfs.state_time = [];
-            concat_states_tfs.freq = avg_tfr(1, hs).freq;
-            concat_states_tfs.label = avg_tfr(1, hs).hs_label;
+            concat_states_csd = struct();
+            concat_states_csd.crsspctrm_abs_mean_norm = [];
+            concat_states_csd.state_time = [];
+            concat_states_csd.freq = avg_hs_tuned_sync(1, hs).csd.freq;
+            concat_states_csd.label = avg_hs_tuned_sync(1, hs).hs_label;
             
             subplot(nhandlabels, nspacelabels, hs);
             hold on;
 
             state_info = struct();
-            for st = 1:size(avg_tfr, 1)
+            for st = 1:size(avg_hs_tuned_sync, 1)
+
+                concat_states_csd.crsspctrm_abs_mean_norm = cat(3, concat_states_csd.crsspctrm_abs_mean_norm, ...
+                    avg_hs_tuned_sync(st, hs).csd.crsspctrm_abs_mean_norm);
+                concat_states_csd.state_time = [concat_states_csd.state_time, ...
+                    avg_hs_tuned_sync(st, hs).csd.time];
+                % append nans to separate the states
+                if st < size(avg_hs_tuned_sync, 1)
+                    concat_states_csd.crsspctrm_abs_mean_norm = ...
+                        cat(3, concat_states_csd.crsspctrm_abs_mean_norm, ...
+                        nan(1, length(concat_states_csd.freq), 100/25));
+                    concat_states_csd.state_time = [concat_states_csd.state_time, ...
+                        nan(1, 100/25)];
+                end
                 
                 % state timing information
                 % state onset sample number
                 state_info(st).onset_s = find(...
-                    avg_tfr(st, hs).time <= 0, 1, 'last'); 
+                    avg_hs_tuned_sync(st, hs).csd.time <= 0, 1, 'last'); 
                 % state onset time
                 state_info(st).onset_t = 0; 
                 % start start sample
                 state_info(st).start_s = 1;
                 % state start time
-                state_info(st).start_t = avg_tfr(st, hs).time(1);
+                state_info(st).start_t = avg_hs_tuned_sync(st, hs).csd.time(1);
                 % start finish sample
-                state_info(st).finish_s = length(avg_tfr(st, hs).time);
+                state_info(st).finish_s = length(avg_hs_tuned_sync(st, hs).csd.time);
                 % start end sample
-                state_info(st).finish_t = avg_tfr(st, hs).time(end);                    
+                state_info(st).finish_t = avg_hs_tuned_sync(st, hs).csd.time(end);                    
                 
                 % state onset, start and finish samples for further states
                 % offset from previous state window
                 if st > 1
-                    state_info(st).start_s = length(concat_states_tfs.state_time) + ...
-                        state_info(st).start_s;
-                    state_info(st).finish_s = length(concat_states_tfs.state_time) + ...
-                        state_info(st).finish_s;
-                    state_info(st).onset_s = length(concat_states_tfs.state_time) + ...
-                        state_info(st).onset_s;
+                    state_info(st).start_s = length(avg_hs_tuned_sync(st-1, hs).csd.time) + ...
+                        state_info(st).start_s + (st-1)*(100/25);
+                    state_info(st).finish_s = length(avg_hs_tuned_sync(st-1, hs).csd.time) + ...
+                        state_info(st).finish_s + (st-1)*(100/25);
+                    state_info(st).onset_s = length(avg_hs_tuned_sync(st-1, hs).csd.time) + ...
+                        state_info(st).onset_s + (st-1)*(100/25);
                 end
-
-                concat_states_tfs.powspctrm = cat(3, concat_states_tfs.powspctrm, ...
-                    avg_tfr(st, hs).powspctrm, ...
-                    nan(1, length(concat_states_tfs.freq), 100/25));
-                concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
-                    avg_tfr(st, hs).time, nan(1, 100/25)];
-                              
                 
                 imagesc(linspace(state_info(st).start_s, state_info(st).finish_s, ...
                     state_info(st).finish_s - state_info(st).start_s + 1), ...
-                    linspace(1, length(avg_tfr(st, hs).freq), length(avg_tfr(st, hs).freq)), ...
-                    squeeze(avg_tfr(st, hs).powspctrm) , imscale);
+                    linspace(1, length(avg_hs_tuned_sync(st, hs).csd.freq), length(avg_hs_tuned_sync(st, hs).csd.freq)), ...
+                    squeeze(avg_hs_tuned_sync(st, hs).csd.crsspctrm_abs_mean_norm), plot_settings.imscale);
                 
                 % horizontal lines to separate frequency bands
                 for f = [2, 4, 8, 12, 18, 32, 80]
-                    f_idx = find(abs(avg_tfr(st, hs).freq - f) == ...
-                        min(abs(avg_tfr(st, hs).freq - f)), 1, 'first');
+                    f_idx = find(abs(avg_hs_tuned_sync(st, hs).csd.freq - f) == ...
+                        min(abs(avg_hs_tuned_sync(st, hs).csd.freq - f)), 1, 'first');
                     line([state_info(st).start_s state_info(st).finish_s], ...
                         [f_idx f_idx], 'color', 'k', 'linestyle', '--');
                 end
 
 
             end
-            concat_states_tfs.time = 1:1:size(concat_states_tfs.powspctrm, 3);
-            state_onsets = find(concat_states_tfs.state_time == 0);
+            concat_states_csd.time = 1:1:size(concat_states_csd.crsspctrm_abs_mean_norm, 3);
+            state_onsets = find(concat_states_csd.state_time(1:end-1) .* ...
+                concat_states_csd.state_time(2:end) <= 0);
             state_samples = sort([state_info.start_s, state_info.onset_s, ...
                 state_info.finish_s]);
 
@@ -140,26 +174,23 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
             %subplot(nhandlabels, nspacelabels, hs)
             %imagesc(concat_states_tfs.time, [1:numel(concat_states_tfs.freq)], squeeze(concat_states_tfs.powspctrm), [-1 1]);
             axis xy, cb = colorbar;
-            set(get(cb,'title'),'string', cbtitle, 'fontsize',8);
+            set(get(cb,'title'),'string', cbtitle, 'fontsize',6);
             set(gca,'TickDir','out')
             % log y axis ticks
-            set(gca, 'ytick', ([1:8:numel(concat_states_tfs.freq)]));
+            set(gca, 'ytick', ([1:8:numel(concat_states_csd.freq)]));
             set(gca, 'yticklabel', ...
-                round(concat_states_tfs.freq([1:8:numel(concat_states_tfs.freq)])));
+                round(concat_states_csd.freq([1:8:numel(concat_states_csd.freq)])));
             % add 0.5 at end since the time value is the center of the bin
             % add 0 at beginning to make x-axis visible
-            set(gca, 'ylim', [0 numel(avg_tfr(st, hs).freq) + 0.5]);
+            set(gca, 'ylim', [0 numel(avg_hs_tuned_sync(st, hs).csd.freq) + 0.5]);
             % mark state onsets
             set(gca,'xtick',state_samples)
             for so = state_onsets
                 line([so so], ylim, 'color', 'k'); 
-                if isfield(avg_tfr(state_onsets == so, hs), 'state_name') && ...
-                        ~isempty(avg_tfr(state_onsets == so, hs).state_name)
-                    state_name = avg_tfr(state_onsets == so, hs).state_name;
-                    text(so+1, 10, state_name, 'fontsize', 8);
-                end
+                state_name = avg_hs_tuned_sync(state_onsets == so, hs).state_name;
+                text(so+1, 10, state_name, 'fontsize', 8);
             end
-            set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 8)
+            set(gca,'xticklabels', round(concat_states_csd.state_time(state_samples), 1), 'fontsize', 7)
             set(gca, 'xticklabelrotation', 45)
             % add 0.5 since the time value is the center of the bin
             % add 0 at the beginning to make the y-axis visible
@@ -167,15 +198,14 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
             xlabel('Time (s)');
             ylabel('Frequency (Hz)');
                         
-            subplottitle = concat_states_tfs.label{1};
-            if isfield(avg_tfr(1, hs), 'nsessions')
-                subplottitle = [subplottitle ' (nsessions = ' num2str(avg_tfr(1, hs).nsessions) ')'];
+            subplottitle = concat_states_csd.label{1};
+            if isfield(avg_hs_tuned_sync(1, hs), 'nsessions')
+                subplottitle = [subplottitle ' (nsessions = ' num2str(avg_hs_tuned_sync(1, hs).nsessions) ')'];
             end
-            if isfield(avg_tfr(1, hs), 'nsites')
-                subplottitle = [subplottitle ' (nsites = ' num2str(avg_tfr(1, hs).nsites) ')'];
-            end
-            if isfield(avg_tfr(1, hs), 'ntrials') && ~isempty(avg_tfr(1, hs).ntrials)
-                subplottitle = [subplottitle ' (ntrials = ' num2str(avg_tfr(1, hs).ntrials) ')'];            
+            if isfield(avg_hs_tuned_sync(1, hs), 'nsites')
+                subplottitle = [subplottitle ' (nsites = ' num2str(avg_hs_tuned_sync(1, hs).nsites) ')'];
+            elseif isfield(avg_hs_tuned_sync(1, hs), 'ntrials') && ~isempty(avg_hs_tuned_sync(1, hs).ntrials)
+                subplottitle = [subplottitle ' (ntrials = ' num2str(avg_hs_tuned_sync(1, hs).ntrials) ')'];            
             end
             title(subplottitle);
             %line([0 0], ylim, 'color', 'k');
@@ -189,14 +219,9 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
     
     % define colormap
-    cm = colormap('jet'); % default
-    if nargin > 4
-        cm = colormap(varargin{1});
-        colorbar;
-    end
-    % white separation between two state windows - commented since there is
-    % a new method for separating windows - test and remove
-    %cm(1,:,:) = [1,1,1];
+    cm = plot_settings.cmap; % default jet
+    %colorbar;
+    
     colormap(cm);
     
     export_fig(h, results_file);

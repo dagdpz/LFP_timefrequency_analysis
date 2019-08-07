@@ -7,7 +7,7 @@
 
 % file containing settings for LFP analysis
 
-settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
+settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Magnus_rest.m';
 
 
 % whether the LFP should be processed (true) or not (false)
@@ -54,6 +54,7 @@ try
             session_name = [sessions_info(i).Monkey '_' sessions_info(i).Date];
             fprintf('Processing LFP for session %s\n', session_name);
             lfp_tfa_cfg.session = session_name;
+            sessions_info(i).sitepair_info = struct();
             % folder to which results of analysis of this session should be
             % stored
             sessions_info(i).proc_results_fldr = ...

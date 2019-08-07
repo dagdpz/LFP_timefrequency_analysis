@@ -58,10 +58,14 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
         for t = 1:length(site_lfp.trials)
             % read lfp data for each trial
             trial = site_lfp.trials(t);
+            if ~trial.completed
+                continue;
+            end
             block = trial.block;
             lfp_data = trial.lfp_data;
             lfp_tfs = trial.tfs;
             lfp_time = trial.time;
+            
             % create a new field to indicate if the trial is noisy
             site_lfp.trials(t).noisy = 0;
 
@@ -125,6 +129,7 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
 
         % loop through each trial lfp again
         for t = 1:length(site_lfp.trials)
+            if ~site_lfp.trials(t).completed, continue, end;
             trial_lfp_std = std(concat_site_lfp{t});
             % a trial is noisy if any LFP datapoint in the trial is beyond 
             % threshold for N consecutive samples
@@ -285,7 +290,7 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
             block_trials_lfp = horzcat(concat_site_lfp{concat_blocks == unq_blocks(b)}) ;
             block_nsamples(b) = length(block_trials_lfp);
         end
-        figure;
+        hnoise = figure('name', 'LFP noise rejection');
         % concatenated raw LFP and LFP derivative
         subplot(321);
         hold on
@@ -313,6 +318,7 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
         line(xlim, [lfp_diff_mean lfp_diff_mean], 'color', 'k');
         line(xlim, [lfp_diff_mean + cfg_noise.diff_thr*lfp_diff_std lfp_diff_mean + cfg_noise.diff_thr*lfp_diff_std], 'color', 'r');
         line(xlim, [lfp_diff_minbound lfp_diff_minbound], 'color', 'r');
+        title('LFP derivative');
         % divide blocks by drawing vertical lines
         block_end_sample = 0;
         for b = 1:length(unq_blocks)
@@ -338,8 +344,8 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
         subplot(3,2,[5 6])
         imagesc(x, trial_pow_fbins(end:1), squeeze(arr_concat_lfp_pow));
         axis xy
-
-        saveas(gca, fullfile(results_folder_noise, [site_lfp.site_ID '_concat_raw_and_deriv_LFP.png']));
+        title('LFP power spectrogram');
+        saveas(hnoise, fullfile(results_folder_noise, [site_lfp.site_ID '_concat_raw_and_deriv_LFP.png']));
 
         % print information
         fprintf('Total number trials: %g \n', length(site_lfp.trials));
@@ -352,7 +358,7 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
         fprintf('Total no:of noisy trials detected = %g \n', nnoisy);
         site_lfp.ntrails = length(site_lfp.trials);
         site_lfp.noisytrails = sum(noisy_trials);
-
+                
     %fprintf('Noise rejection in LFP done. \n');
     %fprintf('=============================================================\n');
 

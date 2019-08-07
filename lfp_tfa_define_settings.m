@@ -59,12 +59,12 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
     % load states - this will be removed after testing
     % now loading directly from settings file
     % first read in the information about states
-    all_states = lfp_tfa_define_states();
-    lfp_tfa_cfg.all_states = all_states;
+    %all_states = lfp_tfa_define_states();
+    %lfp_tfa_cfg.all_states = all_states;
     
     % load epochs - this will be removed after testing
     % now loading directly from settings file
-    lfp_tfa_cfg.epochs = lfp_tfa_define_epochs();
+    %lfp_tfa_cfg.epochs = lfp_tfa_define_epochs();
     
     % maximum number of sites from each session to analyse
     if nargin > 2

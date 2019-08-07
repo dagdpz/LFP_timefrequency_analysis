@@ -1,12 +1,11 @@
 function state_evoked_lfp = lfp_tfa_get_state_evoked_lfp(trials_lfp, state)
 
-state_id = state{2};
-state_name = state{3};
-state_reftstart = state{4};
-state_reftend = state{5};
+state_id = state{1};
+state_name = state{2};
+state_reftstart = state{3};
+state_reftend = state{4};
 
 state_evoked_lfp.time = {}; % timebins fo spectrogram
-state_evoked_lfp.freq = {}; % freq bins
 state_evoked_lfp.lfp = {}; % evoked LFP response
 state_evoked_lfp.state_id = state_id;
 state_evoked_lfp.state_name = state_name;

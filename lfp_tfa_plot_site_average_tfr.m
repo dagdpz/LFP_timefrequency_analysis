@@ -134,19 +134,22 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                     if strcmp(analyse_states{st, 1}, 'combined')
                         state_tfs = lfp_tfa_get_combined_tfs(states_lfp(i), ...
                             cond_trials, analyse_states(st, :), lfp_tfa_cfg);
-                    end
-                    
-                    if strcmp(analyse_states{st, 1}, 'single')
+                    elseif strcmp(analyse_states{st, 1}, 'ecg')
+                        state_tfs = lfp_tfa_get_ECG_triggered_tfs(states_lfp(i), ...
+                            cond_trials, analyse_states(st, :), lfp_tfa_cfg);
+                    else
                         state_tfs = lfp_tfa_get_state_tfs(states_lfp(i), ...
                             cond_trials, analyse_states(st, :), lfp_tfa_cfg);
-                    end                                       
+                    end 
+                    
+                     
 
                     if ~isempty(state_tfs.powspctrm)
 
                         % save average tfs for this condition, hand-space
                         % label, and state
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm = state_tfs.powspctrm_normmean;
-                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm_raw = state_tfs.powspctrm_rawmean;
+                        sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).powspctrm_raw = state_tfs.powspctrm;
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).time = state_tfs.time;
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).freq = state_tfs.freq; 
                         sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).cfg = state_tfs.cfg;
@@ -170,6 +173,8 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                     injection = 'Pre';
                 elseif site_conditions(cn).perturbation == 1
                     injection = 'Post';
+                else
+                    injection = 'Any';
                 end
                 plottitle = ['LFP TFR (' injection '): Site ' sites_tfr(i).site_ID ...
                     ', Target ' sites_tfr(i).target '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...

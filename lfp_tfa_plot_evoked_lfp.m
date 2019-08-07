@@ -75,9 +75,9 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 % concatenate mean, std and time of evoked LFP for
                 % different states
                 concat_states_lfp.mean = [concat_states_lfp.mean, ...
-                    evoked_lfp(st, hs).mean, nan(1, noffset)];
+                    evoked_lfp(st, hs).mean, nan(size(evoked_lfp(st, hs).mean, 1), noffset)];
                 concat_states_lfp.std = [concat_states_lfp.std, ...
-                    evoked_lfp(st, hs).std, nan(1, noffset)];
+                    evoked_lfp(st, hs).std, nan(size(evoked_lfp(st, hs).std, 1), noffset)];
                 concat_states_lfp.time = [concat_states_lfp.time, ...
                     evoked_lfp(st, hs).time, nan(1, noffset)];
                 concat_states_lfp.label = evoked_lfp(st, hs).hs_label;         
@@ -95,9 +95,9 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             % now plot
             subplot(nhandlabels, nspacelabels, hs)
             hold on;
-            plot(concat_states_lfp.mean, 'b');
-            plot(concat_states_lfp.mean + concat_states_lfp.std, 'r--');
-            plot(concat_states_lfp.mean - concat_states_lfp.std, 'r--');
+            plot(concat_states_lfp.mean);
+            %plot(concat_states_lfp.mean + concat_states_lfp.std, 'b:');
+            %plot(concat_states_lfp.mean - concat_states_lfp.std, 'b:');
             % mark state onsets
             %if isfield(evoked_lfp, 'state_name')
             set(gca,'xtick',state_samples)

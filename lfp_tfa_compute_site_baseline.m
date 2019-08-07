@@ -51,7 +51,8 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, l
     % baseline conditions
     perturbation = unique([lfp_tfa_cfg.compare.perturbations]);
     perturbation_blocks = unique([site_lfp.trials.perturbation]);
-    choice = unique([site_lfp.trials.choice_trial]);
+    %choice = unique([site_lfp.trials.choice_trial]);
+    choice = unique([lfp_tfa_cfg.compare.choice_trials]);
     % loop through each baseline condition
     cnd = 1;
     for p = perturbation
@@ -76,8 +77,15 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, l
                 end
                 
                 % whether this trial should be considered for baseline calculation
-                consider_trial = ~(trial.noisy) & sum(trial.perturbation == blocks) ...
-                    & sum(trial.choice_trial == c);
+                consider_trial = ~(trial.noisy);
+                % based on perturbation
+                if ~isnan(p) && ~isinf(p)
+                    consider_trial = consider_trial & sum(trial.perturbation == blocks);
+                end
+                % based on choice
+                if~isnan(c) && ~isinf(c)
+                    consider_trial = consider_trial & sum(trial.choice_trial == c);
+                end
                 if consider_trial 
                     if strcmp(lfp_tfa_cfg.baseline_ref_state, '') && strcmp(lfp_tfa_cfg.baseline_ref_period , 'trial')
                         baseline_pow{t} = trial.tfs.powspctrm(1, :, ...
@@ -102,7 +110,40 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, l
     end
 
     clear('baseline_pow');
-        
+    
+    % baseline normalized power
+    if isnan(lfp_tfa_cfg.baseline_perturbation)
+        baseline_cnd_idx = isnan([site_lfp.baseline.perturbation]);
+    end
+    if isnan(lfp_tfa_cfg.baseline_use_choice_trial)
+        baseline_cnd_idx = baseline_cnd_idx & isnan([site_lfp.baseline.choice]);
+    end
+    if ~isnan(lfp_tfa_cfg.baseline_perturbation) && ~isnan(lfp_tfa_cfg.baseline_use_choice_trial)
+        baseline_cnd_idx = [site_lfp.baseline.perturbation] == ...
+            lfp_tfa_cfg.baseline_perturbation & [site_lfp.baseline.choice] == ...
+            lfp_tfa_cfg.baseline_use_choice_trial;
+    end
+    baseline_mean = site_lfp.baseline(baseline_cnd_idx).pow_mean;
+    baseline_std = site_lfp.baseline(baseline_cnd_idx).pow_std;
+    
+%     trials_tfs = cat(1, site_lfp.trials(:).tfs);
+%     site_lfp_pow = cat(3, trials_tfs.powspctrm);
+%     site_lfp_pow_norm = (site_lfp_pow - repmat(baseline_mean, [1, 1, size(site_lfp_pow, 3)])) ./...
+%         repmat(baseline_std, [1, 1, size(site_lfp_pow, 3)]);
+%     
+%     % plot
+%     trial_pow_timestep = nanmean(diff(trials_tfs(1).time));
+%     x = 1:trial_pow_timestep: trial_pow_timestep * (size(arr_concat_lfp_pow, 3) - 1);
+%     y = trials_tfs(1).freq;
+%     subplot(3,2,[5 6])
+%     imagesc(x, y, squeeze(site_lfp_pow_norm), [-1 1]);
+%     axis xy
+%     title('LFP power spectrogram');
+%     results_folder_noise = fullfile(lfp_tfa_cfg.noise.results_folder, 'LFP_Noise_Rejection');
+%     saveas(hnoise, fullfile(results_folder_noise, [site_lfp.site_ID '_concat_raw_and_deriv_LFP.png']));
+%             
+%     clear('trials_tfs', 'site_lfp_pow', 'site_lfp_pow_norm');
+    
     %end    
     
     fprintf(' done\n');

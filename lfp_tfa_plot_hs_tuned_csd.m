@@ -1,4 +1,4 @@
-function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottitle, results_file )
+function lfp_tfa_plot_hs_tuned_csd( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottitle, results_file )
 %lfp_tfa_plot_hs_tuned_tfr  - Plots the LFP power spectrum 
 %averages for different hand-space conditions to be compared
 %
@@ -40,42 +40,41 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
     % loop through handspace
     for hs = 1:size(avg_hs_tuned_syncsp, 2)
         % check if no trials exist for this condition and HS
-        if isfield(cat(2, avg_hs_tuned_syncsp(:, hs).ppc), 'ppcspctrm')
-            ppc =  cat(2, avg_hs_tuned_syncsp(:, hs).ppc);
+        if isfield(cat(2, avg_hs_tuned_syncsp(:, hs).csd), 'crsspctrm_abs_mean')
+            csd =  cat(2, avg_hs_tuned_syncsp(:, hs).csd);
         else
             continue;
         end   
-        if ~isempty(cat(2, ppc.ppcspctrm))
+        if ~isempty(cat(2, csd.crsspctrm_abs_mean))
             subplot(2,2,hs)
             for ep = 1:size(avg_hs_tuned_syncsp, 1)
                 % check if no trials exist for this epoch and HS
-                if ~isempty(avg_hs_tuned_syncsp(ep, hs).ppc.ppcspctrm) && ...
-                        ~isempty(avg_hs_tuned_syncsp(ep, hs).ppc.freq)
-                    
-                    freq = avg_hs_tuned_syncsp(ep, hs).ppc.freq;
-                    ppc = avg_hs_tuned_syncsp(ep, hs).ppc.ppcspctrm;
+                if ~isempty(avg_hs_tuned_syncsp(ep, hs).csd.crsspctrm_abs_mean) && ...
+                        ~isempty(avg_hs_tuned_syncsp(ep, hs).csd.freq)
+
 
                     % now plot
+
                     
-                    semilogx(freq, ppc, 'Color', cm(ep,:));                
+                    semilogx(avg_hs_tuned_syncsp(ep, hs).csd.freq, ...
+                        10*log10(avg_hs_tuned_syncsp(ep, hs).csd.crsspctrm_abs_mean), ...
+                        'Color', cm(ep,:));                
 
 
                 end
-                
-                % weird error: if hold on is written before first semilogx
-                % plot, x axis is not plotted in log scale, so moving
-                % downward (30.07.2019 SN)
+                % weird error: see lfp_tfa_plot_hs_tuned_syncsp
                 hold on;
+
                 % log y axis ticks
-                set(gca, 'xtick', round((lfp_tfa_cfg.tfr.foi([1:8:numel(lfp_tfa_cfg.tfr.foi)]))));
+                set(gca, 'xtick', round(lfp_tfa_cfg.tfr.foi([1:8:numel(lfp_tfa_cfg.tfr.foi)])));
                 set(gca, 'xticklabel', ...
                     round((lfp_tfa_cfg.tfr.foi([1:8:numel(lfp_tfa_cfg.tfr.foi)]))), ...
                     'fontsize', 8);
                 set(gca, 'xlim', [lfp_tfa_cfg.tfr.foi(1) lfp_tfa_cfg.tfr.foi(end)]);
                 % set y-axis (power) limits in dB
-                set(gca, 'ylim', [0 1]);
+                set(gca, 'ylim', [-100 -40]);
                 set(gca, 'box', 'on');                
-                ylabel('PPC');
+                ylabel('Power (dB)');
                 xlabel('Frequency (Hz)');
                 subplottitle = avg_hs_tuned_syncsp(ep, hs).hs_label{1};
                 if isfield(avg_hs_tuned_syncsp(1, hs), 'nsessions')

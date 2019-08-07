@@ -1,4 +1,4 @@
-function sitepair_crosspow = lfp_tfa_compute_sitepair_csd(site1_lfp, site2_lfp, lfp_tfa_cfg)
+function sitepair_crosspow = lfp_tfa_compute_sitepair_crosspow(site1_lfp, site2_lfp, lfp_tfa_cfg)
 %lfp_tfa_compute_sitepair_csd Summary of this function goes here
 %   Detailed explanation goes here
     
@@ -15,6 +15,11 @@ sitepair_crosspow.trials = site1_lfp.trials;
 sitepair_crosspow.trials = rmfield(sitepair_crosspow.trials, 'lfp_data');
 sitepair_crosspow.trials = rmfield(sitepair_crosspow.trials, 'time');
 %sitepair_crosspow.ntrials = site1_lfp.ntrails;
+
+
+% store the baseline 
+sitepair_crosspow.baseline = struct(site1_lfp.site_ID, site1_lfp.baseline, ...
+    site2_lfp.site_ID, site2_lfp.baseline);
 
 % concat_lfppair = []; % to concatenate LFP data
 % concat_time = []; % to concatenate sample time
