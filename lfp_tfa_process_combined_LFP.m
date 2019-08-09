@@ -80,35 +80,34 @@ function session_info = lfp_tfa_process_combined_LFP( session_info, lfp_tfa_cfg 
     
     % save data inside struct 
     % first loop through each site
-    for i = 1:min(length(combined_sites{1}), lfp_tfa_cfg.maxsites)        
+    for i = 1:min(length(combined_sites{1}), lfp_tfa_cfg.maxsites)
+        
+        % get info about site
+        % for future use
+            % find if this site's entry is available in usable_sites_table
+    %         if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
+    %                 sites(i).site_ID),:))
+    %             continue;
+    %         end
+            fprintf('=============================================================\n');
+            fprintf('Processing site, %s\n', sites(i).site_ID);
+            % for future use
+            % get 'Set' entry from usable_sites_table
+    %         site_lfp.dataset = usable_sites_table(...
+    %             strcmp(usable_sites_table.Site_ID, sites(i).site_ID), :).Set(1);
+            site_lfp.site_ID = sites(i).site_ID;
+            site_lfp.target = sites(i).target;
+            site_lfp.recorded_hemisphere = upper(sites(i).target(end));            
+            site_lfp.xpos = sites(i).grid_x;
+            site_lfp.ypos = sites(i).grid_y;
+            site_lfp.zpos = sites(i).electrode_depth;
+            site_lfp.session = sites(i).site_ID(1:12);
+            site_lfp.ref_hemisphere = lfp_tfa_cfg.ref_hemisphere; 
+              
+        % loop through each input LFP file
         for s = 1:length(combined_sites)
             sites = combined_sites{s};
-            
-            if s == 1 && i == 1
-                        % for future use
-                    % find if this site's entry is available in usable_sites_table
-            %         if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
-            %                 sites(i).site_ID),:))
-            %             continue;
-            %         end
-                    fprintf('=============================================================\n');
-                    fprintf('Processing site, %s\n', sites(i).site_ID);
-                    % for future use
-                    % get 'Set' entry from usable_sites_table
-            %         site_lfp.dataset = usable_sites_table(...
-            %             strcmp(usable_sites_table.Site_ID, sites(i).site_ID), :).Set(1);
-                    site_lfp.site_ID = sites(i).site_ID;
-                    site_lfp.target = sites(i).target;
-                    site_lfp.recorded_hemisphere = upper(sites(i).target(end));            
-                    site_lfp.xpos = sites(i).grid_x;
-                    site_lfp.ypos = sites(i).grid_y;
-                    site_lfp.zpos = sites(i).electrode_depth;
-                    site_lfp.session = sites(i).site_ID(1:12);
-                    site_lfp.ref_hemisphere = lfp_tfa_cfg.ref_hemisphere;                    
-                                
-            end
-                
-
+                        
             %% get information common to all sites for a session
             
             if i == 1    
@@ -270,14 +269,17 @@ function session_info = lfp_tfa_process_combined_LFP( session_info, lfp_tfa_cfg 
             end
         end
         
+        % Get ECG spikes
+        if i == 1 && exist('block_ECG', 'var')
+            site_lfp = lfp_tfa_get_ECG_peaks( site_lfp, block_ECG );
+        end
+        
             
         %%% Noise rejection - should this be included within processing check this? %%%
         %state_filt_lfp(i) = lfp_tfa_reject_noisy_lfp( state_lfp(i), lfp_tfa_cfg.noise );
 
         %% Time frequency spectrogram calculation
         site_lfp = lfp_tfa_compute_site_tfr( site_lfp, lfp_tfa_cfg );
-
-
 
         % Noise rejection
         if lfp_tfa_cfg.noise.detect

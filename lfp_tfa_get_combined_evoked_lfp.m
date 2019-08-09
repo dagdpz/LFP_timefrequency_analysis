@@ -35,12 +35,16 @@ for t = 1:length(trials_lfp)
     
     % number of samples in each window
     nsamples_window = round(width/lfp_ts);
+    if mod(nsamples_window, 2) 
+        nsamples_window = nsamples_window + 1;
+    end
     
     % check if LFP data is sufficiently long to extract the required number
     % of windows of specified length
     if nwindows*(nsamples_window) > length(lfp_time)
-        fprintf('LFP is too short to extract the required windows. \n');
-        return
+        fprintf('LFP is too short to extract the required windows. Reducing the number of windows\n');
+        %return
+        nwindows = floor(length(lfp_time)/nsamples_window);
     end
     
     % now get the windows to combine
@@ -53,12 +57,12 @@ for t = 1:length(trials_lfp)
         for w = 1:length(window_mid_idx)
             % evoked LFP for this state
             combined_evoked_lfp.lfp = [combined_evoked_lfp.lfp, ...
-                lfp_data(max(1, window_mid_idx(w) - round(nsamples_window/2)):...
-                min(length(lfp_time), window_mid_idx(w) + round(nsamples_window/2)))];
+                lfp_data(max(1, window_mid_idx(w) - round((nsamples_window-1)/2)):...
+                min(length(lfp_time), window_mid_idx(w) + round((nsamples_window-1)/2)))];
             % timestamps
             combined_evoked_lfp.lfp_time = ...
-                lfp_time(max(1, window_mid_idx(w) - round(nsamples_window/2)):...
-                min(length(lfp_time), window_mid_idx(w) + round(nsamples_window/2)));
+                lfp_time(max(1, window_mid_idx(w) - round((nsamples_window-1)/2)):...
+                min(length(lfp_time), window_mid_idx(w) + round((nsamples_window-1)/2)));
             % set mid-timestamp to zero
             combined_evoked_lfp.lfp_time = combined_evoked_lfp.lfp_time - ...
                 combined_evoked_lfp.lfp_time(round(length(combined_evoked_lfp.lfp_time)/2));
@@ -69,14 +73,15 @@ for t = 1:length(trials_lfp)
     if strcmp(spacing, 'random') % randomly spaced windows
                    
         window_spacing = round(length(lfp_time)/nwindows);
-        window_start_idx = 1:window_spacing:...
-            length(lfp_time) - nsamples_window;
-        window_start_idx = window_start_idx(1:nwindows);
+        window_start_idx = round(linspace(1,...
+            length(lfp_time), nwindows + 1));
+        %window_start_idx = window_start_idx(1:nwindows);
                 
         % loop through each window
-        for w = 1:length(window_start_idx)
-            window_sample_idx = lfp_sample_idx(window_start_idx(w) + round(nsamples_window/2):min(window_start_idx(w) + ...
-                window_spacing - round(nsamples_window/2), length(lfp_time) - round(nsamples_window/2)));
+        for w = 1:length(window_start_idx) - 1
+            window_sample_idx = lfp_sample_idx(window_start_idx(w) + ...
+                round((nsamples_window-1)/2):window_start_idx(w+1) - ...
+                round((nsamples_window-1)/2));
             % pick a random sample as window middle
             window_mid_idx = round((window_sample_idx(end) - window_sample_idx(1)) ...
                 * rand) + window_sample_idx(1);%randsample(window_sample_idx, 1, true);

@@ -14,7 +14,7 @@ combined_tfs.freq = {}; % freq bins
 combined_tfs.state = [];
 combined_tfs.state_name = '';
 
-for t = 1:find(cond_trials)
+for t = find(cond_trials)
 
     states                = site_lfp.trials(t).states;
     state_start_onset_t   = states([states(:).id] == ...
@@ -38,12 +38,17 @@ for t = 1:find(cond_trials)
     
     % number fo time bins in each window
     ntbins_window = round(width/tbin_width);
+    if mod(ntbins_window, 2)
+        ntbins_window = ntbins_window + 1;
+    end
     
     % check if LFP data is sufficiently long to extract the required number
-    % of windows of specified length
+    % of windows of specified length, if so reduce the number of windows to
+    % fit the length of LFP data
     if nwindows*(ntbins_window) > length(lfp_tfs_time)
-        fprintf('LFP is too short to extract the required windows. \n');
-        return
+%         fprintf('LFP is too short to extract the required windows. \n');
+%         return
+        nwindows = floor(length(lfp_tfs_time)/ntbins_window);
     end
     
     combined_tfs.cfg = site_lfp.trials(t).tfs.cfg;
@@ -58,12 +63,12 @@ for t = 1:find(cond_trials)
         for w = 1:length(window_mid_idx)
             % evoked LFP for this state
             combined_tfs.powspctrm = [combined_tfs.powspctrm, ...
-                lfp_tfs_pow(:, :, max(1, window_mid_idx(w) - round(ntbins_window/2)):...
-                min(length(lfp_tfs_time), window_mid_idx(w) + round(ntbins_window/2)))];
+                lfp_tfs_pow(:, :, max(1, window_mid_idx(w) - round((ntbins_window-1)/2)):...
+                min(length(lfp_tfs_time), window_mid_idx(w) + round((ntbins_window-1)/2)))];
             % timestamps
             combined_tfs.time = ...
-                lfp_tfs_time(max(1, window_mid_idx(w) - round(ntbins_window/2)):...
-                min(length(lfp_tfs_time), window_mid_idx(w) + round(ntbins_window/2)));
+                lfp_tfs_time(max(1, window_mid_idx(w) - round((ntbins_window-1)/2)):...
+                min(length(lfp_tfs_time), window_mid_idx(w) + round((ntbins_window-1)/2)));
             % set mid-timestamp to zero
             combined_tfs.time = combined_tfs.time - ...
                 combined_tfs.time(round(length(combined_tfs.time)/2));
@@ -75,25 +80,26 @@ for t = 1:find(cond_trials)
     
     if strcmp(spacing, 'random') % randomly spaced windows
         window_spacing = round(length(lfp_tfs_time)/nwindows);
-        window_start_idx = 1:window_spacing:...
-            length(lfp_tfs_time) - ntbins_window;
+        window_start_idx = round(linspace(1, ...
+            length(lfp_tfs_time), nwindows + 1));
         window_start_idx = window_start_idx(1:nwindows);
                 
         % loop through each window
-        for w = 1:length(window_start_idx)
-            window_sample_idx = lfp_timebin_idx(window_start_idx(w) + round(ntbins_window/2):min(window_start_idx(w) + ...
-                window_spacing - round(ntbins_window/2), length(lfp_tfs_time) - round(ntbins_window/2)));
+        for w = 1:length(window_start_idx) - 1
+            window_sample_idx = lfp_timebin_idx(window_start_idx(w) + ...
+                round((ntbins_window-1)/2):window_start_idx(w + 1) - ...
+                round((ntbins_window-1)/2));
             % pick a random sample as window middle
             window_mid_idx = round((window_sample_idx(end) - window_sample_idx(1)) ...
                 * rand) + window_sample_idx(1);%randsample(window_sample_idx, 1, true);
             %if p_window > rand % a window occurs
             % evoked LFP for this window
             combined_tfs.powspctrm = [combined_tfs.powspctrm, ...
-                lfp_tfs_pow(:, :, max(1, window_mid_idx - round(ntbins_window/2)):...
-                min(length(lfp_tfs_time), window_mid_idx + floor(ntbins_window/2)))];
+                lfp_tfs_pow(:, :, max(1, window_mid_idx - round((ntbins_window-1)/2)):...
+                min(length(lfp_tfs_time), window_mid_idx + floor((ntbins_window-1)/2)))];
             % timestamps
-            combined_tfs.time = lfp_tfs_time(max(1, window_mid_idx - round(ntbins_window/2)):...
-                min(length(lfp_tfs_time), window_mid_idx + round(ntbins_window/2)));
+            combined_tfs.time = lfp_tfs_time(max(1, window_mid_idx - round((ntbins_window-1)/2)):...
+                min(length(lfp_tfs_time), window_mid_idx + round((ntbins_window-1)/2)));
             % set mid-timestamp to zero
             combined_tfs.time = combined_tfs.time - ...
                 combined_tfs.time(round(length(combined_tfs.time)/2));
@@ -138,7 +144,9 @@ if ~isempty(combined_tfs.powspctrm)
     if ~isnan(lfp_tfa_cfg.baseline_perturbation) && ~isnan(lfp_tfa_cfg.baseline_use_choice_trial)
         baseline_cnd_idx = [site_lfp.baseline.perturbation] == ...
             lfp_tfa_cfg.baseline_perturbation & [site_lfp.baseline.choice] == ...
-            lfp_tfa_cfg.baseline_use_choice_trial;
+            lfp_tfa_cfg.baseline_use_choice_trial & ...
+            [site_lfp.baseline.type] == lfp_tfa_cfg.baseline_use_type & ...
+            [site_lfp.baseline.effector] == lfp_tfa_cfg.baseline_use_effector;
     end
     cfg_baseline.mean = site_lfp.baseline(baseline_cnd_idx).pow_mean;
     cfg_baseline.std = site_lfp.baseline(baseline_cnd_idx).pow_std;

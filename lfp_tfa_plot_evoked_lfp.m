@@ -95,9 +95,12 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             % now plot
             subplot(nhandlabels, nspacelabels, hs)
             hold on;
-            plot(concat_states_lfp.mean);
-            %plot(concat_states_lfp.mean + concat_states_lfp.std, 'b:');
-            %plot(concat_states_lfp.mean - concat_states_lfp.std, 'b:');
+            colors = ['b', 'r', 'g', 'y', 'm', 'c', 'k'];
+            for i = 1:size(concat_states_lfp.mean, 1)
+                plot(concat_states_lfp.mean(i, :), colors(i));
+                plot(concat_states_lfp.mean(i, :) + concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
+                plot(concat_states_lfp.mean(i, :) - concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
+            end
             % mark state onsets
             %if isfield(evoked_lfp, 'state_name')
             set(gca,'xtick',state_samples)

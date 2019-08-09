@@ -51,11 +51,23 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
     
     for t = 1:length(lfp_tfa_cfg.compare.targets)
         sites_avg(t).target = lfp_tfa_cfg.compare.targets{t};
+                
         for cn = 1:length(lfp_tfa_cfg.conditions)
+            
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
             sites_avg(t).condition(cn).hs_tuned_evoked = struct();
             sites_avg(t).condition(cn).cfg_condition = lfp_tfa_cfg.conditions(cn);
             sites_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
+            for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
+                for hs = 1:size(lfp_tfa_cfg.conditions(1).hs_labels, 2)
+                    sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsites = 0;
+                    sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).lfp = [];
+                    sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).mean = [];
+                    sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).std = [];
+                    sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).time = [];
+                end
+            end  
+            
             nsites = 0;
             for i = 1:length(lfp_evoked.session) 
                 for j = 1:length(lfp_evoked.session(i).sites)
@@ -84,6 +96,7 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
                                             sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).state_name ...
                                                 = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).state_name;
                                         end
+                                        
                                         sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).mean ...
                                             = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).mean;
                                         sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).std ...
@@ -106,7 +119,7 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
                                         sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).std ...
                                             = (lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).std(1:ntimebins)) + ...
                                             sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).std(1:ntimebins);
-                                        if isfield(sites_avg(t).condition(cn).hs_tuned_evoked(st,hs), 'nsites')
+                                        if isfield(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs), 'nsites')
                                             sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).nsites ...
                                                 = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).nsites + ...
                                                 sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).nsites;
@@ -135,7 +148,7 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
             % plot
             if ~isempty(sites_avg(t).condition(cn).hs_tuned_evoked)
                 if isfield(sites_avg(t).condition(cn).hs_tuned_evoked,... 
-                        'mean')
+                        'mean') && ~isempty(sites_avg(t).condition(cn).hs_tuned_evoked.mean)
                     plottitle = [lfp_tfa_cfg.compare.targets{t},...
                         ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
                         '_' lfp_tfa_cfg.conditions(cn).label];
@@ -148,29 +161,29 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
         end
         
         % difference between conditions
-%         sites_avg(t).difference = [];
-%         for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
-%             diff_condition = lfp_tfa_cfg.diff_condition{diff};
-%             sites_avg(t).difference = [sites_avg(t).difference, ...
-%                 lfp_tfa_compute_diff_condition_evoked(sites_avg(t).condition, diff_condition)];
-%         end
-%         % plot Difference TFR
-%         for dcn = 1:length(sites_avg(t).difference)
-%             if ~isempty(sites_avg(t).difference(dcn).hs_tuned_evoked)
-%                 if isfield(sites_avg(t).difference(dcn).hs_tuned_evoked,... 
-%                         'mean')
-%                     plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
-%                     ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
-%                     sites_avg(t).difference(dcn).label];
-%                     result_file = fullfile(results_fldr, ...
-%                         ['LFP_DiffEvoked_' lfp_tfa_cfg.compare.targets{t} ...
-%                         '_' 'diff_condition' num2str(dcn) '.png']);
-%                         %sites_avg(t).difference(dcn).label '.png']);
-%                     lfp_tfa_plot_evoked_lfp(sites_avg(t).difference(dcn).hs_tuned_evoked, ...
-%                         lfp_tfa_cfg, plottitle, result_file);
-%                 end
-%             end
-%         end
+        sites_avg(t).difference = [];
+        for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
+            diff_condition = lfp_tfa_cfg.diff_condition{diff};
+            sites_avg(t).difference = [sites_avg(t).difference, ...
+                lfp_tfa_compute_diff_condition_evoked(sites_avg(t).condition, diff_condition)];
+        end
+        % plot Difference TFR
+        for dcn = 1:length(sites_avg(t).difference)
+            if ~isempty(sites_avg(t).difference(dcn).hs_tuned_evoked)
+                if isfield(sites_avg(t).difference(dcn).hs_tuned_evoked,... 
+                        'mean')
+                    plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
+                    ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
+                    sites_avg(t).difference(dcn).label];
+                    result_file = fullfile(results_fldr, ...
+                        ['LFP_DiffEvoked_' lfp_tfa_cfg.compare.targets{t} ...
+                        '_' 'diff_condition' num2str(dcn) '.png']);
+                        %sites_avg(t).difference(dcn).label '.png']);
+                    lfp_tfa_plot_evoked_lfp(sites_avg(t).difference(dcn).hs_tuned_evoked, ...
+                        lfp_tfa_cfg, plottitle, result_file);
+                end
+            end
+        end
         
     end
     % save session average tfs
