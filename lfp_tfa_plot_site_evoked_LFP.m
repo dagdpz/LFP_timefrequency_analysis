@@ -328,6 +328,32 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                     plottitle, result_file);
             end
         end 
+        
+        
+        % difference between conditions
+        session_avg(t).difference = [];
+        for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
+            diff_condition = lfp_tfa_cfg.diff_condition{diff};
+            session_avg(t).difference = [session_avg(t).difference, ...
+                lfp_tfa_compute_diff_condition_evoked(session_avg(t).condition, diff_condition)];
+        end
+        % plot Difference TFR
+        for dcn = 1:length(session_avg(t).difference)
+            if ~isempty(session_avg(t).difference(dcn).hs_tuned_evoked)
+                if isfield(session_avg(t).difference(dcn).hs_tuned_evoked,... 
+                        'mean')
+                    plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
+                    ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
+                    session_avg(t).difference(dcn).label];
+                    result_file = fullfile(results_fldr, ...
+                        ['LFP_DiffEvoked_' lfp_tfa_cfg.compare.targets{t} ...
+                        '_' 'diff_condition' num2str(dcn) '.png']);
+                        %session_avg(t).difference(dcn).label '.png']);
+                    lfp_tfa_plot_evoked_lfp(session_avg(t).difference(dcn).hs_tuned_evoked, ...
+                        lfp_tfa_cfg, plottitle, result_file);
+                end
+            end
+        end
 
     end
         

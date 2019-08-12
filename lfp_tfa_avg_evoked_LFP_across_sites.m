@@ -17,7 +17,10 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
 %               lfp_tfa_settings.m, lfp_tfa_define_settings.m and lfp_tfa_compare_conditions.m
 %               2. root_results_fldr   - root folder where results are saved
 %               3. compare.targets     - targets to compare, see lfp_tfa_settings.m
-%               4. 
+%               4. ref_hemisphere      - reference hemisphere for ipsi and
+%               contra labeling
+%           Optional fields:
+%               1. diff_conditions     - conditions to be compared
 % OUTPUTS:
 %		sites_avg    - structure containing condition-based evoked LFP
 %		response averaged across multiple sites
@@ -148,7 +151,7 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
             % plot
             if ~isempty(sites_avg(t).condition(cn).hs_tuned_evoked)
                 if isfield(sites_avg(t).condition(cn).hs_tuned_evoked,... 
-                        'mean') && ~isempty(sites_avg(t).condition(cn).hs_tuned_evoked.mean)
+                        'mean') && ~isempty([sites_avg(t).condition(cn).hs_tuned_evoked.mean])                        
                     plottitle = [lfp_tfa_cfg.compare.targets{t},...
                         ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
                         '_' lfp_tfa_cfg.conditions(cn).label];

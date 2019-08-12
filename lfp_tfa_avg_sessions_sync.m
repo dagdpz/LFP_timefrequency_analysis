@@ -1,23 +1,30 @@
 function [results_fldr, sessions_avg] = lfp_tfa_avg_sessions_sync(sessions_info, lfp_tfa_cfg, varargin)
-%lfp_tfa_avg_tfr_across_sites  - Condition-based LFP time frequency
-%response average across many site averages
+%lfp_tfa_avg_sessions_sync  - Condition-based LFP-LFP phase synchrony
+% averaged across many session averages
 %
 % USAGE:
-%	sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
+%	[results_fldr, sessions_avg] = lfp_tfa_avg_sessions_sync(sessions_info, lfp_tfa_cfg, varargin)
 %
 % INPUTS:
-%		lfp_tfr     	- struct containing the condition-based LFP time freq spectrogram for
-%		indiviual sites, output of lfp_tfa_plot_site_average_tfr.m
-%		lfp_tfa_cfg     - struct containing the required settings
+%		sessions_info                   - structure containing info about different 
+%       sessions analysed
+%           Required fields:
+%           1. avg_sync_results         - path to mat file containing session
+%           average LFP-LFP sync
+%		lfp_tfa_cfg                     - struct containing the required settings
 %           Required Fields:
-%               1. conditions          - trial conditions to compare, see
+%               1. conditions           - trial conditions to compare, see
 %               lfp_tfa_settings.m and lfp_tfa_compare_conditions.m
-%               2. root_results_fldr   - root folder where results are saved
-%               3. compare.targets     - targets to compare, see lfp_tfa_settings.m
-%               4. 
+%               2. root_results_fldr    - root folder where results are saved
+%               3. compare.targetpairs  - target pairs to include, see lfp_tfa_settings.m
+%               4. analyse_states       - time windows around the states to be analysed, see lfp_tfa_settings.m
+%               5. ref_hemisphere       - reference hemisphere for ipsi and
+%               contra labeling
 % OUTPUTS:
-%		sites_avg      - structure containing condition-based evoked LFP
-%		response averaged across multiple sites
+%       results_fldr                    - folder in which resulting mat
+%       file and figures are stored
+%		sessions_avg                    - structure containing condition-based LFP-LFP pahse synchronization
+%       averaged across multiple sites
 %
 % REQUIRES:	lfp_tfa_plot_hs_tuned_tfr, lfp_tfa_compute_diff_tfr
 %

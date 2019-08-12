@@ -18,7 +18,8 @@ function sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg)
 %               lfp_tfa_settings.m and lfp_tfa_compare_conditions.m
 %               2. root_results_fldr   - root folder where results are saved
 %               3. compare.targets     - targets to compare, see lfp_tfa_settings.m
-%               4. 
+%               4. ref_hemisphere      - reference hemisphere for ipsi and
+%               contra labeling
 % OUTPUTS:
 %		sessions_avg    - structure containing condition-based LFP Power
 %		spectrum response averaged across multiple sessions
