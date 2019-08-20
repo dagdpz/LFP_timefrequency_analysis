@@ -122,7 +122,7 @@ function [ diff_evoked ] = lfp_tfa_compute_diff_condition_evoked( lfp_evoked, di
                     % change the condition label
                     diff_evoked.difference(dcn).label = ['( ' cond2_evoked.label, ' vs. ', ...
                                 cond1_evoked.label ' )'];  
-
+                    
                     diff_evoked.difference(dcn).cfg_condition = cond2_evoked.cfg_condition;
                     if strcmp(compare.field, 'choice')                        
                         diff_evoked.difference(dcn).cfg_condition.choice = ['diff' num2str(i)];
@@ -159,12 +159,16 @@ function [ diff_evoked ] = lfp_tfa_compute_diff_condition_evoked( lfp_evoked, di
                                     diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).ntrials = ...
                                         [];
                                 end
+                                diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).legend = ...
+                                    {[compare.field ':' num2str(compare.values{1})], ...
+                                    [compare.field ':' num2str(compare.values{2})]};
                                 
                             else
                                 %diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp = [];
                                 diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).time = [];
                                 diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).mean = [];
                                 diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).std = [];
+                                diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).legend = [];
                             end
                         end
                     end

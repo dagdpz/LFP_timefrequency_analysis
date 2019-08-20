@@ -56,8 +56,9 @@ lfp_tfa_cfg.session_info(1) = ...
            'Input',         {{'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_control_20190131_rest\sites_Magnus_20190131.mat', ...
                             'Y:\Projects\PPC_pulv_body_signals\ephys\dPul_control_20190131\sites_Magnus_20190131.mat'}}, ...
            'Input_ECG',     'Y:\Projects\PhysiologicalRecording\Data\Magnus\20190131\20190131_ecg.mat', ...
-           'Preinj_blocks',  [0 2], ...
-           'Postinj_blocks', []);  
+           'Input_ECG_raw', 'Y:\Data\Magnus_phys_combined_monkeypsych_TDT\20190131', ...
+           'Preinj_blocks',  [0], ...
+           'Postinj_blocks', [2]);  
 %        
 % lfp_tfa_cfg.session_info(2) = ...
 %     struct('Monkey',        'Magnus', ...
@@ -149,7 +150,7 @@ lfp_tfa_cfg.random_seed = rng;
 % and type = 2 separately
 % 2. lfp_tfa_cfg.compare.types = nan; Ignore trial type (trials with any
 % type value are combined)
-lfp_tfa_cfg.compare.types = [4, 1];
+lfp_tfa_cfg.compare.types = [4];
 
 % effectors to be included in the analysis
 % should be a vector of integers specifying the effectors
@@ -160,7 +161,7 @@ lfp_tfa_cfg.compare.types = [4, 1];
 % and effector = 6 separately
 % 2. lfp_tfa_cfg.compare.types = nan; Ignore effector (trials with any
 % effector value are combined)
-lfp_tfa_cfg.compare.effectors = [6, 0];
+lfp_tfa_cfg.compare.effectors = [6];
 
 % which type of choice trials are to be included in the analysis
 % Examples:
@@ -223,7 +224,7 @@ lfp_tfa_cfg.compare.exclude_handspace = {};
 % lfp_tfa_cfg.compare.perturbation_groups(1) separately
 % lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
 % any perturbation value 
-lfp_tfa_cfg.compare.perturbations = inf; 
+lfp_tfa_cfg.compare.perturbations = [0, 1]; 
 
 % differences in conditions to be analysed
 % add new entries for further difference calculations
@@ -243,9 +244,9 @@ lfp_tfa_cfg.compare.perturbations = inf;
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
 lfp_tfa_cfg.diff_condition = {};
-% lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
-lfp_tfa_cfg.diff_condition(1) = {{'type_eff', {[4 6], [1 0]}}};
+%lfp_tfa_cfg.diff_condition(1) = {{'type_eff', {[4 6], [1 0]}, 'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
 %     'choice', {0, 1}}};
 
@@ -497,10 +498,11 @@ end
 % 
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
-%     lfp_tfa_cfg.analyse_states = {'combined', [lfp_tfa_states.INI_TRI, ...
+%   lfp_tfa_cfg.analyse_states = {'combined', [lfp_tfa_states.INI_TRI, ...
 %         lfp_tfa_states.TRI_END], 0.8, 100, 'random'};
-lfp_tfa_cfg.analyse_states = {'ecg', 'ECG peak', -0.4, 0.4};
-
+%   lfp_tfa_cfg.analyse_states = {'ecg', 'ECG peak', -0.4, 0.4};
+lfp_tfa_cfg.analyse_states = {lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
+                             lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};
 
 % define the epochs to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse

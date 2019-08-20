@@ -7,7 +7,7 @@
 
 % file containing settings for LFP analysis
 
-settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
+settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Magnus_rest.m';
 
 
 % whether the LFP should be processed (true) or not (false)
@@ -42,6 +42,8 @@ session_proc_lfp = struct();
 lfp_tfr = struct();
 % struct to store average LFP evoked response for different conditions
 lfp_evoked = struct();
+% struct to store average ECG evoked response for different conditions
+lfp_evoked_ecg = struct();
 % struct to store average LFP power spectrum for different conditions
 lfp_pow = struct();
 
@@ -131,6 +133,9 @@ try
         if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))
             lfp_evoked.session(i) = ...
                 lfp_tfa_plot_site_evoked_LFP( session_proc_lfp, ...
+                lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
+            lfp_evoked_ecg.session(i) = ...
+                lfp_tfa_plot_site_evoked_ECG( session_proc_lfp, ...
                 lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
         end
         if any(strcmp(lfp_tfa_cfg.analyses, 'pow'))

@@ -80,7 +80,10 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                     evoked_lfp(st, hs).std, nan(size(evoked_lfp(st, hs).std, 1), noffset)];
                 concat_states_lfp.time = [concat_states_lfp.time, ...
                     evoked_lfp(st, hs).time, nan(1, noffset)];
-                concat_states_lfp.label = evoked_lfp(st, hs).hs_label;         
+                concat_states_lfp.label = evoked_lfp(st, hs).hs_label;
+                if isfield(evoked_lfp(st, hs), 'legend')
+                    concat_states_lfp.legend = evoked_lfp(st, hs).legend;
+                end
 
                 
 
@@ -98,6 +101,11 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             colors = ['b', 'r', 'g', 'y', 'm', 'c', 'k'];
             for i = 1:size(concat_states_lfp.mean, 1)
                 plot(concat_states_lfp.mean(i, :), colors(i));
+            end
+            if isfield(concat_states_lfp, 'legend')
+                legend(concat_states_lfp.legend);
+            end
+            for i = 1:size(concat_states_lfp.mean, 1)
                 plot(concat_states_lfp.mean(i, :) + concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
                 plot(concat_states_lfp.mean(i, :) - concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
             end
@@ -119,6 +127,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             set(gca, 'xticklabelrotation', 45);
             xlabel('Time(s)');
             ylabel('LFP amplitude');
+            
             subplottitle = [concat_states_lfp.label{1}];
             if isfield(evoked_lfp(1, hs), 'nsessions')
                 subplottitle = [subplottitle ' (nsessions = ' num2str(evoked_lfp(1, hs).nsessions) ')'];

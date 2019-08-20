@@ -11,22 +11,19 @@ for b = (unique([site_lfp.trials.block]))
     trials_time = [];
     trials_idx = find([site_lfp.trials.block] == b);
     for t = 1:length(trials_idx) % ignore first trial
-        %concat_trial_start_samples = [concat_trial_start_samples, length(concat_LFP) + 1];
-        trial_onset_time = site_lfp.trials(trials_idx(t)).trial_onset_time;
-
+        
         ts = site_lfp.trials(trials_idx(t)).tsample;
         if ~isempty(concat_time) 
             trial_timestamps = ...
-                linspace(ts, ts*length(site_lfp.trials(trials_idx(t)).lfp_data), ...
-                length(site_lfp.trials(trials_idx(t)).lfp_data)) + concat_time(end);
+                linspace(ts, ts*length(site_lfp.trials(trials_idx(t)).time), ...
+                length(site_lfp.trials(trials_idx(t)).time)) + concat_time(end);
         else
             trial_timestamps = ...
-                linspace(0, ts*(length(site_lfp.trials(trials_idx(t)).lfp_data)-1), ...
-                length(site_lfp.trials(trials_idx(t)).lfp_data));
+                linspace(0, ts*(length(site_lfp.trials(trials_idx(t)).time)-1), ...
+                length(site_lfp.trials(trials_idx(t)).time));
         end
         
-        block_LFP = [block_LFP site_lfp.trials(trials_idx(t)).lfp_data];
-
+        
 %         trial_timestamps = ...
 %             linspace(0, (length(site_lfp.trials(trials_idx(t)).time) - 1)*ts, ...
 %                 length(site_lfp.trials(trials_idx(t)).time));
@@ -44,11 +41,12 @@ for b = (unique([site_lfp.trials.block]))
     ECG_spikes = false(size(concat_time));
     for k = 1:length(ECG_timestamps)
         if min(abs(concat_time - ECG_timestamps(k))) < ts
-            ECG_spikes(abs(concat_time - ECG_timestamps(k)) == ...
-                min(abs(concat_time - ECG_timestamps(k)))) = true;
+            time_lgcl_idx = abs(concat_time - ECG_timestamps(k)) == ...
+                min(abs(concat_time - ECG_timestamps(k)));
+            ECG_spikes(time_lgcl_idx) = true;            
         end
     end
-        
+            
     % now divide into trials
     for t = 1:length(trials_idx)
         trial_ECG_spikes = ECG_spikes(...

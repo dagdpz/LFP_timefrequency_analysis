@@ -208,6 +208,7 @@ function session_info = lfp_tfa_process_combined_LFP( session_info, lfp_tfa_cfg 
                         site_lfp.trials(comp_trial).lfp_data = LFP;
                         site_lfp.trials(comp_trial).fsample  = fs;
                         site_lfp.trials(comp_trial).tsample = ts;
+                        site_lfp.trials(comp_trial).tstart = start_time;
                         site_lfp.trials(comp_trial).reach_hand  = reach_hand;
                         site_lfp.trials(comp_trial).reach_space  = reach_space;
                         site_lfp.trials(comp_trial).hndspc_lbl  = hs_label;
@@ -252,6 +253,18 @@ function session_info = lfp_tfa_process_combined_LFP( session_info, lfp_tfa_cfg 
                     end
                 end
                 
+                if s == length(combined_sites)
+                    % Get ECG spikes
+                    if exist('block_ECG', 'var')
+                        site_lfp = lfp_tfa_get_ECG_peaks( site_lfp, block_ECG );
+                    end
+
+                    % Get ECG raw data
+                    if isfield(session_info, 'Input_ECG_raw')
+                        site_lfp = lfp_tfa_get_ECG_raw( site_lfp, session_info.Input_ECG_raw );
+                    end
+                end
+                
             else
                 % loop through each trial for this site to get the LFP data
                 if s == 1
@@ -267,11 +280,6 @@ function session_info = lfp_tfa_process_combined_LFP( session_info, lfp_tfa_cfg 
                     end
                 end
             end
-        end
-        
-        % Get ECG spikes
-        if i == 1 && exist('block_ECG', 'var')
-            site_lfp = lfp_tfa_get_ECG_peaks( site_lfp, block_ECG );
         end
         
             

@@ -53,10 +53,13 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
         imscale = [0, 2];
     elseif strcmp(lfp_tfa_cfg.baseline_method, 'subtraction')
         cbtitle = 'P - \mu';
-        imscale = [0 1e-8];
+        imscale = [];
     elseif strcmp(lfp_tfa_cfg.baseline_method, 'relchange')
         cbtitle = '(P - \mu) / \mu';
         imscale = [-1, 1];
+    elseif strcmp(lfp_tfa_cfg.baseline_method, 'none')
+        cbtitle = '';
+        imscale = [];
     end
     
     % offset samples
@@ -114,6 +117,10 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
                 concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
                     avg_tfr(st, hs).time, nan(1, 100/25)];
                               
+                if isempty(imscale)
+                    imscale = [min(avg_tfr(st, hs).powspctrm(:)), ...
+                        max(avg_tfr(st, hs).powspctrm(:))];
+                end
                 
                 imagesc(linspace(state_info(st).start_s, state_info(st).finish_s, ...
                     state_info(st).finish_s - state_info(st).start_s + 1), ...
@@ -132,8 +139,8 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
             end
             concat_states_tfs.time = 1:1:size(concat_states_tfs.powspctrm, 3);
             state_onsets = find(concat_states_tfs.state_time == 0);
-            state_samples = sort([state_info.start_s, state_info.onset_s, ...
-                state_info.finish_s]);
+            state_samples = unique(sort([state_info.start_s, state_info.onset_s, ...
+                state_info.finish_s]));
 
             % now plot
             
