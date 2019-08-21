@@ -39,20 +39,43 @@ for b = (unique([site_lfp.trials.block]))
     ECG_timestamps = block_ECG(b).Rpeak_t;
     % ECG spikes based on ECG timestamps
     ECG_spikes = false(size(concat_time));
+    % get ECG peak to peak interval and beat rate
     for k = 1:length(ECG_timestamps)
         if min(abs(concat_time - ECG_timestamps(k))) < ts
-            time_lgcl_idx = abs(concat_time - ECG_timestamps(k)) == ...
-                min(abs(concat_time - ECG_timestamps(k)));
-            ECG_spikes(time_lgcl_idx) = true;            
+%             time_idx = find(abs(concat_time - ECG_timestamps(k)) < ts*0.5);
+%             time_lgcl_idx = abs(concat_time - ECG_timestamps(k)) == ...
+%                 min(abs(concat_time - ECG_timestamps(k)));
+            ECG_spikes(...
+                find(abs(concat_time - ECG_timestamps(k)) < ts*0.5, 1)) = true;            
         end
+        
     end
+    ECG_b2btime = [nan diff(ECG_timestamps)];
+    ECG_beatidx = cumsum(ECG_spikes);
+    ECG_b2bt = nan(size(ECG_beatidx));
+    ECG_bpm = nan(size(ECG_beatidx));
+    for k = 1:length(ECG_b2btime)
+        ECG_beatrate = k/ECG_timestamps(k);
+        ECG_b2bt(ECG_beatidx ==k) = ECG_b2btime(k);
+        ECG_bpm(ECG_beatidx ==k) = ECG_beatrate/60;
+    end
+        
+        
             
     % now divide into trials
     for t = 1:length(trials_idx)
         trial_ECG_spikes = ECG_spikes(...
             concat_time >= trials_time(trials_idx == trials_idx(t), 1) & ...
             concat_time <= trials_time(trials_idx == trials_idx(t), 2));
+        trial_ECG_bpm = ECG_bpm(...
+            concat_time >= trials_time(trials_idx == trials_idx(t), 1) & ...
+            concat_time <= trials_time(trials_idx == trials_idx(t), 2));
+        trial_ECG_b2btime = ECG_b2bt(...
+            concat_time >= trials_time(trials_idx == trials_idx(t), 1) & ...
+            concat_time <= trials_time(trials_idx == trials_idx(t), 2));
         site_lfp.trials(trials_idx(t)).ECG_spikes = trial_ECG_spikes;
+        site_lfp.trials(trials_idx(t)).ECG_bpm = trial_ECG_bpm;
+        site_lfp.trials(trials_idx(t)).ECG_b2btime = trial_ECG_b2btime;
     end
         
 end

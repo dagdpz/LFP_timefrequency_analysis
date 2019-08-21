@@ -100,8 +100,8 @@ if ~isempty(state_tfs_ecg.powspctrm)
     % find the average TFS for each state
     arr_state_pow = cat(1, state_tfs_ecg.powspctrm{:});
     % remove nans
-    state_tfs_ecg.time = state_ecg_time(~any(isinf(sum(arr_state_pow, 1)), 2));
-    arr_state_pow(:, :, any(isinf(sum(arr_state_pow, 1)), 2)) = [];
+    state_tfs_ecg.time = state_ecg_time(~any(isinf(nansum(arr_state_pow, 1)), 2));
+    arr_state_pow(:, :, any(isinf(nansum(arr_state_pow, 1)), 2)) = [];
     state_tfs_ecg.powspctrm = arr_state_pow;
     state_tfs_ecg.dimord = 'rpt_freq_time';
     

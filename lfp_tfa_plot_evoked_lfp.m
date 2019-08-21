@@ -1,4 +1,4 @@
-function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_file )
+function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_file, varargin )
 %lfp_tfa_plot_evoked_lfp  - Plots the LFP evoked response
 %averages for different hand-space conditions to be compared
 %
@@ -35,6 +35,13 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
 
     h = figure;
     set(h, 'position', [100, 100,900, 675]);
+    
+    yaxislabel = 'LFP amplitude';
+    if nargin > 4
+        settings = struct(varargin{:});
+        yaxislabel = settings.ylabel;
+    end
+    
 
     % number of offset samples to divide between time windows
     noffset = 100;
@@ -126,7 +133,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             set(gca,'xticklabels', round(concat_states_lfp.time(state_samples), 2), 'fontsize', 8)
             set(gca, 'xticklabelrotation', 45);
             xlabel('Time(s)');
-            ylabel('LFP amplitude');
+            ylabel(yaxislabel);
             
             subplottitle = [concat_states_lfp.label{1}];
             if isfield(evoked_lfp(1, hs), 'nsessions')

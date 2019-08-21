@@ -53,6 +53,14 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
     
     % struct to save data for a site
     session_ecg = struct();
+    
+    if isfield(session_info, 'Input_ECG')
+        load(session_info.Input_ECG, 'out');
+        if exist('out', 'var')
+            block_ECG = out;
+            clear out;
+        end        
+    end
           
     % for future use
 %     usable_sites_table = table;
@@ -76,6 +84,12 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
             run = str2num(block_files(b).name(end-8:end-7));
             fprintf('=============================================================\n');
             fprintf('Reading ECG for block, %g\n', block);
+            
+            % block ECG timestamps
+            block_ecg_timestamps = [];
+            trial_ecg_timestamps = [];           
+            
+            
             % for future use
             % get 'Set' entry from usable_sites_table
     %         site_lfp.dataset = usable_sites_table(...
@@ -83,6 +97,14 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
             session_ecg.session = session_info.session;
             
             load(fullfile(session_info.Input_ECG_raw, block_files(b).name));
+            
+            % add first trial INI to block timestamps
+            ts = 1/(trial(1).TDT_ECG1_samplingrate);
+             first_trial_INI_timestamps = linspace(0, ...
+                 ts*(length(First_trial_INI.ECG1)-1), length(First_trial_INI.ECG1));
+             trial_ecg_timestamps = first_trial_INI_timestamps;
+%              block_ecg_timestamps = [block_ecg_timestamps, ...
+%                  trial_ecg_timestamps];
                                     
             %% get information common to all sites for a session
             
@@ -114,8 +136,11 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
                         ECG = trial(t).TDT_ECG1; % LFP data
                         nsamples = numel(ECG);
                         end_time = start_time + (ts*(nsamples-1));
-                        timestamps = linspace(start_time, end_time, nsamples);                    
-
+                        timestamps = linspace(start_time, end_time, nsamples);  
+                        trial_ecg_timestamps = ...
+                            timestamps + ts + trial_ecg_timestamps(end);                           
+%                         block_ecg_timestamps = [block_ecg_timestamps, ...
+%                             trial_ecg_timestamps];
                         % save retrieved data into struct
                         comp_trial = comp_trial + 1;
                         session_ecg.trials(comp_trial).completed = completed;
@@ -133,6 +158,8 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
                         session_ecg.trials(comp_trial).fsample  = fs;
                         session_ecg.trials(comp_trial).tsample = ts;
                         session_ecg.trials(comp_trial).tstart = start_time;
+                        session_ecg.trials(comp_trial).trial_period = ...
+                            [trial_ecg_timestamps(1) trial_ecg_timestamps(end)];
                         session_ecg.trials(comp_trial).perturbation  = perturbation;
                         % flag to mark noisy trials, default False, filled in by
                         % lfp_tfa_reject_noisy_lfp.m
@@ -164,8 +191,8 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
 
                     end
                 end
+                %session_ecg = lfp_tfa_get_ECG_peak_times( session_ecg, block_ECG(b), block_ecg_timestamps );
                       
-            
         
             
         %%% Noise rejection - should this be included within processing check this? %%%
@@ -180,7 +207,7 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
             block_ECG = out;
             clear out;
         end
-        session_ecg = lfp_tfa_get_ECG_peaks( session_ecg, block_ECG );
+        session_ecg = lfp_tfa_get_ECG_peak_times( session_ecg, block_ECG );
     end  
     
     % Calculate time frequency spectrogram of ECG
