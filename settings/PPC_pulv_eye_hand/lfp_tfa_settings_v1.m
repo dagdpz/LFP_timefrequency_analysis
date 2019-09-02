@@ -103,6 +103,19 @@ lfp_tfa_cfg.session_info(9) = ...
 %            'Postinj_blocks', 'all');
 
 
+% what kind of analyses should be done on LFP
+% should be a cell array of strings which indicate which kind of analyses
+% should be performed on LFP
+% Currently supported analyses are 'tfs', 'evoked', 'pow', and 'sync'
+%       'tfs'       - LFP time frequency spectrogram average for given conditions and time windows
+%       'evoked'    - LFP evoked response average for given conditions and time windows
+%       'pow'       - LFP power spectrum average for given conditions and epochs
+%       'sync'      - LFP-LFP phase synchronization measure for given conditions and
+%           time windows
+
+
+lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow'};
+
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
 % the target names should be same as the target field in the LFP data
@@ -169,6 +182,9 @@ lfp_tfa_cfg.ref_hemisphere = 'R';
 % 1. lfp_tfa_cfg.maxsites = inf; all the sites will be analysed from 
 % each session
 lfp_tfa_cfg.maxsites = inf; % inf = analyse all sites
+
+% random seed for random number generator for reproducibility
+lfp_tfa_cfg.random_seed = rng;
 
 %% Settings for ft_freqanalysis in FieldTrip
 % Configuration for calculating LFP time frequency spectrogram using
@@ -440,8 +456,8 @@ lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
 % 
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
-lfp_tfa_cfg.analyse_states = {lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.85;...
-                             lfp_tfa_states.REA_INI,    'Reach',    -0.2,   0.5};
+lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
+                             'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};                    
 
 % define the states to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
