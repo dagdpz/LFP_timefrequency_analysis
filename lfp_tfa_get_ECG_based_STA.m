@@ -1,4 +1,4 @@
-function ecg_triggered_evoked = lfp_tfa_get_ECG_based_STA( trials_lfp, site_ID, cfg_ecg )
+function ecg_triggered_evoked = lfp_tfa_get_ECG_based_STA( trials_lfp, site_ID, cfg_ecg, signal_type )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -16,19 +16,24 @@ ft_data_all.trial = {}; % evoked LFP response
 for t = 1:length(trials_lfp)
 
     trialperiod           = trials_lfp(t).trialperiod;
+    
+    % check if ECG spike data exists for this trial
+    if isempty(trials_lfp(t).ECG_spikes)
+        continue;
+    end
+    
     % get the LFP samples and timestamps for the trial
-    lfp_data = trials_lfp(t).lfp_data(...
-        (trials_lfp(t).time >= trialperiod(1) & ...
-        trials_lfp(t).time <= trialperiod(2)));
-    ecg_peaks = trials_lfp(t).ECG_spikes(...
-        (trials_lfp(t).time >= trialperiod(1) & ...
-        trials_lfp(t).time <= trialperiod(2)));
-    lfp_time = trials_lfp(t).time(...
-        (trials_lfp(t).time >= trialperiod(1) & ...
-        trials_lfp(t).time <= trialperiod(2)));
+    if strcmp(signal_type, 'lfp')
+        signal = trials_lfp(t).lfp_data;
+    elseif strcmp(signal_type, 'ecg')
+        signal = trials_lfp(t).ecg_data;
+    end
+    
+    ecg_peaks = trials_lfp(t).ECG_spikes;
+    signal_time = trials_lfp(t).time;
     ft_data_all.trial = [ft_data_all.trial, ...
-        [lfp_data; ecg_peaks]];
-    ft_data_all.time = [ft_data_all.time, lfp_time];
+        [signal; ecg_peaks]];
+    ft_data_all.time = [ft_data_all.time, signal_time];
 
 end
 
@@ -41,15 +46,13 @@ if ~isempty(ft_data_all.trial)
     cfg.timwin          = [cfg_ecg{3} cfg_ecg{4}];
     cfg.channel         = ft_data_all.label(1); % LFP chan
     cfg.spikechannel    = ft_data_all.label(2); % ECG peak
-    cfg.latency         = 'maxperiod';
     
     ecg_based_sta       = ft_spiketriggeredaverage(cfg, ft_data_all);
     
     ecg_triggered_evoked.lfp = ecg_based_sta.trial;
     ecg_triggered_evoked.lfp_time = ecg_based_sta.time;
     ecg_triggered_evoked.mean = ecg_based_sta.avg;
-    ecg_triggered_evoked.std = permute(nanstd(ecg_based_sta.trial, 0, 1), [2 3 1])...
-        /sqrt(size(ecg_based_sta.trial, 1));
+    ecg_triggered_evoked.std = permute(nanstd(ecg_based_sta.trial, 0, 1), [2 3 1]);
 %     ecg_based_sta.std = nanstd(arr_state_lfp, 0, 1);
     
 end

@@ -21,7 +21,7 @@ for b = (unique([site_lfp.trials.block]))
     
     % trial ids for this block
     trials_idx = find([site_lfp.trials.block] == b);
-    for t = 2:length(trials_idx) % ignore first trial
+    for t = 2:length(trials_idx) 
         % ECG sampling rate
         ECG_SR = trials_ECG(t).TDT_ECG1_samplingrate;
         ECG_ts = 1/ECG_SR;
@@ -31,12 +31,15 @@ for b = (unique([site_lfp.trials.block]))
         end_time = start_time + ECG_ts * (nsamples-1);        
         ECG_timestamps = linspace(start_time, end_time, nsamples);
         
-        % stoe ECG data
-        site_lfp.trials(trials_idx(t)).ecg_data = trial_ECG_raw;
-        site_lfp.trials(trials_idx(t)).ecg_timestamp = ECG_timestamps;
-        site_lfp.trials(trials_idx(t)).ecg_fs = ECG_SR;
-        site_lfp.trials(trials_idx(t)).ecg_ts = ECG_ts;
+        % resample ECG data
+        ECG_timeseries = timeseries(trial_ECG_raw, ECG_timestamps);
+        trial_timestamps = site_lfp.trials(trials_idx(t)).time;
+        resampled_ECG_timeseries = resample(ECG_timeseries, trial_timestamps);
+        trial_ECG_raw = permute(resampled_ECG_timeseries.Data, [2 3 1]);
         
+        % store ECG data
+        site_lfp.trials(trials_idx(t)).ecg_data = trial_ECG_raw;
+       
         
         
     end

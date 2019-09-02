@@ -185,7 +185,7 @@ function [ session_ecg_tfs ] = lfp_tfa_plot_session_tfs_ECG( session_ecg, sessio
         % save mat file for site
         save(fullfile(results_folder_tfs, ['TFS_ECG_' session_ecg_tfs(i).session '.mat']), 'site_evoked_ecg');
         % save to a mother struct
-        session_ecg_tfs.sites(i) = site_evoked_ecg;
+        session_ecg_tfs = site_evoked_ecg;
     end
         
 %     % Average across sites for a session

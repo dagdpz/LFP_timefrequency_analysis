@@ -49,8 +49,8 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, l
     % structure to store baseline
     baseline = struct();        
     % baseline conditions
-    task_type = unique([lfp_tfa_cfg.compare.types]);
-    task_effector = unique([lfp_tfa_cfg.compare.effectors]);
+    task_type = lfp_tfa_cfg.baseline_use_type;%unique([lfp_tfa_cfg.compare.types]);
+    task_effector = lfp_tfa_cfg.baseline_use_effector;%unique([lfp_tfa_cfg.compare.effectors]);
     perturbation = unique([lfp_tfa_cfg.compare.perturbations]);
     perturbation_blocks = unique([site_lfp.trials.perturbation]);
     %choice = unique([site_lfp.trials.choice_trial]);

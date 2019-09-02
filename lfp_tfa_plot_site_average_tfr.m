@@ -340,7 +340,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         
         % Difference TFR for session
         % check if both pre- and post- injection blocks exist
-        if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
+        %if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
             %session_avg(t).difference = lfp_tfa_compute_diff_tfr(session_avg(t), lfp_tfa_cfg);
             session_avg(t).difference = [];
             % difference between conditions
@@ -372,7 +372,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 
                 end
             end
-        end
+        %end
         
     end
     

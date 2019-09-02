@@ -254,15 +254,17 @@ function session_info = lfp_tfa_process_combined_LFP( session_info, lfp_tfa_cfg 
                 end
                 
                 if s == length(combined_sites)
-                    % Get ECG spikes
-                    if exist('block_ECG', 'var')
-                        site_lfp = lfp_tfa_get_ECG_peaks( site_lfp, block_ECG );
-                    end
-
+                    
                     % Get ECG raw data
                     if isfield(session_info, 'Input_ECG_raw')
                         site_lfp = lfp_tfa_get_ECG_raw( site_lfp, session_info.Input_ECG_raw );
                     end
+                    
+                    % Get ECG spikes
+                    if exist('block_ECG', 'var')
+                        site_lfp = lfp_tfa_get_ECG_peaks( site_lfp, block_ECG );                        
+                    end
+
                 end
                 
             else

@@ -43,6 +43,14 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
 %     fprintf('Reading processed LFP data \n');
 %     session = load(lfp_tfa_cfg.data_filepath);
 
+    % struct to save data for a site
+    session_ecg = struct();
+        
+    if ~exist(session_info.Input_ECG_raw, 'dir')
+        fprintf('No file with ECG data found in the specified directory \n%s\n', ...
+            session_info.Input_ECG_raw);
+        return;
+    end
     block_files = dir(fullfile(session_info.Input_ECG_raw, '*.mat'));
     
     % prepare results folder
@@ -51,10 +59,12 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
         mkdir(results_fldr);
     end
     
-    % struct to save data for a site
-    session_ecg = struct();
-    
     if isfield(session_info, 'Input_ECG')
+        if ~exist(session_info.Input_ECG, 'file')
+            fprintf('No file found \n%s\n', ...
+                session_info.Input_ECG_raw);
+            return;
+        end
         load(session_info.Input_ECG, 'out');
         if exist('out', 'var')
             block_ECG = out;
@@ -158,7 +168,7 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
                         session_ecg.trials(comp_trial).fsample  = fs;
                         session_ecg.trials(comp_trial).tsample = ts;
                         session_ecg.trials(comp_trial).tstart = start_time;
-                        session_ecg.trials(comp_trial).trial_period = ...
+                        session_ecg.trials(comp_trial).trialperiod = ...
                             [trial_ecg_timestamps(1) trial_ecg_timestamps(end)];
                         session_ecg.trials(comp_trial).perturbation  = perturbation;
                         % flag to mark noisy trials, default False, filled in by
@@ -211,8 +221,10 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
     end  
     
     % Calculate time frequency spectrogram of ECG
-    session_ecg = lfp_tfa_compute_ECG_spectrogram( session_ecg, lfp_tfa_cfg );
+    %session_ecg = lfp_tfa_compute_ECG_spectrogram( session_ecg, lfp_tfa_cfg );
     
+%     % Calculate time frequency spectrogram of ECG b2b interval
+%     session_ecg = lfp_tfa_compute_ECGb2bt_spectrogram( session_ecg, lfp_tfa_cfg );
     
     % save allsites_lfp
     results_mat = fullfile(results_fldr, ['session_ecg_' session_info.session '.mat']);

@@ -18,7 +18,7 @@ settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\
 % analysis won't happen
 % TODO: check if LFP is processed, of not, process LFP even if flag is set
 % to false
-process_LFP = true;
+process_LFP = false;
 
 %% INITIALIZATION
 close all;
@@ -98,7 +98,8 @@ try
         session_proc_lfp = [];
         for file = {sites_lfp_files.name}
             %fprintf('Reading processed LFP for site %s\n', file{1});
-            if ~strcmp(file{1}, 'allsites_lfp.mat')
+            if ~isempty(strfind(file{1}, 'site_lfp_'))
+                fprintf('Reading processed LFP for site %s\n', file{:});
                 load(fullfile(sessions_info(i).proc_results_fldr, file{1}))
                 session_proc_lfp = [session_proc_lfp site_lfp];
             end            
@@ -134,9 +135,7 @@ try
             lfp_evoked.session(i) = ...
                 lfp_tfa_plot_site_evoked_LFP( session_proc_lfp, ...
                 lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
-            lfp_evoked_ecg.session(i) = ...
-                lfp_tfa_plot_site_evoked_ECG( session_proc_lfp, ...
-                lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
+            
         end
         if any(strcmp(lfp_tfa_cfg.analyses, 'pow'))
             lfp_pow.session(i) = ...

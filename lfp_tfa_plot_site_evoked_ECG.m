@@ -129,24 +129,36 @@ function [ session_evoked_ecg ] = lfp_tfa_plot_site_evoked_ECG( session_ecg, ses
                 if sum(cond_trials) < lfp_tfa_cfg.mintrials_percondition
                     sites_evoked(i).use_for_avg = 0;
                 end
+                
+                if any(cond_trials)
+                    cond_trials_ecg = session_ecg(i).trials(cond_trials);
+                else
+                    continue;
+                end
 
 
                 % loop through time windows around the states to analyse
-                for st = 1:size(analyse_states, 1)
+                for st = 1:size(analyse_states, 1)                    
+                                       
                     
-                    cond_trials_ecg = session_ecg(i).trials(cond_trials);                    
-                     
-                    state_evoked = lfp_tfa_get_state_evoked_ECG(cond_trials_ecg, ...
-                        analyse_states(st, :));                    
+                    if strcmp(analyse_states{st, 1}, 'ecg')
+                        state_evoked = lfp_tfa_get_ECG_based_STA(cond_trials_ecg, ...
+                            session_ecg.session, analyse_states(st, :), 'ecg');
+%                         state_evoked = lfp_tfa_shuffled_ECG_peaks_evoked(cond_trials_ecg, ...
+%                             session_ecg.session, analyse_states(st, :), 'ecg');
+                    else 
+                        state_evoked = lfp_tfa_get_state_evoked_ECG(cond_trials_ecg, ...
+                            analyse_states(st, :));    
+                    end
 
 
-                    if ~isempty(state_evoked.ecg)
+                    if ~isempty(state_evoked.lfp)
 
                         % save evoked ECG
-                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).ecg = state_evoked.ecg;
+                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).lfp = state_evoked.lfp;
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean = state_evoked.mean;
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std = state_evoked.std; 
-                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time = state_evoked.ecg_time;
+                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time = state_evoked.lfp_time;
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).trials = find(cond_trials);
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).hs_label = hs_labels(hs);
                         if isfield(state_evoked, 'state_id') && isfield(state_evoked, 'state_name')
@@ -174,7 +186,7 @@ function [ session_evoked_ecg ] = lfp_tfa_plot_site_evoked_ECG( session_ecg, ses
                     ['ECG_Evoked_' sites_evoked(i).session '_' site_conditions(cn).label '.png']);
 
                 lfp_tfa_plot_evoked_lfp (sites_evoked(i).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
-                    plottitle, result_file);
+                    plottitle, result_file, 'ylabel', 'ECG amplitude');
             end
 
         end
@@ -198,7 +210,7 @@ function [ session_evoked_ecg ] = lfp_tfa_plot_site_evoked_ECG( session_ecg, ses
                         '_' 'diff_condition' num2str(dcn) '.png']);
                         %sites_avg(t).difference(dcn).label '.png']);
                     lfp_tfa_plot_evoked_lfp(sites_evoked(i).difference(dcn).hs_tuned_evoked, ...
-                        lfp_tfa_cfg, plottitle, result_file);
+                        lfp_tfa_cfg, plottitle, result_file, 'ylabel', 'ECG amplitude');
                 end
             end
         end
@@ -207,7 +219,7 @@ function [ session_evoked_ecg ] = lfp_tfa_plot_site_evoked_ECG( session_ecg, ses
         % save mat file for site
         save(fullfile(site_results_folder, ['ECG_evoked_' sites_evoked(i).session '.mat']), 'site_evoked_ecg');
         % save to a mother struct
-        session_evoked_ecg.sites(i) = site_evoked_ecg;
+        session_evoked_ecg = site_evoked_ecg;
     end
         
 %     % Average across sites for a session

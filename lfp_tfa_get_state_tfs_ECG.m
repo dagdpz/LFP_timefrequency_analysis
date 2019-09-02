@@ -35,7 +35,7 @@ for t = find(cond_trials)
         state_ecg_time >= state_ref_tstart & ...
         state_ecg_time <= state_ref_tend);    
     % crop the tfs for this state
-    state_ecg_powspctrm = inf(...
+    state_ecg_powspctrm = nan(...
         size(session_ecg.trials(t).tfs.powspctrm, 1), ...
         size(session_ecg.trials(t).tfs.powspctrm, 2), ...
         length(state_ecg_time));
@@ -100,10 +100,10 @@ if ~isempty(state_tfs_ecg.powspctrm)
     % find the average TFS for each state
     arr_state_pow = cat(1, state_tfs_ecg.powspctrm{:});
     % remove nans
-    state_tfs_ecg.time = state_ecg_time(~any(isinf(nansum(arr_state_pow, 1)), 2));
-    arr_state_pow(:, :, any(isinf(nansum(arr_state_pow, 1)), 2)) = [];
+    state_tfs_ecg.time = state_ecg_time;%(~any(isinf(nansum(arr_state_pow, 1)), 2));
+    %arr_state_pow(:, :, any(isinf(nansum(arr_state_pow, 1)), 2)) = [];
     state_tfs_ecg.powspctrm = arr_state_pow;
-    state_tfs_ecg.dimord = 'rpt_freq_time';
+    state_tfs_ecg.dimord = 'nbeats_freq_time';
     
     state_tfs_ecg.powspctrm_rawmean = nanmean(arr_state_pow, 1);
     

@@ -58,6 +58,9 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
         dcn = 0;
         traversed_idx = [];
         for cn = 1:length(lfp_tfr)
+            if isempty(lfp_tfr(cn).cfg_condition)
+                continue;
+            end
             condition_found = false;
             if strcmp(compare.field, 'choice')
                 condition_found = lfp_tfr(cn).cfg_condition.choice == compare.values{1};
@@ -77,6 +80,9 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
                 continue;
             end
             for d = 1:length(lfp_tfr)
+                if isempty(lfp_tfr(d).cfg_condition)
+                    continue;
+                end
                 if any(traversed_idx == d), continue; end
                 comparison_pair_found = false;
 

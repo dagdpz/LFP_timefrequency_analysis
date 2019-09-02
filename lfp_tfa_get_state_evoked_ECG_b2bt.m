@@ -12,7 +12,7 @@ state_evoked.state_name = state_name;
 
 for t = 1:length(trials_lfp)
     
-    if isempty(trials_lfp(t).ecg_data)
+    if isempty(trials_lfp(t).ECG_b2btime)
         continue;
     end
 
@@ -72,11 +72,13 @@ if ~isempty(state_evoked.ecg_b2bt)
     
     % remove nans
     arr_state_ecg_b2bt = cat(1, state_evoked.ecg_b2bt{:});
+%     state_evoked.ecg_time = ...
+%         state_evoked_ecg_time;
     state_evoked.ecg_time = ...
-        state_evoked_ecg_time(~any(isnan(arr_state_ecg_b2bt), 1));
-    arr_state_ecg_b2bt(:, any(isnan(arr_state_ecg_b2bt), 1)) = [];
+        state_evoked_ecg_time;%(~any(isinf(arr_state_ecg_b2bt), 1));
+    %arr_state_ecg_b2bt(:, any(isinf(arr_state_ecg_b2bt), 1)) = [];
     state_evoked.ecg_b2bt = arr_state_ecg_b2bt;
-    state_evoked.dimord = 'rpt_time';
+    state_evoked.dimord = 'nbeats_time';
 
     % crop each lfp to same number of samples
 %     min_ecg_time = state_evoked_ecg.ecg_time{cellfun('length', state_evoked_ecg.ecg_time) == ...
@@ -100,7 +102,7 @@ if ~isempty(state_evoked.ecg_b2bt)
 %     state_evoked_ecg.ecg_time = state_evoked_ecg.ecg_time(1:nsamples);
     
     % evoked LFP average
-    state_evoked.mean = nanmean(arr_state_ecg_b2bt, 1);
-    state_evoked.std = nanstd(arr_state_ecg_b2bt, 0, 1);
+    state_evoked.mean = mean(arr_state_ecg_b2bt, 1);
+    state_evoked.std = std(arr_state_ecg_b2bt, 0, 1) / sqrt(size(arr_state_ecg_b2bt, 1));
     
 end

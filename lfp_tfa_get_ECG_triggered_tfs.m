@@ -16,21 +16,15 @@ for t = find(cond_trials)
     trialperiod           = site_lfp.trials(t).trialperiod;
     
     % get the LFP samples and timestamps between start and end states
-    lfp_tfs_pow = site_lfp.trials(t).tfs.powspctrm(:, :, ...
-        (site_lfp.trials(t).tfs.time >= trialperiod(1) & ...
-        site_lfp.trials(t).tfs.time <= trialperiod(2)));
-    lfp_tfs_time = site_lfp.trials(t).tfs.time(...
-        (site_lfp.trials(t).tfs.time >= trialperiod(1) & ...
-        site_lfp.trials(t).tfs.time <= trialperiod(2)));
+    lfp_tfs_pow = site_lfp.trials(t).tfs.powspctrm;
+    lfp_tfs_time = site_lfp.trials(t).tfs.time;
     lfp_tfs_freq = site_lfp.trials(t).tfs.freq;
     
     % ecg peak times
-    lfp_time = site_lfp.trials(t).time(...
-        (site_lfp.trials(t).time >= trialperiod(1) & ...
-        site_lfp.trials(t).time <= trialperiod(2))); 
-    ecg_peaks = site_lfp.trials(t).ECG_spikes(...
-        (site_lfp.trials(t).time >= trialperiod(1) & ...
-        site_lfp.trials(t).time <= trialperiod(2))); 
+    lfp_time = site_lfp.trials(t).time; 
+    ecg_peaks = site_lfp.trials(t).ECG_spikes; %...
+%         ((site_lfp.trials(t).time >= trialperiod(1) & ...
+%         site_lfp.trials(t).time <= trialperiod(2))); 
     ecg_peak_times = lfp_time(ecg_peaks);
     
     % lfp sample indices
@@ -100,23 +94,34 @@ if ~isempty(ecg_triggered_tfs.powspctrm)
 
     % baseline normalization
     cfg_baseline.method = lfp_tfa_cfg.baseline_method;
-    if isnan(lfp_tfa_cfg.baseline_perturbation)
-        baseline_cnd_idx = isnan([site_lfp.baseline.perturbation]);
+    if ~strcmp(cfg_baseline.method, 'none')
+        if isnan(lfp_tfa_cfg.baseline_perturbation)
+            baseline_cnd_idx = isnan([site_lfp.baseline.perturbation]);
+        end
+        if isnan(lfp_tfa_cfg.baseline_use_choice_trial)
+            baseline_cnd_idx = baseline_cnd_idx & isnan([site_lfp.baseline.choice]);
+        end
+        if isnan(lfp_tfa_cfg.baseline_use_type)
+            baseline_cnd_idx = baseline_cnd_idx & isnan([site_lfp.baseline.type]);
+        end
+        if isnan(lfp_tfa_cfg.baseline_use_effector)
+            baseline_cnd_idx = baseline_cnd_idx & isnan([site_lfp.baseline.effector]);
+        end
+        if ~isnan(lfp_tfa_cfg.baseline_perturbation) && ~isnan(lfp_tfa_cfg.baseline_use_choice_trial)
+            baseline_cnd_idx = ...
+                [site_lfp.baseline.perturbation] == lfp_tfa_cfg.baseline_perturbation & ...
+                [site_lfp.baseline.choice] == lfp_tfa_cfg.baseline_use_choice_trial & ...
+                [site_lfp.baseline.type] == lfp_tfa_cfg.baseline_use_type & ...
+                [site_lfp.baseline.effector] == lfp_tfa_cfg.baseline_use_effector;
+        end
+        cfg_baseline.mean = site_lfp.baseline(baseline_cnd_idx).pow_mean;
+        cfg_baseline.std = site_lfp.baseline(baseline_cnd_idx).pow_std;
+        ecg_triggered_tfs.powspctrm_normmean = lfp_tfa_baseline_normalization(...
+            ecg_triggered_tfs.powspctrm_rawmean, cfg_baseline); 
+    else
+        ecg_triggered_tfs.powspctrm_normmean = ecg_triggered_tfs.powspctrm_rawmean;
     end
-    if isnan(lfp_tfa_cfg.baseline_use_choice_trial)
-        baseline_cnd_idx = baseline_cnd_idx & isnan([site_lfp.baseline.choice]);
-    end
-    if ~isnan(lfp_tfa_cfg.baseline_perturbation) && ~isnan(lfp_tfa_cfg.baseline_use_choice_trial)
-        baseline_cnd_idx = ...
-            [site_lfp.baseline.perturbation] == lfp_tfa_cfg.baseline_perturbation & ...
-            [site_lfp.baseline.choice] == lfp_tfa_cfg.baseline_use_choice_trial & ...
-            [site_lfp.baseline.type] == lfp_tfa_cfg.baseline_use_type & ...
-            [site_lfp.baseline.effector] == lfp_tfa_cfg.baseline_use_effector;
-    end
-    cfg_baseline.mean = site_lfp.baseline(baseline_cnd_idx).pow_mean;
-    cfg_baseline.std = site_lfp.baseline(baseline_cnd_idx).pow_std;
-    ecg_triggered_tfs.powspctrm_normmean = lfp_tfa_baseline_normalization(...
-        ecg_triggered_tfs.powspctrm_rawmean, cfg_baseline); 
+    
     
 end
 

@@ -157,7 +157,7 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(session_results_folder, ...
-                    ['ECG_Evoked_' session_ecg_b2bt(i).session '_' site_conditions(cn).label '.png']);
+                    ['ECG_b2bt_Evoked_' session_ecg_b2bt(i).session '_' site_conditions(cn).label '.png']);
 
                 lfp_tfa_plot_evoked_lfp (session_ecg_b2bt(i).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
                     plottitle, result_file, 'ylabel', 'ECG b2b interval(s)');
@@ -180,7 +180,7 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
                     plottitle = ['Session: ', session_ecg_b2bt(i).session ...
                         session_ecg_b2bt(i).difference(dcn).label];
                     result_file = fullfile(session_results_folder, ...
-                        ['ECG_DiffEvoked_' session_ecg_b2bt(i).session ...
+                        ['ECG_b2bt_DiffEvoked_' session_ecg_b2bt(i).session ...
                         '_' 'diff_condition' num2str(dcn) '.png']);
                         %sites_avg(t).difference(dcn).label '.png']);
                     lfp_tfa_plot_evoked_lfp(session_ecg_b2bt(i).difference(dcn).hs_tuned_evoked, ...
@@ -193,7 +193,7 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
         % save mat file for site
         save(fullfile(session_results_folder, ['ECG_evoked_' session_ecg_b2bt(i).session '.mat']), 'site_evoked_ecg');
         % save to a mother struct
-        session_evoked_ecg.sites(i) = site_evoked_ecg;
+        session_evoked_ecg = site_evoked_ecg;
     end
         
 %     % Average across sites for a session

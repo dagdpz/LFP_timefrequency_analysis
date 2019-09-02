@@ -92,7 +92,7 @@ function sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_t
                                                     = lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).nsites;
                                             end
                                         else
-                                            ntimebins = length(sessions_avg(t).condition(cn).avg_across_sessions(st, hs).time);
+                                            ntimebins = length(sessions_avg(t).condition(cn).hs_tuned_evoked(st, hs).time);
                                             % average same number of time bins
                                             if ntimebins > length(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).time)
                                                 ntimebins = length(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).time);

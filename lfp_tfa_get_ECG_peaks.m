@@ -64,6 +64,7 @@ for b = (unique([site_lfp.trials.block]))
             
     % now divide into trials
     for t = 1:length(trials_idx)
+        
         trial_ECG_spikes = ECG_spikes(...
             concat_time >= trials_time(trials_idx == trials_idx(t), 1) & ...
             concat_time <= trials_time(trials_idx == trials_idx(t), 2));
