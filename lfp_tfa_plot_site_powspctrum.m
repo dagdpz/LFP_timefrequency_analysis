@@ -218,9 +218,9 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
 
 
                         % hand-space labels
-                        for hs = 1:size(lfp_tfa_cfg.analyse_epochs, 2)
+                        for hs = 1:size(sites_pow(i).condition(cn).hs_tuned_power, 2)
                             % epochs
-                            for ep = 1:size(lfp_tfa_cfg.analyse_epochs, 1)
+                            for ep = 1:size(sites_pow(i).condition(cn).hs_tuned_power, 1)
                                 if ~isempty(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean)
 
                                     if isite == 1
