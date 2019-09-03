@@ -239,7 +239,10 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         for cn = 1:length(site_conditions) 
             % condition-wise session average tfs
             session_avg(t).condition(cn).hs_tuned_tfs = struct();
-            isite = 0;
+            session_avg(t).condition(cn).cfg_condition = site_conditions(cn);
+            session_avg(t).condition(cn).label = site_conditions(cn).label;
+            session_avg(t).condition(cn).session = states_lfp(i).session;
+            session_avg(t).condition(cn).target = states_lfp(i).target;isite = 0;
             for i = 1:length(states_lfp)
                 if strcmp(states_lfp(i).target, targets{t})
                     % check if this site should be used for averaging
@@ -287,10 +290,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                                             session_avg(t).condition(cn).hs_tuned_tfs(st, hs).state_name = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).state_name;
                                         end
                                         session_avg(t).condition(cn).hs_tuned_tfs(st, hs).cfg = sites_tfr(i).condition(cn).hs_tuned_tfs(st, hs).cfg;
-                                        session_avg(t).condition(cn).cfg_condition = site_conditions(cn);
-                                        session_avg(t).condition(cn).label = site_conditions(cn).label;
-                                        session_avg(t).condition(cn).session = states_lfp(i).session;
-                                        session_avg(t).condition(cn).target = states_lfp(i).target;
+                                        
                                     end
                                 end
                             end
@@ -335,7 +335,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         
         % Difference TFR for session
         % check if both pre- and post- injection blocks exist
-        if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
+        %if sum(lfp_tfa_cfg.compare.perturbations == [0, 1]) > 1
             %session_avg(t).difference = lfp_tfa_compute_diff_tfr(session_avg(t), lfp_tfa_cfg);
             session_avg(t).difference = [];
             % difference between conditions
@@ -367,7 +367,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
 
                 end
             end
-        end
+        %end
         
     end
     

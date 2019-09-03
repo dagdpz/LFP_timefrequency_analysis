@@ -190,6 +190,10 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
         % conditions
         for cn = 1:length(site_conditions)
             session_avg(t).condition(cn).hs_tuned_evoked = struct();
+            session_avg(t).condition(cn).condition = site_conditions(cn);
+            session_avg(t).condition(cn).label = site_conditions(cn).label;
+            session_avg(t).condition(cn).session = site_lfp(i).session;
+            session_avg(t).condition(cn).target = site_lfp(i).target;
             isite = 0;
             for i = 1:length(sites_evoked)
                 % if the site's target is same as target being considered
@@ -238,10 +242,6 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                                         session_avg(t).condition(cn).hs_tuned_evoked(st, hs).state_name = ...
                                             sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state_name;
                                     end
-                                    session_avg(t).condition(cn).condition = site_conditions(cn);
-                                    session_avg(t).condition(cn).label = site_conditions(cn).label;
-                                    session_avg(t).condition(cn).session = site_lfp(i).session;
-                                    session_avg(t).condition(cn).target = site_lfp(i).target;
                                     session_avg(t).condition(cn).nsites = nsites;
                                 end
 

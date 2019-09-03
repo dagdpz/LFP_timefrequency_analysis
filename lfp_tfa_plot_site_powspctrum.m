@@ -202,7 +202,10 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
         session_avg(t).target = targets{t};
         for cn = 1:length(site_conditions)
             session_avg(t).condition(cn).hs_tuned_power = struct();
-            % variable to store no:of sites with trials satisfying this
+            session_avg(t).condition(cn).condition = site_conditions(cn);
+            session_avg(t).condition(cn).session = states_lfp(i).session;
+            session_avg(t).condition(cn).target = states_lfp(i).target;
+            session_avg(t).condition(cn).label = site_conditions(cn).label;% variable to store no:of sites with trials satisfying this
             % condition
             isite = 0;            
             for i = 1:length(states_lfp)
@@ -250,11 +253,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).hs_label;
                                     session_avg(t).condition(cn).hs_tuned_power(ep, hs).epoch_name = ...
                                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).epoch_name;
-                                    session_avg(t).condition(cn).condition = site_conditions(cn);
-                                    session_avg(t).condition(cn).session = states_lfp(i).session;
-                                    session_avg(t).condition(cn).target = states_lfp(i).target;
-                                    session_avg(t).condition(cn).condition = site_conditions(cn);
-                                    session_avg(t).condition(cn).label = site_conditions(cn).label;
+                                    
                                 end
                             end
                         end
