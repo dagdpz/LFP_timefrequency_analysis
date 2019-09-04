@@ -33,7 +33,13 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    conditions = [lfp_tfr.cfg_condition];
+    diff_tfr = [];
+    
+    if ~isempty(lfp_tfr.cfg_condition)
+        conditions = [lfp_tfr.cfg_condition];
+    else
+        return;
+    end
     
     for i = 1:length(diff_condition)/2
         diff_tfr = struct();
@@ -104,16 +110,17 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
                     %diff_tfr.difference(dcn) = struct();
                     % pre injection
                     preinj_sync = lfp_tfr(cn);
-                    if isempty(preinj_sync.hs_tuned_tfs) 
+                    if isempty(fieldnames(preinj_sync.hs_tuned_tfs) )
                         continue;
                     end
                     % post injection
                     postinj_tfr = lfp_tfr(d);
-                    if isempty(postinj_tfr.hs_tuned_tfs)
+                    if isempty(fieldnames(postinj_tfr.hs_tuned_tfs))
                         continue;
                     end
 
-                    if ~isfield(postinj_tfr.hs_tuned_tfs, 'powspctrm') || ~isfield(preinj_sync.hs_tuned_tfs, 'powspctrm')
+                    if ~isfield(postinj_tfr.hs_tuned_tfs, 'powspctrm') || ...
+                            ~isfield(preinj_sync.hs_tuned_tfs, 'powspctrm')
                         continue;
                     end
                     
