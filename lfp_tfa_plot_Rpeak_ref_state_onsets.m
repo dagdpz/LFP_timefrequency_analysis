@@ -54,7 +54,7 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
     
     % loop through handspace
     for hs = 1:size(Rpeak_evoked_states, 2)
-        if ~isempty([Rpeak_evoked_states(:,hs).ref_onset_times])
+        if ~isempty([Rpeak_evoked_states(:,hs).abs_timefromRpeak])
 %             % concatenate states
 %             concat_states_lfp = struct();
 %             concat_states_lfp.mean = [];
@@ -95,13 +95,21 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
 %                 end
 %                 
 %                 % now plot
-                subplot(nhandspacelabels, nstates, (hs-1)*nstates + st);
+                subplot(nhandspacelabels, nstates*2, (hs-1)*nstates*2 + st);
                 
-                histogram(Rpeak_evoked_states(st, hs).ref_onset_times, 'BinWidth', 0.05, ...
+                histogram(Rpeak_evoked_states(st, hs).abs_timefromRpeak, 'BinWidth', 0.05, ...
                     'Normalization', 'probability')
                 title(Rpeak_evoked_states(st, hs).state_name);
                 xlabel('Time from Rpeak (s)')
-                ylabel('Probability');                
+                ylabel('Probability');
+                
+                subplot(nhandspacelabels, nstates*2, (hs-1)*nstates*2 + nstates + st);
+                
+                histogram(Rpeak_evoked_states(st, hs).rel_timefromRpeak, 'BinWidth', 0.1, ...
+                    'Normalization', 'probability')
+                title(Rpeak_evoked_states(st, hs).state_name);
+                xlabel('Rel. Time from Rpeak')
+                ylabel('Probability');
 
             end
             
@@ -155,6 +163,11 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
 %             end
 %             title(subplottitle);
         end
+    end
+    if isfield(Rpeak_evoked_states, 'ntrials')
+        plottitle = [plottitle, ' (ntrials = ' num2str(Rpeak_evoked_states.ntrials) ')'];
+    elseif isfield(Rpeak_evoked_states, 'nsessions')
+        plottitle = [plottitle, ' (nsessions = ' num2str(Rpeak_evoked_states.nsessions) ')'];
     end
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');

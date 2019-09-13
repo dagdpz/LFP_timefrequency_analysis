@@ -160,8 +160,8 @@ function [ diff_evoked ] = lfp_tfa_compute_diff_condition_evoked( lfp_evoked, di
                                         [];
                                 end
                                 diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).legend = ...
-                                    {[compare.field ':' num2str(compare.values{1})], ...
-                                    [compare.field ':' num2str(compare.values{2})]};
+                                    {[compare.field ':' num2str(compare.values{2})], ...
+                                    [compare.field ':' num2str(compare.values{1})]};
                                 
                             else
                                 %diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp = [];

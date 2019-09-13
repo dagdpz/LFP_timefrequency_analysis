@@ -41,6 +41,8 @@ for t = 1:length(trials_signal)
     
 end
 
+mean_ecg_p2pt = mean(ecg_p2pt);
+
 ts = trials_signal(1).tsample;
 
 if distplot
@@ -77,6 +79,12 @@ for i = 1:nshuffles
         shuffled_ecg_peak_times = shuffled_ecg_peak_times(...
             shuffled_ecg_peak_times < timestamps{s}(end));
         shuffled_ECG_peak_samples = round(shuffled_ecg_peak_times / ts);
+        % randomly shift shuffled ECG peaks
+        shuffled_ECG_peak_samples = ...
+            shuffled_ECG_peak_samples + ...
+            round((2*rand(size(shuffled_ECG_peak_samples)) - 1) * (mean_ecg_p2pt/ts));  
+        shuffled_ECG_peak_samples(shuffled_ECG_peak_samples > ...
+            length(ecg_peaks{s}) | shuffled_ECG_peak_samples < 1) = [];
         shuffled_ecg_peaks(shuffled_ECG_peak_samples) = 1;
         peak_idx = peak_idx + npeaks - 1;
         ft_data_all.trial{s} = [signal{s}; shuffled_ecg_peaks];

@@ -1,4 +1,4 @@
-function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(evoked_ecg, lfp_tfa_cfg)
+function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ecg_b2bt_evoked, lfp_tfa_cfg)
 %lfp_tfa_avg_evoked_LFP_across_sessions  - Condition-based evoked LFP response
 % average across many session averages
 %
@@ -61,38 +61,41 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(evoked_ecg, lfp_tfa_
         
         % initialize number of site pairs for each handspace
         % label
-        for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
-            for hs = 1:size(lfp_tfa_cfg.conditions(1).hs_labels, 2)
+        for st = 1:size(ecg_b2bt_evoked.session(end).condition(cn).hs_tuned_evoked, 1)
+            for hs = 1:size(ecg_b2bt_evoked.session(end).condition(cn).hs_tuned_evoked, 2)
                 sessions_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsessions = 0;
-                sessions_avg(t).condition(cn).hs_tuned_evoked(st, hs).ecg_b2bt = [];                
+                sessions_avg(t).condition(cn).hs_tuned_evoked(st, hs).ecg_b2bt = {};                
             end
         end  
 
-        for i = 1:length(evoked_ecg.session)
-            if ~isempty(evoked_ecg.session(i).condition(cn).hs_tuned_evoked) && ... 
-                isfield(evoked_ecg.session(i).condition(cn).hs_tuned_evoked, 'mean')
-                for st = 1:size(evoked_ecg.session(i).condition(cn).hs_tuned_evoked, 1)
-                    for hs = 1:size(evoked_ecg.session(i).condition(cn).hs_tuned_evoked, 2)
-                        if isfield(evoked_ecg.session(i).condition(cn).hs_tuned_evoked(st, hs), 'mean') ...
-                                && ~isempty(evoked_ecg.session(i).condition(cn).hs_tuned_evoked(st, hs).mean)
+        for i = 1:length(ecg_b2bt_evoked.session)
+            if isempty(ecg_b2bt_evoked.session(i).condition)
+                continue;
+            end
+            if ~isempty(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked) && ... 
+                isfield(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked, 'mean')
+                for st = 1:size(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked, 1)
+                    for hs = 1:size(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked, 2)
+                        if isfield(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs), 'mean') ...
+                                && ~isempty(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs).mean)
                             sessions_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsessions = ...
                                 sessions_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsessions + 1;
                             if sessions_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsessions == 1
                                 sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).time ...
-                                    = evoked_ecg.session(i).condition(cn).hs_tuned_evoked(st, hs).time;
+                                    = ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs).time;
                                 sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).hs_label ...
-                                    = evoked_ecg.session(i).condition(cn).hs_tuned_evoked(st, hs).hs_label;
-                                if isfield(evoked_ecg.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs), 'state') && ...
-                                        isfield(evoked_ecg.session(i).condition(cn).hs_tuned_evoked(st, hs), 'state_name')
+                                    = ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs).hs_label;
+                                if isfield(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs), 'state') && ...
+                                        isfield(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs), 'state_name')
                                     sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).state ...
-                                        = evoked_ecg.session(i).condition(cn).hs_tuned_evoked(st, hs).state;
+                                        = ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs).state;
                                     sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).state_name ...
-                                        = evoked_ecg.session(i).condition(cn).hs_tuned_evoked(st, hs).state_name;
+                                        = ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs).state_name;
                                 end
                             end
                             sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt ...
-                                = [sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt; ...
-                                evoked_ecg.session(i).condition(cn).hs_tuned_evoked(st, hs).mean];                                                             
+                                = [sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt, ...
+                                ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs).mean];                                                             
                         end
                     end
                 end
@@ -103,9 +106,12 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(evoked_ecg, lfp_tfa_
         if isfield(sessions_avg(t).condition(cn).hs_tuned_evoked, 'ecg_b2bt')
             for st = 1:size(sessions_avg(t).condition(cn).hs_tuned_evoked, 1)
                 for hs = 1:size(sessions_avg(t).condition(cn).hs_tuned_evoked, 2)
-                    if ~isempty(sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).mean)
+                    if ~isempty(sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt)
                         sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt = ...
                             cat(1, sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt{:});
+                        sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).dimord = 'nsessions_time';
+                        sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt(...
+                            :, isnan(sum(sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt, 1))) = nan;
                         sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).std = ...
                             std(sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt, 0, 1);
                         sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).mean = ...
@@ -122,8 +128,8 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(evoked_ecg, lfp_tfa_
                 plottitle = [lfp_tfa_cfg.compare.targets{t},...
                      lfp_tfa_cfg.conditions(cn).label];
                 result_file = fullfile(results_fldr, ...
-                                ['ECG_Evoked_' lfp_tfa_cfg.conditions(cn).label '.png']);
-                lfp_tfa_plot_evoked_lfp(sessions_avg(t).condition(cn).hs_tuned_evoked, ...
+                                ['ECG_b2bt_Evoked_' lfp_tfa_cfg.conditions(cn).label '.png']);
+                lfp_tfa_plot_evoked_R2Rt(sessions_avg(t).condition(cn).hs_tuned_evoked, ...
                             lfp_tfa_cfg, plottitle, result_file, 'ylabel', 'ECG b2b interval (s)');
             end
         end
@@ -146,9 +152,9 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(evoked_ecg, lfp_tfa_
                 plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
                     sessions_avg(t).difference(dcn).label];
                 result_file = fullfile(results_fldr, ...
-                    ['ECG_DiffEvoked_' 'diff_condition' num2str(dcn) '.png']);
+                    ['ECG_b2bt_DiffEvoked_' 'diff_condition' num2str(dcn) '.png']);
                     %sessions_avg(t).difference(dcn).label '.png']);
-                lfp_tfa_plot_evoked_lfp(sessions_avg(t).difference(dcn).hs_tuned_evoked, ...
+                lfp_tfa_plot_evoked_R2Rt(sessions_avg(t).difference(dcn).hs_tuned_evoked, ...
                     lfp_tfa_cfg, plottitle, result_file, 'ylabel', 'ECG b2b interval (s)');
             end
         end

@@ -18,7 +18,7 @@ settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\
 % analysis won't happen
 % TODO: check if LFP is processed, of not, process LFP even if flag is set
 % to false
-process_LFP = false;
+process_LFP = true;
 
 %% INITIALIZATION
 close all;

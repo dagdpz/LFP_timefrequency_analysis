@@ -1,4 +1,4 @@
-function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_info, analyse_states, lfp_tfa_cfg ) 
+function [ session_R2Rt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_info, analyse_states, lfp_tfa_cfg ) 
 
 % lfp_tfa_plot_average_evoked_LFP  - plots average evoked LFP for
 % different hand-space tuning conditions for each site and across all sites
@@ -42,9 +42,7 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
     end
        
     % condition based Evoked
-    session_ecg_b2bt = struct();
-    session_evoked_ecg = struct();
-    session_evoked_ecg.session = session_ecg(1).session;
+    session_R2Rt = struct();
     
     % get trial conditions for this session
     site_conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, {0, 1});
@@ -60,11 +58,11 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
             mkdir(session_results_folder);
         end
         % struct to store condition-wise evoked
-        session_ecg_b2bt(i).condition = struct();
-        session_ecg_b2bt(i).session = session_ecg(i).session;
+        session_R2Rt(i).condition = struct();
+        session_R2Rt(i).session = session_ecg(i).session;
         % flag to indicate if this site should be used for
         % averaging based on minimum no:of trials per condition
-        session_ecg_b2bt(i).use_for_avg = 1;
+        session_R2Rt(i).use_for_avg = 1;
         
         % loop through conditions
         for cn = 1:length(site_conditions)
@@ -76,10 +74,10 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
             nsites = length(session_ecg);                 
             
             % store details of analysed condition
-            session_ecg_b2bt(i).condition(cn).label = site_conditions(cn).label;
-            session_ecg_b2bt(i).condition(cn).cfg_condition = site_conditions(cn);
-            session_ecg_b2bt(i).condition(cn).hs_tuned_evoked = struct(); 
-            session_ecg_b2bt(i).condition(cn).ntrials = zeros(1,length(hs_labels));        
+            session_R2Rt(i).condition(cn).label = site_conditions(cn).label;
+            session_R2Rt(i).condition(cn).cfg_condition = site_conditions(cn);
+            session_R2Rt(i).condition(cn).hs_tuned_evoked = struct(); 
+            session_R2Rt(i).condition(cn).ntrials = zeros(1,length(hs_labels));        
 
             % loop through hand space labels
             for hs = 1:length(hs_labels)
@@ -97,12 +95,12 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
                         site_conditions(cn).reach_spaces{hs});
                 end
                 
-                session_ecg_b2bt(i).condition(cn).ntrials(hs) = sum(cond_trials);
+                session_R2Rt(i).condition(cn).ntrials(hs) = sum(cond_trials);
 
                 fprintf('Condition %s - %s\n', site_conditions(cn).label, hs_labels{hs});
                 fprintf('Total number of trials %g\n', sum(cond_trials));
 
-                session_ecg_b2bt(i).condition(cn).noisytrials(hs) = ...
+                session_R2Rt(i).condition(cn).noisytrials(hs) = ...
                     sum(cond_trials & [session_ecg(i).trials.noisy]); 
 
                 % consider only non noisy trials
@@ -113,7 +111,7 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
                 % check if the site contains a specified minimum number
                 % of trials for all conditions
                 if sum(cond_trials) < lfp_tfa_cfg.mintrials_percondition
-                    session_ecg_b2bt(i).use_for_avg = 0;
+                    session_R2Rt(i).use_for_avg = 0;
                 end
 
 
@@ -129,15 +127,17 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
                     if ~isempty(state_evoked.ecg_b2bt)
 
                         % save evoked ECG
-                        session_ecg_b2bt(i).condition(cn).hs_tuned_evoked(st, hs).ecg_b2bt = state_evoked.ecg_b2bt;
-                        session_ecg_b2bt(i).condition(cn).hs_tuned_evoked(st, hs).mean = state_evoked.mean;
-                        session_ecg_b2bt(i).condition(cn).hs_tuned_evoked(st, hs).std = state_evoked.std; 
-                        session_ecg_b2bt(i).condition(cn).hs_tuned_evoked(st, hs).time = state_evoked.ecg_time;
-                        session_ecg_b2bt(i).condition(cn).hs_tuned_evoked(st, hs).trials = find(cond_trials);
-                        session_ecg_b2bt(i).condition(cn).hs_tuned_evoked(st, hs).hs_label = hs_labels(hs);
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).ecg_b2bt = state_evoked.ecg_b2bt;
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).baseline_mean = state_evoked.mean_ecg_b2bt;
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).mean = state_evoked.mean;
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).std = state_evoked.std; 
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).time = state_evoked.ecg_time;
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).trials = find(cond_trials);
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).ntrials = size(state_evoked.ecg_b2bt, 1);
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).hs_label = hs_labels(hs);
                         if isfield(state_evoked, 'state_id') && isfield(state_evoked, 'state_name')
-                            session_ecg_b2bt(i).condition(cn).hs_tuned_evoked(st, hs).state = state_evoked.state_id;
-                            session_ecg_b2bt(i).condition(cn).hs_tuned_evoked(st, hs).state_name = state_evoked.state_name;
+                            session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).state = state_evoked.state_id;
+                            session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).state_name = state_evoked.state_name;
                         end
 
                     end
@@ -148,8 +148,8 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
             
             % plots
             % Evoked LFP
-            if ~isempty(fieldnames(session_ecg_b2bt(i).condition(cn).hs_tuned_evoked))
-                plottitle = ['Session: ', session_ecg_b2bt(i).session ...
+            if ~isempty(fieldnames(session_R2Rt(i).condition(cn).hs_tuned_evoked))
+                plottitle = ['Session: ', session_R2Rt(i).session ...
                     site_conditions(cn).label '), '];
                 if site_conditions(cn).choice == 0
                     plottitle = [plottitle 'Instructed trials'];
@@ -157,41 +157,41 @@ function [ session_ecg_b2bt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, sess
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(session_results_folder, ...
-                    ['ECG_b2bt_Evoked_' session_ecg_b2bt(i).session '_' site_conditions(cn).label '.png']);
-
-                lfp_tfa_plot_evoked_lfp (session_ecg_b2bt(i).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
-                    plottitle, result_file, 'ylabel', 'ECG b2b interval(s)');
+                    ['ECG_b2bt_Evoked_' session_R2Rt(i).session '_' site_conditions(cn).label '.png']);
+                   
+                lfp_tfa_plot_evoked_R2Rt (session_R2Rt(i).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
+                    plottitle, result_file, 'normalize', true);
             end
 
         end
         
         % difference between conditions
-        session_ecg_b2bt(i).difference = [];
+        session_R2Rt(i).difference = [];
         for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
-            session_ecg_b2bt(i).difference = [session_ecg_b2bt(i).difference, ...
-                lfp_tfa_compute_diff_condition_evoked(session_ecg_b2bt(i).condition, diff_condition)];
+            session_R2Rt(i).difference = [session_R2Rt(i).difference, ...
+                lfp_tfa_compute_diff_condition_R2Rt_evoked(session_R2Rt(i).condition, diff_condition)];
         end
         % plot Difference TFR
-        for dcn = 1:length(session_ecg_b2bt(i).difference)
-            if ~isempty(session_ecg_b2bt(i).difference(dcn).hs_tuned_evoked)
-                if isfield(session_ecg_b2bt(i).difference(dcn).hs_tuned_evoked,... 
+        for dcn = 1:length(session_R2Rt(i).difference)
+            if ~isempty(session_R2Rt(i).difference(dcn).hs_tuned_evoked)
+                if isfield(session_R2Rt(i).difference(dcn).hs_tuned_evoked,... 
                         'mean')
-                    plottitle = ['Session: ', session_ecg_b2bt(i).session ...
-                        session_ecg_b2bt(i).difference(dcn).label];
+                    plottitle = ['Session: ', session_R2Rt(i).session ...
+                        session_R2Rt(i).difference(dcn).label];
                     result_file = fullfile(session_results_folder, ...
-                        ['ECG_b2bt_DiffEvoked_' session_ecg_b2bt(i).session ...
+                        ['ECG_b2bt_DiffEvoked_' session_R2Rt(i).session ...
                         '_' 'diff_condition' num2str(dcn) '.png']);
                         %sites_avg(t).difference(dcn).label '.png']);
-                    lfp_tfa_plot_evoked_lfp(session_ecg_b2bt(i).difference(dcn).hs_tuned_evoked, ...
-                        lfp_tfa_cfg, plottitle, result_file, 'ylabel', 'ECG b2b interval(s)');
+                    lfp_tfa_plot_evoked_R2Rt(session_R2Rt(i).difference(dcn).hs_tuned_evoked, ...
+                        lfp_tfa_cfg, plottitle, result_file, 'normalize', true);
                 end
             end
         end
         
-        site_evoked_ecg = session_ecg_b2bt(i);
+        site_evoked_ecg = session_R2Rt(i);
         % save mat file for site
-        save(fullfile(session_results_folder, ['ECG_evoked_' session_ecg_b2bt(i).session '.mat']), 'site_evoked_ecg');
+        save(fullfile(session_results_folder, ['ECG_evoked_' session_R2Rt(i).session '.mat']), 'site_evoked_ecg');
         % save to a mother struct
         session_evoked_ecg = site_evoked_ecg;
     end

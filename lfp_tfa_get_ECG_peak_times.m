@@ -2,29 +2,36 @@ function [ session_ecg ] = lfp_tfa_get_ECG_peak_times( session_ecg, block_ECG )
 %lfp_tfa_compute_site_tfr Summary of this function goes here
 %   Detailed explanation goes here
 
+blocks = unique([session_ecg.trials.block]);
+
 %loop through each run
-for b = 1:length(block_ECG)
-    
-    fprintf('Extracting ECG for block %g\n-----------------------\n', b);
+for b = 1:length(blocks)
+     
+    fprintf('Extracting ECG for block %g\n-----------------------\n', blocks(b));
     
     % get ECG timestamps for this block
-    ECG_timestamps = block_ECG(b).Rpeak_t;
-    if isempty(ECG_timestamps)
-        fprintf('No ECG data found for block %g\n', b);
+    block_idx = [block_ECG.nrblock_combinedFiles] == blocks(b);
+    if any(block_idx)
+        ECG_timestamps = block_ECG(block_idx).Rpeak_t;
+        if isempty(ECG_timestamps)
+            fprintf('No ECG data found for block %g\n', blocks(b));
+            continue;
+        end 
+    else
         continue;
-    end 
+    end
         
     % concatenate all trials for this run
     block_ecg_timestamps = []; % to concatenate sample time
 %     block_LFP = [];
     trials_time = [];
-    trials_idx = find([session_ecg.trials.block] == b);
+    trials_idx = find([session_ecg.trials.block] == blocks(b));
     if numel(trials_idx) == 0
-        fprintf('No ECG data found for block %g\n', b);
+        fprintf('No ECG data found for block %g\n', blocks(b));
         continue;
     end
     trials_time = vertcat(session_ecg.trials(...
-        [session_ecg.trials.block] == b).trialperiod);
+        trials_idx).trialperiod);
     ts = session_ecg.trials(trials_idx(1)).tsample;
     block_ecg_timestamps = ...
         (0:ts:round(trials_time(end)/ts)*ts);

@@ -42,6 +42,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
         yaxislabel = settings.ylabel;
     end
     
+    ploterr = 0;
 
     % number of offset samples to divide between time windows
     noffset = 100;
@@ -112,13 +113,15 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             if isfield(concat_states_lfp, 'legend')
                 legend(concat_states_lfp.legend);
             end
-            for i = 1:size(concat_states_lfp.mean, 1)
-                plot(concat_states_lfp.mean(i, :) + concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
-                plot(concat_states_lfp.mean(i, :) - concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
+            if ploterr
+                for i = 1:size(concat_states_lfp.mean, 1)
+                    plot(concat_states_lfp.mean(i, :) + concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
+                    plot(concat_states_lfp.mean(i, :) - concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
+                end
             end
             % mark state onsets
             %if isfield(evoked_lfp, 'state_name')
-            set(gca,'xtick',state_samples)
+            set(gca,'xtick', unique(state_samples))
             for so = state_onsets
                 line([so so], ylim, 'color', 'k'); 
                 if isfield(evoked_lfp(state_onsets == so, hs), 'state_name') && ...
@@ -130,7 +133,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 end
             end
             %end
-            set(gca,'xticklabels', round(concat_states_lfp.time(state_samples), 2), 'fontsize', 8)
+            set(gca,'xticklabels', round(concat_states_lfp.time(unique(state_samples)), 2), 'fontsize', 8)
             set(gca, 'xticklabelrotation', 45);
             xlabel('Time(s)');
             ylabel(yaxislabel);

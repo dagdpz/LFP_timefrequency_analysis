@@ -65,9 +65,9 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
                 session_info.Input_ECG_raw);
             return;
         end
-        load(session_info.Input_ECG, 'out');
+        load(session_info.Input_ECG);
         if exist('out', 'var')
-            block_ECG = out;
+            block_Rpeaks = out;
             clear out;
         end        
     end
@@ -90,10 +90,21 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
     %                 sites(i).site_ID),:))
     %             continue;
     %         end
-            block = str2num(block_files(b).name(end-5:end-4));
+            nrblock_combinedFile = str2num(block_files(b).name(end-5:end-4));
             run = str2num(block_files(b).name(end-8:end-7));
+            
+            % check if ECG peaks exists for this block
+            if length(block_Rpeaks) >= b
+                block_Rpeak = block_Rpeaks(b);
+                if isempty(block_Rpeak) || isempty(block_Rpeak.Rpeak_t)
+                    continue;
+                end
+            else
+                continue;
+            end
+            
             fprintf('=============================================================\n');
-            fprintf('Reading ECG for block, %g\n', block);
+            fprintf('Reading ECG for block, %g\n', nrblock_combinedFile);
             
             % block ECG timestamps
             block_ecg_timestamps = [];
@@ -134,11 +145,23 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
                         choice_trial = trial(t).choice;
                         perturbation = nan;
                         
-                        if ismember(block, session_info.Preinj_blocks)
+                        if isfield(session_info, 'Preinj_blocks') && ...
+                            ~isempty(session_info.Preinj_blocks) && ...
+                            ismember(nrblock_combinedFile, session_info.Preinj_blocks)
+                                perturbation = 0;
+                        elseif exist('ses', 'var') && ...
+                                nrblock_combinedFile < ses.first_inj_block
                             perturbation = 0;
-                        elseif ismember(block, session_info.Postinj_blocks)
+                        end
+                        if isfield(session_info, 'Postinj_blocks') && ...
+                            ~isempty(session_info.Postinj_blocks) && ...
+                            ismember(nrblock_combinedFile, session_info.Postinj_blocks)
+                                perturbation = 1;
+                        elseif exist('ses', 'var') && ...
+                                nrblock_combinedFile >= ses.first_inj_block
                             perturbation = 1;
                         end
+                                      
                         
                         start_time = 0; % trial start time
                         fs = trial(t).TDT_ECG1_samplingrate; % sample rate
@@ -157,7 +180,7 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
                         session_ecg.trials(comp_trial).type = type;
                         session_ecg.trials(comp_trial).effector = effector;
                         session_ecg.trials(comp_trial).run = run;
-                        session_ecg.trials(comp_trial).block = block;
+                        session_ecg.trials(comp_trial).block = nrblock_combinedFile;
                         session_ecg.trials(comp_trial).dataset = [];
                         session_ecg.trials(comp_trial).choice_trial = choice_trial;
                         session_ecg.trials(comp_trial).reach_hand = 0;
@@ -201,7 +224,8 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
 
                     end
                 end
-                %session_ecg = lfp_tfa_get_ECG_peak_times( session_ecg, block_ECG(b), block_ecg_timestamps );
+                
+                session_ecg = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpeak, nrblock_combinedFile );
                       
         
             
@@ -211,20 +235,17 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
         
     end
     
-    if isfield(session_info, 'Input_ECG')
-        load(session_info.Input_ECG, 'out');
-        if exist('out', 'var')
-            block_ECG = out;
-            clear out;
-        end
-        session_ecg = lfp_tfa_get_ECG_peak_times( session_ecg, block_ECG );
-    end  
+%     if isfield(session_info, 'Input_ECG')
+%         load(session_info.Input_ECG, 'out');
+%         if exist('out', 'var')
+%             block_Rpeaks = out;
+%             clear out;
+%         end
+%         session_ecg = lfp_tfa_get_ECG_peak_times( session_ecg, block_Rpeaks );
+%     end  
     
     % Calculate time frequency spectrogram of ECG
     %session_ecg = lfp_tfa_compute_ECG_spectrogram( session_ecg, lfp_tfa_cfg );
-    
-%     % Calculate time frequency spectrogram of ECG b2b interval
-%     session_ecg = lfp_tfa_compute_ECGb2bt_spectrogram( session_ecg, lfp_tfa_cfg );
     
     % save allsites_lfp
     results_mat = fullfile(results_fldr, ['session_ecg_' session_info.session '.mat']);

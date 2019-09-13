@@ -69,6 +69,9 @@ function sessions_avg = lfp_tfa_avg_sessions_ECG_evoked(evoked_ecg, lfp_tfa_cfg)
         end  
 
         for i = 1:length(evoked_ecg.session)
+            if isempty(evoked_ecg.session(i).condition)
+                continue;
+            end
             if ~isempty(evoked_ecg.session(i).condition(cn).hs_tuned_evoked) && ... 
                 isfield(evoked_ecg.session(i).condition(cn).hs_tuned_evoked, 'mean')
                 for st = 1:size(evoked_ecg.session(i).condition(cn).hs_tuned_evoked, 1)

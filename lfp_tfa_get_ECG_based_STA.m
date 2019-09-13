@@ -1,4 +1,4 @@
-function ecg_triggered_evoked = lfp_tfa_get_ECG_based_STA( trials_lfp, site_ID, cfg_ecg, signal_type )
+function ecg_triggered_evoked = lfp_tfa_get_ECG_based_STA( trials, site_ID, cfg_ecg, signal_type )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -13,30 +13,29 @@ ft_data_all.label = {site_ID, 'ECG'};
 ft_data_all.time = {}; % timestamps
 ft_data_all.trial = {}; % evoked LFP response
 
-for t = 1:length(trials_lfp)
+for t = 1:length(trials)
 
-    trialperiod           = trials_lfp(t).trialperiod;
+    trialperiod           = trials(t).trialperiod;
     
     % check if ECG spike data exists for this trial
-    if isempty(trials_lfp(t).ECG_spikes)
+    if isempty(trials(t).ECG_spikes)
         continue;
     end
     
     % get the LFP samples and timestamps for the trial
     if strcmp(signal_type, 'lfp')
-        signal = trials_lfp(t).lfp_data;
+        signal = trials(t).lfp_data;
     elseif strcmp(signal_type, 'ecg')
-        signal = trials_lfp(t).ecg_data;
+        signal = trials(t).ecg_data;
     end
     
-    ecg_peaks = trials_lfp(t).ECG_spikes;
-    signal_time = trials_lfp(t).time;
+    ecg_peaks = trials(t).ECG_spikes;
+    signal_time = trials(t).time;
     ft_data_all.trial = [ft_data_all.trial, ...
         [signal; ecg_peaks]];
     ft_data_all.time = [ft_data_all.time, signal_time];
 
 end
-
 
 if ~isempty(ft_data_all.trial)
 
@@ -54,6 +53,8 @@ if ~isempty(ft_data_all.trial)
     ecg_triggered_evoked.mean = ecg_based_sta.avg;
     ecg_triggered_evoked.std = permute(nanstd(ecg_based_sta.trial, 0, 1), [2 3 1]);
 %     ecg_based_sta.std = nanstd(arr_state_lfp, 0, 1);
+
+    clear ft_data_all ecg_based_sta;
     
 end
 

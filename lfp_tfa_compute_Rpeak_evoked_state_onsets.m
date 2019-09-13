@@ -144,10 +144,12 @@ function [ session_evoked_ecg ] = lfp_tfa_compute_Rpeak_evoked_state_onsets( ses
                         cond_trials_ecg, analyse_states(st, :));    
 
 
-                    if ~isempty(Rpeak_states.ref_onset_times)
+                    if ~isempty(Rpeak_states.abs_onset_times) && ...
+                            ~isempty(Rpeak_states.rel_onset_times)
 
                         % save evoked ECG
-                        session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).ref_onset_times = Rpeak_states.ref_onset_times;
+                        session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).abs_timefromRpeak = Rpeak_states.abs_onset_times;
+                        session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).rel_timefromRpeak = Rpeak_states.rel_onset_times;
                         session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).trials = find(cond_trials);
                         session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).hs_label = hs_labels(hs);
                         if isfield(Rpeak_states, 'state_id') && isfield(Rpeak_states, 'state_name')
@@ -175,7 +177,7 @@ function [ session_evoked_ecg ] = lfp_tfa_compute_Rpeak_evoked_state_onsets( ses
                     ['Rpeak_Evoked_state_onsets_' session_Rpeak_states(i).session '_' site_conditions(cn).label '.png']);
 
                 lfp_tfa_plot_Rpeak_ref_state_onsets (session_Rpeak_states(i).condition(cn).Rpeak_evoked, lfp_tfa_cfg, ...
-                    plottitle, result_file, 'ylabel', 'ECG amplitude');
+                    plottitle, result_file);
             end
 
         end
