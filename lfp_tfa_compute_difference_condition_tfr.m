@@ -1,4 +1,4 @@
-function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_condition )
+function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_condition, stat_test )
 %lfp_tfa_compute_diff_tfr - function to compute the difference in time freq
 %response between control and inactivation trials
 %
@@ -35,7 +35,11 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
 
     diff_tfr = [];
     
-    if ~isempty(lfp_tfr.cfg_condition)
+    if nargin < 3
+        stat_test = false;
+    end
+    
+    if ~isempty([lfp_tfr.cfg_condition])
         conditions = [lfp_tfr.cfg_condition];
     else
         return;
@@ -119,8 +123,8 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
                         continue;
                     end
 
-                    if ~isfield(postinj_tfr.hs_tuned_tfs, 'powspctrm') || ...
-                            ~isfield(preinj_sync.hs_tuned_tfs, 'powspctrm')
+                    if ~isfield(postinj_tfr.hs_tuned_tfs, 'freq') || ...
+                            ~isfield(preinj_sync.hs_tuned_tfs, 'freq')
                         continue;
                     end
                     
@@ -144,27 +148,37 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
                     for hs = 1:size(postinj_tfr.hs_tuned_tfs, 2)
                         for st = 1:size(postinj_tfr.hs_tuned_tfs, 1)
                             
-                            if isfield(preinj_sync.hs_tuned_tfs(st, hs), 'powspctrm') && ...
-                                    isfield(postinj_tfr.hs_tuned_tfs(st, hs), 'powspctrm') && ...
-                                    ~isempty(preinj_sync.hs_tuned_tfs(st, hs).powspctrm) && ...
-                                ~isempty(postinj_tfr.hs_tuned_tfs(st, hs).powspctrm)
-                                ntimebins = min([size(postinj_tfr.hs_tuned_tfs(st, hs).powspctrm, 3), ...
-                                    size(preinj_sync.hs_tuned_tfs(st, hs).powspctrm, 3)]);
+                            if isfield(preinj_sync.hs_tuned_tfs(st, hs).freq, 'powspctrm') && ...
+                                    isfield(postinj_tfr.hs_tuned_tfs(st, hs).freq, 'powspctrm') && ...
+                                    ~isempty(preinj_sync.hs_tuned_tfs(st, hs).freq.powspctrm) && ...
+                                ~isempty(postinj_tfr.hs_tuned_tfs(st, hs).freq.powspctrm)
+                                ntimebins = min([size(postinj_tfr.hs_tuned_tfs(st, hs).freq.powspctrm, 3), ...
+                                    size(preinj_sync.hs_tuned_tfs(st, hs).freq.powspctrm, 3)]);
+                                diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.time = ...
+                                        postinj_tfr.hs_tuned_tfs(st, hs).freq.time(1:ntimebins);  
                                 % calculate the difference
-                                diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).powspctrm = ...
-                                    postinj_tfr.hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins) - ...
-                                    preinj_sync.hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins);
-                                diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).time = ...
-                                    postinj_tfr.hs_tuned_tfs(st, hs).time(1:ntimebins);  
                                 if isfield(postinj_tfr.hs_tuned_tfs(st, hs), 'ntrials')
+                                    diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.powspctrm = ...
+                                        nanmean(postinj_tfr.hs_tuned_tfs(st, hs).freq.powspctrm(:,:,1:ntimebins), 1) - ...
+                                        nanmean(preinj_sync.hs_tuned_tfs(st, hs).freq.powspctrm(:,:,1:ntimebins), 1);
                                     diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).ntrials = ...
                                         [];
+                                else
+                                    diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.powspctrm = ...
+                                        postinj_tfr.hs_tuned_tfs(st, hs).freq.powspctrm(:,:,1:ntimebins) - ...
+                                        preinj_sync.hs_tuned_tfs(st, hs).freq.powspctrm(:,:,1:ntimebins);
+                                    % statistical significance test
+                                    if stat_test == true
+                                        [~, p] = ttest(diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.powspctrm);
+                                        [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p,.005,'pdep','yes');
+                                        diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.significant = h;
+                                    end
                                 end
                                 
                             else
-                                diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).powspctrm = [];
-                                diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).time = [];
-                                diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq = [];
+                                diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.powspctrm = [];
+                                diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.time = [];
+                                diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.freq = [];
                             end
                         end
                     end
