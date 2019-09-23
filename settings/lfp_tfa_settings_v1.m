@@ -113,7 +113,7 @@ lfp_tfa_cfg.session_info(9) = ...
 %       'pow'       - LFP power spectrum average for given conditions and epochs
 %       'sync'      - LFP-LFP phase synchronization measure for given conditions and
 %           time windows
-lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow'};
+lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow', 'sync', 'syncsp'};
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names

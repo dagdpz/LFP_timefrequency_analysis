@@ -35,7 +35,8 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
     h = figure;
     set(h, 'position', [100, 100,900, 675]);
     
-    cm = colormap(othercolor('BrBG4', size(avg_hs_tuned_syncsp, 1)));
+    cm = colormap(othercolor('Cat_12', size(avg_hs_tuned_syncsp, 1)));
+    %cm = colormap(jet(size(avg_hs_tuned_syncsp, 1)));
        
     % loop through handspace
     for hs = 1:size(avg_hs_tuned_syncsp, 2)
@@ -57,19 +58,24 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
 
                     hold on;
 
-                    plot(avg_hs_tuned_syncsp(ep, hs).ppc.freq, avg_hs_tuned_syncsp(ep, hs).ppc.ppcspctrm, ...
-                        'Color', cm(ep,:));                
+                    plot(1:numel(avg_hs_tuned_syncsp(ep, hs).ppc.freq), avg_hs_tuned_syncsp(ep, hs).ppc.ppcspctrm, ...
+                        'Color', cm(ep,:), 'LineWidth', 2);                
 
 
                 end
-                % log y axis ticks
-                set(gca, 'xtick', (lfp_tfa_cfg.tfr.foi([1:8:numel(lfp_tfa_cfg.tfr.foi)])));
-                set(gca, 'xticklabel', ...
-                    round((lfp_tfa_cfg.tfr.foi([1:8:numel(lfp_tfa_cfg.tfr.foi)]))), ...
-                    'fontsize', 8);
-                set(gca, 'xlim', [lfp_tfa_cfg.tfr.foi(1) lfp_tfa_cfg.tfr.foi(end)]);
-                % set y-axis (power) limits in dB
+                
+                % set y-axis (power) limits
                 set(gca, 'ylim', [0 1]);
+                
+                %...
+                    %round((avg_hs_tuned_syncsp(ep, hs).ppc.freq([1:8:numel(avg_hs_tuned_syncsp(ep, hs).ppc.freq)]))), ...
+                    %'fontsize', 8);
+%                 set(gca, 'xtick', (lfp_tfa_cfg.tfr.foi([1:8:numel(lfp_tfa_cfg.tfr.foi)])));
+%                 set(gca, 'xticklabel', ...
+%                     round((lfp_tfa_cfg.tfr.foi([1:8:numel(lfp_tfa_cfg.tfr.foi)]))), ...
+%                     'fontsize', 8);
+                set(gca, 'xlim', [1 numel(avg_hs_tuned_syncsp(ep, hs).ppc.freq)]);
+                %set(gca, 'xlim', [lfp_tfa_cfg.tfr.foi(1) lfp_tfa_cfg.tfr.foi(end)]);
                 set(gca, 'box', 'on');                
                 ylabel('PPC');
                 xlabel('Frequency (Hz)');
@@ -86,6 +92,20 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
             end
             title(subplottitle); 
             legend({lfp_tfa_cfg.analyse_epochs{:,2}});
+            
+            fbandstart = [2, 4, 8, 12, 18, 32, 80];
+            fbandstart_idx = zeros(size(fbandstart));
+            for f = fbandstart
+                f_idx = find(abs(avg_hs_tuned_syncsp(ep, hs).ppc.freq - f) == ...
+                    min(abs(avg_hs_tuned_syncsp(ep, hs).ppc.freq - f)), 1, 'first');
+                line([f_idx f_idx], ylim,'color', 'k', 'linestyle', '--');
+                fbandstart_idx(fbandstart == f) = f_idx;
+            end
+
+            % log y axis ticks
+            set(gca, 'xtick', fbandstart_idx);%[1:8:numel(avg_hs_tuned_syncsp(ep, hs).ppc.freq)]);
+            set(gca, 'xticklabel', fbandstart);
+            
         end
     end
         

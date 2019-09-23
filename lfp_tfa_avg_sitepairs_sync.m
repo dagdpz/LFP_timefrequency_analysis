@@ -171,25 +171,25 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_sync(sessions_i
             end
         end
 
-        % compute average and plot
+        % plot
         for cn = 1:length(sitepairs_avg(t).condition)
-            if ~isempty(sitepairs_avg(t).condition(cn).hs_tuned_sync)
-                if isfield(sitepairs_avg(t).condition(cn).hs_tuned_sync, 'ppc')
-                    for st = 1:size(sitepairs_avg(t).condition(cn).hs_tuned_sync, 1)
-                        for hs = 1:size(sitepairs_avg(t).condition(cn).hs_tuned_sync, 2)
-                            if isempty(sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc)
-                                continue;
-                            end
-                            sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm_std = ...
-                                nanstd( ...
-                                sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm, 0, 1);
-                            sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm = ...
-                                nanmean( ...
-                                sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm, 1);
-                        end
-                    end
-                end
-            end
+%             if ~isempty(sitepairs_avg(t).condition(cn).hs_tuned_sync)
+%                 if isfield(sitepairs_avg(t).condition(cn).hs_tuned_sync, 'ppc')
+%                     for st = 1:size(sitepairs_avg(t).condition(cn).hs_tuned_sync, 1)
+%                         for hs = 1:size(sitepairs_avg(t).condition(cn).hs_tuned_sync, 2)
+%                             if isempty(sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc)
+%                                 continue;
+%                             end
+%                             sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm_std = ...
+%                                 nanstd( ...
+%                                 sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm, 0, 1);
+%                             sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm = ...
+%                                 nanmean( ...
+%                                 sitepairs_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm, 1);
+%                         end
+%                     end
+%                 end
+%             end
 
 
             if ~isempty(sitepairs_avg(t).condition(cn).hs_tuned_sync)
@@ -211,7 +211,7 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_sync(sessions_i
         for diff = 1:length(lfp_tfa_cfg.diff_condition)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
             sitepairs_avg(t).difference = [sitepairs_avg(t).difference, ...
-                lfp_tfa_compute_diff_condition_tfsync(sitepairs_avg(t).condition, diff_condition)];
+                lfp_tfa_compute_diff_condition_tfsync(sitepairs_avg(t).condition, diff_condition, 1)];
         end
         % plot Difference TFR
         for dcn = 1:length(sitepairs_avg(t).difference)
@@ -224,7 +224,8 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_sync(sessions_i
                         sprintf('%s-%s_%s.png', lfp_tfa_cfg.compare.target_pairs{t}{:}, ...
                         sitepairs_avg(t).difference(dcn).label));
                     lfp_tfa_plot_hs_tuned_sync(sitepairs_avg(t).difference(dcn).hs_tuned_sync, ...
-                        lfp_tfa_cfg, plottitle, result_file, 'cmap', 'bluewhitered', 'imscale', [-0.3, 0.3]);
+                        lfp_tfa_cfg, plottitle, result_file, 'cmap', 'bluewhitered', 'imscale', [-0.3, 0.3], ...
+                        'significant', true);
                 end
             end
         end

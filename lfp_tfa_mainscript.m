@@ -119,6 +119,9 @@ try
         elseif any(lfp_tfa_cfg.compare.perturbations == 1)            
             lfp_tfa_cfg.perturbation_groups = [lfp_tfa_cfg.perturbation_groups 'all'];            
         end
+        
+        
+                    
         % Calculate and plot the site-wise and session average TFR, 
         % evoked response and power spectral density for 
         % different conditions and hand-space labels
@@ -138,6 +141,33 @@ try
                 lfp_tfa_cfg ) ; 
         end
         
+        if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) ...
+            || any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
+            % session cross power spctrum folder
+            session_csd_folder = ...
+                fullfile(sessions_info(i).proc_results_fldr, 'crossspectrum');
+            conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
+                {sessions_info(i).Preinj_blocks, sessions_info(i).Postinj_blocks});
+            % loop through each sitepair
+            for sitepair_csd_file = dir(fullfile(session_csd_folder, '*.mat'))'
+                % load mat file
+                load(fullfile(session_csd_folder, ...
+                    sitepair_csd_file.name), 'sitepair_crosspow');
+                if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
+                    % compute ppc spectrogram between sitepair
+                    % get the trial conditions for this session
+                    sitepair_sync = lfp_tfa_sitepair_averaged_sync(sitepair_crosspow, conditions, lfp_tfa_cfg);
+                end
+                
+                if any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
+                    % compute ppc spectrogram between sitepair
+                    % get the trial conditions for this session
+                    sitepair_syncsp = lfp_tfa_sitepair_averaged_syncspctrm(sitepair_crosspow, conditions, lfp_tfa_cfg);
+                end
+            end
+                
+        end
+        
         % Calculate the session-wise average of LFP-LFP phase sync
         if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) && ...
                 any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
@@ -145,7 +175,7 @@ try
         end
         
         % Calculate the session-wise average of LFP-LFP phase sync spectrum
-        if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm')) && ...
+        if any(strcmp(lfp_tfa_cfg.analyses, 'syncsp')) && ...
                 any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
             sessions_info(i).avg_syncspctrm_results = lfp_tfa_avg_sitepairs_syncspctrm(sessions_info(i), lfp_tfa_cfg);
         end
@@ -178,7 +208,7 @@ if length(sessions_info) > 1
         lfp_tfa_avg_sessions_sync(sessions_info, lfp_tfa_cfg);
     end
     % LFP-LFP phase sync
-    if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
+    if any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
         lfp_tfa_avg_sessions_syncspctrm(sessions_info, lfp_tfa_cfg);
     end
     end
@@ -207,7 +237,7 @@ if length(sessions_info) > 1
             lfp_tfa_avg_sitepairs_sync(sessions_info, lfp_tfa_cfg);
         end
         % LFP-LFP phase sync spectrum
-        if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
+        if any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
             lfp_tfa_avg_sitepairs_syncspctrm(sessions_info, lfp_tfa_cfg);
         end
     end
