@@ -157,7 +157,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
             sites_avg(t).difference = [sites_avg(t).difference, ...
                 lfp_tfa_compute_difference_condition_tfr(sites_avg(t).condition, ...
-                diff_condition, 1)];
+                diff_condition, 1, lfp_tfa_cfg)];
         end
         % plot Difference TFR
         for dcn = 1:length(sites_avg(t).difference)
