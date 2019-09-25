@@ -70,11 +70,9 @@ function lfp_tfa_plot_hs_tuned_psd_2( avg_lfp_psd, lfp_tfa_cfg, plottitle, resul
                 subplottitle = avg_lfp_psd(ep, hs).hs_label{1};
                 if isfield(avg_lfp_psd(1, hs), 'nsessions')
                     subplottitle = [subplottitle ' (nsessions = ' num2str(avg_lfp_psd(1, hs).nsessions) ')'];
-                end
-                if isfield(avg_lfp_psd(1, hs), 'trials')
+                elseif isfield(avg_lfp_psd(1, hs), 'trials')
                     subplottitle = [subplottitle ' (ntrials = ' num2str(length(avg_lfp_psd(1, hs).trials)) ')'];
-                end
-                if isfield(avg_lfp_psd(1, hs), 'nsites')
+                elseif isfield(avg_lfp_psd(1, hs), 'nsites')
                     subplottitle = [subplottitle ' (nsites = ' num2str(avg_lfp_psd(1, hs).nsites) ')'];
                 end
             end

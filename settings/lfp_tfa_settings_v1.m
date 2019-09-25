@@ -8,7 +8,7 @@ lfp_tfa_cfg = [];
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
 % eg: 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\20190506\ver_SN_0.2'
-lfp_tfa_cfg.version = 'Linus_inactivation';
+lfp_tfa_cfg.version = 'Linus_inactivation_8sessions';
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
@@ -86,12 +86,12 @@ lfp_tfa_cfg.session_info(8) = ...
            'Preinj_blocks',  0, ...
            'Postinj_blocks', 'allbutfirst');
        
-lfp_tfa_cfg.session_info(9) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20171012', ...
-           'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20171012.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 'allbutfirst');
+% lfp_tfa_cfg.session_info(9) = ...
+%     struct('Monkey',        'Lin', ...
+%            'Date',          '20171012', ...
+%            'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\MIP_dPul_inj_working_post_sfn\sites_Linus_20171012.mat', ...
+%            'Preinj_blocks',  0, ...
+%            'Postinj_blocks', 'allbutfirst');
        
        
 % To add a new session to analyse, increment the counter by 1 and add a new
@@ -113,7 +113,7 @@ lfp_tfa_cfg.session_info(9) = ...
 %       'pow'       - LFP power spectrum average for given conditions and epochs
 %       'sync'      - LFP-LFP phase synchronization measure for given conditions and
 %           time windows
-lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow', 'sync', 'syncsp'};
+lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow'}; %, 'sync', 'syncsp'
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -551,3 +551,26 @@ lfp_tfa_cfg.baseline_method = 'zscore';
 % Example: lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'};  compute
 % both averages across session averages and across site averages
 lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'}; 
+
+%% Settings for statistical test for significance of difference between LFP time-frequency spectrograms
+
+% Set to true (1) for performing the statistical test for difference
+% between site averages, false (0) otherwise
+lfp_tfa_cfg.plot_significant = 1;
+
+% Desired false discovery rate (default 0.005) for multiple comparison
+% correction for statistical significance tests
+% See
+% https://de.mathworks.com/matlabcentral/fileexchange/27418-fdr_bh?focused=5807896&tab=function
+% for details
+lfp_tfa_cfg.fd_rate = 0.005;
+
+% FDR procedure to be used
+% can be 'pdep' or 'dep'
+% 'pdep' - executes the original Bejnamini & Hochberg
+%             FDR procedure is used, which is guaranteed to be accurate if
+%             the individual tests are independent or positively dependent
+% 'dep' - the FDR procedure
+%             described in Benjamini & Yekutieli (2001) that is guaranteed
+%             to be accurate for any test dependency structure
+lfp_tfa_cfg.fdr_method = 'pdep';

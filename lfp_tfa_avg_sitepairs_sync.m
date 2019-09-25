@@ -225,7 +225,7 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_sync(sessions_i
                         sitepairs_avg(t).difference(dcn).label));
                     lfp_tfa_plot_hs_tuned_sync(sitepairs_avg(t).difference(dcn).hs_tuned_sync, ...
                         lfp_tfa_cfg, plottitle, result_file, 'cmap', 'bluewhitered', 'imscale', [-0.3, 0.3], ...
-                        'significant', true);
+                        'significant', lfp_tfa_cfg.stat_test.plot_significant);
                 end
             end
         end

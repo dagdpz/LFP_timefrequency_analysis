@@ -43,6 +43,11 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
     h = figure;
     set(h, 'position', [100, 100,900, 675]);
     hold on
+    
+    plot_significant = 0;
+    if nargin > 5
+        plot_significant = varargin{2};        
+    end
         
     % colorbar title
     if strcmp(lfp_tfa_cfg.baseline_method, 'zscore')
@@ -122,10 +127,11 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
                               
                 
                 state_lfp_powspctrm = nanmean(avg_tfr(st, hs).freq.powspctrm, 1);
-                if isfield(avg_tfr(st, hs).freq, 'significant') && ...
-                        ~isempty(avg_tfr(st, hs).freq.significant)
+                if plot_significant && ...
+                        isfield(avg_tfr(st, hs).freq, 'stat_test') && ...
+                        ~isempty(avg_tfr(st, hs).freq.stat_test.h)
                     state_lfp_powspctrm = state_lfp_powspctrm .* ...
-                        avg_tfr(st, hs).freq.significant;
+                        avg_tfr(st, hs).freq.stat_test.h;
                 end
                 imagesc(...
                     linspace(state_info(st).start_s, state_info(st).finish_s, ...

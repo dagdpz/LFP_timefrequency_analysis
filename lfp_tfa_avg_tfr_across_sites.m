@@ -156,7 +156,8 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
         for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
             sites_avg(t).difference = [sites_avg(t).difference, ...
-                lfp_tfa_compute_difference_condition_tfr(sites_avg(t).condition, diff_condition, 1)];
+                lfp_tfa_compute_difference_condition_tfr(sites_avg(t).condition, ...
+                diff_condition, 1)];
         end
         % plot Difference TFR
         for dcn = 1:length(sites_avg(t).difference)
@@ -171,7 +172,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
                         '_' 'diff_condition' num2str(dcn) '.png']);
                         %sites_avg(t).difference(dcn).label '.png']);
                     lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_avg(t).difference(dcn).hs_tuned_tfs, ...
-                        lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
+                        lfp_tfa_cfg, plottitle, result_file, 'bluewhitered', lfp_tfa_cfg.plot_significant);
                 end
             end
         end

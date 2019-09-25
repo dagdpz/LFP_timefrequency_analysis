@@ -1,4 +1,4 @@
-function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_condition, stat_test )
+function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_condition, stat_test, lfp_tfa_cfg )
 %lfp_tfa_compute_diff_tfr - function to compute the difference in time freq
 %response between control and inactivation trials
 %
@@ -169,9 +169,16 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
                                         preinj_sync.hs_tuned_tfs(st, hs).freq.powspctrm(:,:,1:ntimebins);
                                     % statistical significance test
                                     if stat_test == true
-                                        [~, p] = ttest(diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.powspctrm);
-                                        [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p,.005,'pdep','yes');
-                                        diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.significant = h;
+                                        % paired ttest
+                                        [~, p] = ttest(...
+                                            diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.powspctrm);
+                                        % multiple comparison correction
+                                        [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p, lfp_tfa_cfg.fd_rate,...
+                                            lfp_tfa_cfg.fdr_method, 'yes');
+                                        diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.h = h;
+                                        diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.crit_p = crit_p;
+                                        diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.adj_ci_cvrg = adj_ci_cvrg;
+                                        diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.adj_p = adj_p;
                                     end
                                 end
                                 

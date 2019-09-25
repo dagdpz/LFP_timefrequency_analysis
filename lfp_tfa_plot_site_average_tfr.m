@@ -368,7 +368,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
             session_avg(t).difference = [session_avg(t).difference, ...
-                lfp_tfa_compute_difference_condition_tfr(session_avg(t).condition, diff_condition, true)];
+                lfp_tfa_compute_difference_condition_tfr(session_avg(t).condition, diff_condition)];
         end
 
         % plot average TFR difference across sites for this session
