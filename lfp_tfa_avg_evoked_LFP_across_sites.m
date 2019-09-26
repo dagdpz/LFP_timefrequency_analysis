@@ -54,8 +54,16 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
         for cn = 1:length(lfp_tfa_cfg.conditions)
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
             sites_avg(t).condition(cn).hs_tuned_evoked = struct();
+            sites_avg(t).condition(cn).cfg_condition = lfp_tfa_cfg.conditions(cn);
             sites_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
-            nsites = 0;
+            % initialize number of site pairs for each handspace
+            % label
+            for st = 1:size(lfp_evoked.session(1).sites(1).condition(cn).hs_tuned_evoked, 1)
+                for hs = 1:size(lfp_evoked.session(1).sites(1).condition(cn).hs_tuned_evoked, 2)
+                    sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsites = 0;
+                    sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).lfp = [];
+                end
+            end
             for i = 1:length(lfp_evoked.session) 
                 for j = 1:length(lfp_evoked.session(i).sites)
                     if ~strcmp(lfp_evoked.session(i).sites(j).target, lfp_tfa_cfg.compare.targets{t})
@@ -66,14 +74,15 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
                     end
                     if ~isempty(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked) && ... 
                         isfield(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked, 'mean')
-                        nsites = nsites + 1;   
                         for st = 1:size(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked, 1)
                             for hs = 1:size(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked, 2)
                                 if isfield(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs), 'mean') ...
                                         && ~isempty(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).mean)
-                                    if nsites == 1%~isfield(sessions_avg.condition(cn).hs_tuned_evoked, 'mean')
-                                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).time ...
-                                        = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).time;
+                                    sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsites = ...
+                                        sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsites + 1;                                    
+                                    
+                                    if sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).nsites == 1%~isfield(sessions_avg.condition(cn).hs_tuned_evoked, 'mean')
+                                        
                                         sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).hs_label ...
                                             = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).hs_label;
                                         if isfield(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs), 'state') && ...
@@ -83,15 +92,14 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
                                             sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).state_name ...
                                                 = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).state_name;
                                         end
-                                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).mean ...
+                                        
+                                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).time ...
+                                            = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).time;
+                                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).lfp ...
                                             = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).mean;
-                                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).std ...
-                                            = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).std;                                
-                                        if isfield(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs), 'nsites')
-                                            sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).nsites ...
-                                                = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).nsites;
-                                        end
+                                        
                                     else
+                                        
                                         ntimebins = length(sites_avg(t).condition(cn).hs_tuned_evoked(st, hs).time);
                                         % average same number of time bins
                                         if ntimebins > length(lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).time)
@@ -99,17 +107,11 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
                                         end
                                         sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).time = ...
                                             lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).time(1:ntimebins);
-                                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).mean ...
-                                            = (lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).mean(1:ntimebins)) + ...
-                                            sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).mean(1:ntimebins);
-                                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).std ...
-                                            = (lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).std(1:ntimebins)) + ...
-                                            sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).std(1:ntimebins);
-                                        if isfield(sites_avg(t).condition(cn).hs_tuned_evoked(st,hs), 'nsites')
-                                            sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).nsites ...
-                                                = lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).nsites + ...
-                                                sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).nsites;
-                                        end                               
+                                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).lfp ...
+                                            = cat(1, ...
+                                            sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).lfp(:, 1:ntimebins), ...
+                                            (lfp_evoked.session(i).sites(j).condition(cn).hs_tuned_evoked(st, hs).mean(1:ntimebins)));
+                                                                   
                                     end
                                 end
                             end
@@ -121,12 +123,13 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
             % compute average
             for st = 1:size(sites_avg(t).condition(cn).hs_tuned_evoked, 1)
                 for hs = 1:size(sites_avg(t).condition(cn).hs_tuned_evoked, 2)
-                    if isfield(sites_avg(t).condition(cn).hs_tuned_evoked(st,hs), 'mean')
-                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).nsites = nsites;                                
+                    if isfield(sites_avg(t).condition(cn).hs_tuned_evoked(st,hs), 'lfp') && ...
+                            ~isempty(sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).lfp)
+                        sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).dimord = 'nsites_time';                                
                         sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).mean = ...
-                            (1/nsites) * sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).mean;
+                            nanmean(sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).lfp, 1);
                         sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).std = ...
-                            (1/nsites) * sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).std;
+                            nanstd(sites_avg(t).condition(cn).hs_tuned_evoked(st,hs).lfp, 0, 1);
                     end
                 end
             end

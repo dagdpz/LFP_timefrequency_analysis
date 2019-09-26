@@ -554,11 +554,7 @@ lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'};
 
 %% Settings for statistical test for significance of difference between LFP time-frequency spectrograms
 
-% Set to true (1) for performing the statistical test for difference
-% between site averages, false (0) otherwise
-lfp_tfa_cfg.plot_significant = 1;
-
-% Desired false discovery rate (default 0.005) for multiple comparison
+% Desired false discovery rate for multiple comparison
 % correction for statistical significance tests
 % See
 % https://de.mathworks.com/matlabcentral/fileexchange/27418-fdr_bh?focused=5807896&tab=function
@@ -574,3 +570,7 @@ lfp_tfa_cfg.fd_rate = 0.005;
 %             described in Benjamini & Yekutieli (2001) that is guaranteed
 %             to be accurate for any test dependency structure
 lfp_tfa_cfg.fdr_method = 'pdep';
+
+% Set to true (1) for plotting only the significant difference
+% between site averages, false (0) otherwise
+lfp_tfa_cfg.plot_significant = 1;

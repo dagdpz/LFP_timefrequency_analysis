@@ -56,18 +56,31 @@ function sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_t
         for cn = 1:length(lfp_tfa_cfg.conditions)
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
             sessions_avg(t).condition(cn).avg_across_sessions = struct();
+            sessions_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
+            sessions_avg(t).condition(cn).cfg_condition = lfp_tfa_cfg.conditions(cn);
+            % initialize number of site pairs for each handspace
+            % label
+            for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
+                for hs = 1:size(lfp_tfa_cfg.conditions(1).hs_labels, 2)
+                    sessions_avg(t).condition(cn).avg_across_sessions(st, hs).nsessions = 0;
+                    sessions_avg(t).condition(cn).avg_across_sessions(st, hs).lfp = [];
+                end
+            end
             nsessions = 0;
             for i = 1:length(lfp_evoked.session)
                 for k = 1:length(lfp_evoked.session(i).session_avg)
                     if strcmp(lfp_evoked.session(i).session_avg(k).target, lfp_tfa_cfg.compare.targets{t})
                         if ~isempty(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked) && ... 
                             isfield(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked, 'mean')
-                            nsessions = nsessions + 1;   
                             for st = 1:size(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked, 1)
                                 for hs = 1:size(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked, 2)
                                     if isfield(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs), 'mean') ...
                                             && ~isempty(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).mean)
-                                        if nsessions == 1%~isfield(sessions_avg(t).condition(cn).avg_across_sessions, 'mean')
+                                        
+                                        sessions_avg(t).condition(cn).avg_across_sessions(st, hs).nsessions = ...
+                                            sessions_avg(t).condition(cn).avg_across_sessions(st, hs).nsessions + 1;
+                                        
+                                        if sessions_avg(t).condition(cn).avg_across_sessions(st, hs).nsessions == 1%~isfield(sessions_avg(t).condition(cn).avg_across_sessions, 'mean')
                                             sessions_avg(t).condition(cn).avg_across_sessions(st,hs).time ...
                                                 = lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).time;
                                             sessions_avg(t).condition(cn).avg_across_sessions(st,hs).hs_label ...
@@ -79,10 +92,8 @@ function sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_t
                                                 sessions_avg(t).condition(cn).avg_across_sessions(st,hs).state_name ...
                                                     = lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).state_name;
                                             end
-                                            sessions_avg(t).condition(cn).avg_across_sessions(st,hs).mean ...
+                                            sessions_avg(t).condition(cn).avg_across_sessions(st,hs).lfp ...
                                                 = lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).mean;
-                                            sessions_avg(t).condition(cn).avg_across_sessions(st,hs).std ...
-                                                = lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).std;                                
                                             if isfield(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs), 'nsites')
                                                 sessions_avg(t).condition(cn).avg_across_sessions(st,hs).nsites ...
                                                     = lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).nsites;
@@ -93,12 +104,12 @@ function sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_t
                                             if ntimebins > length(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).time)
                                                 ntimebins = length(lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).time);
                                             end
-                                            sessions_avg(t).condition(cn).avg_across_sessions(st,hs).mean ...
-                                                = (lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).mean(1:ntimebins)) + ...
-                                                sessions_avg(t).condition(cn).avg_across_sessions(st,hs).mean(1:ntimebins);
-                                            sessions_avg(t).condition(cn).avg_across_sessions(st,hs).std ...
-                                                = (lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).std(1:ntimebins)) + ...
-                                                sessions_avg(t).condition(cn).avg_across_sessions(st,hs).std(1:ntimebins);
+                                            sessions_avg(t).condition(cn).avg_across_sessions(st,hs).time = ...
+                                                sessions_avg(t).condition(cn).avg_across_sessions(st,hs).time(1:ntimebins);
+                                            sessions_avg(t).condition(cn).avg_across_sessions(st,hs).lfp ...
+                                                = cat(1, ...
+                                                sessions_avg(t).condition(cn).avg_across_sessions(st,hs).lfp(:, 1:ntimebins), ...
+                                                lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).mean(1:ntimebins));
                                             if isfield(sessions_avg(t).condition(cn).avg_across_sessions(st,hs), 'nsites')
                                                 sessions_avg(t).condition(cn).avg_across_sessions(st,hs).nsites ...
                                                     = lfp_evoked.session(i).session_avg(k).condition(cn).hs_tuned_evoked(st, hs).nsites + ...
@@ -116,15 +127,15 @@ function sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_t
             end
 
             % compute average
-            if isfield(sessions_avg(t).condition(cn).avg_across_sessions, 'mean')
+            if isfield(sessions_avg(t).condition(cn).avg_across_sessions, 'lfp')
                 for st = 1:size(sessions_avg(t).condition(cn).avg_across_sessions, 1)
                     for hs = 1:size(sessions_avg(t).condition(cn).avg_across_sessions, 2)
-                        if ~isempty(sessions_avg(t).condition(cn).avg_across_sessions(st,hs).mean)
-                            sessions_avg(t).condition(cn).avg_across_sessions(st,hs).nsessions = nsessions;                                
+                        if ~isempty(sessions_avg(t).condition(cn).avg_across_sessions(st,hs).lfp)
+                            sessions_avg(t).condition(cn).avg_across_sessions(st,hs).dimord = 'nsessions_time';                                
                             sessions_avg(t).condition(cn).avg_across_sessions(st,hs).mean = ...
-                                (1/nsessions) * sessions_avg(t).condition(cn).avg_across_sessions(st,hs).mean;
+                                nanmean(sessions_avg(t).condition(cn).avg_across_sessions(st,hs).lfp, 1);
                             sessions_avg(t).condition(cn).avg_across_sessions(st,hs).std = ...
-                                (1/nsessions) * sessions_avg(t).condition(cn).avg_across_sessions(st,hs).std;
+                                nanstd(sessions_avg(t).condition(cn).avg_across_sessions(st,hs).lfp, 0, 1);
                         end
                     end
                 end
