@@ -124,10 +124,32 @@ function [ diff_evoked ] = lfp_tfa_compute_diff_condition_evoked( lfp_evoked, di
                                 cond1_evoked.label ' )'];  
                     
                     diff_evoked.difference(dcn).cfg_condition = cond2_evoked.cfg_condition;
+                    
+                    legend = cell(1,2);
                     if strcmp(compare.field, 'choice')                        
                         diff_evoked.difference(dcn).cfg_condition.choice = ['diff' num2str(i)];
+                        if cond2_evoked.cfg_condition.choice == 0
+                            legend(1) = {'Instructed'};
+                        else
+                            legend(1) = {'Choice'};
+                        end
+                        if cond1_evoked.cfg_condition.choice == 0
+                            legend(2) = {'Instructed'};
+                        else
+                            legend(2) = {'Choice'};
+                        end
                     elseif strcmp(compare.field, 'perturbation')
                         diff_evoked.difference(dcn).cfg_condition.perturbation = ['diff' num2str(i)];
+                        if cond2_evoked.cfg_condition.perturbation == 0
+                            legend(1) = {'Pre-injection'};
+                        else
+                            legend(1) = {'Post-injection'};
+                        end
+                        if cond1_evoked.cfg_condition.perturbation == 0
+                            legend(2) = {'Pre-injection'};
+                        else
+                            legend(2) = {'Post-injection'};
+                        end
                     elseif strcmp(compare.field, 'type_eff')
                         diff_evoked.difference(dcn).cfg_condition.type_eff = ['diff' num2str(i)];
                     end
@@ -158,10 +180,12 @@ function [ diff_evoked ] = lfp_tfa_compute_diff_condition_evoked( lfp_evoked, di
                                 if isfield(cond2_evoked.hs_tuned_evoked(st, hs), 'ntrials')
                                     diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).ntrials = ...
                                         [];
+                                elseif isfield(cond2_evoked.hs_tuned_evoked(st, hs), 'npeaks')
+                                    diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).ntrials = ...
+                                        [];
                                 end
                                 diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).legend = ...
-                                    {[compare.field ':' num2str(compare.values{2})], ...
-                                    [compare.field ':' num2str(compare.values{1})]};
+                                    legend;
                                 
                             else
                                 %diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp = [];

@@ -7,7 +7,7 @@
 
 % file containing settings for LFP analysis
 
-settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Cornelius_inactivation_ecg.m';
+settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Cornelius_inactivation_ecg_by_block.m';
 
 
 % whether the LFP should be processed (true) or not (false)
@@ -52,10 +52,16 @@ ecg_b2bt = struct();
             % stored
             sessions_info(i).proc_results_fldr = ...
                 fullfile(lfp_tfa_cfg.proc_lfp_folder, session_name);
-            % read LFP data for each site and each trial and calculate the 
-            % trial-wise time frequency spectrogram
-            session_ecg = ...
-                lfp_tfa_process_session_ECG(sessions_info(i), lfp_tfa_cfg);
+            % read LFP data for each site and each trial 
+            if isfield(sessions_info(i), 'Input_ECG_combined') && ...
+                    ~isempty(sessions_info(i).Input_ECG_combined)
+                session_ecg = ...
+                    lfp_tfa_read_combined_ECG(sessions_info(i), lfp_tfa_cfg.plottrials);
+            elseif isfield(sessions_info(i), 'Input_ECG_preproc') && ...
+                    ~isempty(sessions_info(i).Input_ECG_preproc)
+                session_ecg = ...
+                    lfp_tfa_read_preproc_ECG(sessions_info(i), lfp_tfa_cfg.plottrials);
+            end
 
             if isempty(fieldnames(session_ecg))
                 continue;

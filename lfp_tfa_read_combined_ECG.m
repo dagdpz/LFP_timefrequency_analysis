@@ -1,4 +1,4 @@
-function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
+function session_ecg = lfp_tfa_read_combined_ECG( session_info, plottrials  )
 
 % lfp_tfa_process_LFP - function to read in the processed lfp and
 % compute the time frequency spectrogram for each trial
@@ -38,6 +38,10 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
     
     close all; 
     
+    if nargin < 2 
+        plottrials = 0;
+    end
+    
 %     % Read in LFP data for the session - check if this is better than the
 %     current approach
 %     fprintf('Reading processed LFP data \n');
@@ -46,12 +50,12 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
     % struct to save data for a site
     session_ecg = struct();
         
-    if ~exist(session_info.Input_ECG_raw, 'dir')
+    if ~exist(session_info.Input_ECG_combined, 'dir')
         fprintf('No file with ECG data found in the specified directory \n%s\n', ...
-            session_info.Input_ECG_raw);
+            session_info.Input_ECG_combined);
         return;
     end
-    block_files = dir(fullfile(session_info.Input_ECG_raw, '*.mat'));
+    block_files = dir(fullfile(session_info.Input_ECG_combined, '*.mat'));
     
     % prepare results folder
     results_fldr = fullfile(session_info.proc_results_fldr);
@@ -117,7 +121,7 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
     %             strcmp(usable_sites_table.Site_ID, sites(i).site_ID), :).Set(1);
             session_ecg.session = session_info.session;
             
-            load(fullfile(session_info.Input_ECG_raw, block_files(b).name));
+            load(fullfile(session_info.Input_ECG_combined, block_files(b).name));
             
             % add first trial INI to block timestamps
             ts = 1/(trial(1).TDT_ECG1_samplingrate);
@@ -204,16 +208,18 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
                             for st = 1:length(trial(t).TDT_states)
                                 % get state ID
                                 state_id = trial(t).TDT_states(st);
-                                if state_id == 1
-                                    continue;
-                                end
-                                st_idx = st_idx + 1;
                                 % get state onset time
                                 state_onset = trial(t).TDT_state_onsets(trial(t).TDT_states == ...
                                     state_id);
+                                % for combined file, first sample
+                                % correspond to timestamp = 0
+                                if state_onset < 0
+                                    continue;
+                                end
                                 % get sample number of state onset time
                                 state_onset_sample = find(abs(timestamps - state_onset(1)) == ...
-                                    min(abs(timestamps - state_onset(1))));
+                                    min(abs(timestamps - state_onset(1))), 1);
+                                st_idx = st_idx + 1;
                                 % save into struct
                                 session_ecg.trials(comp_trial).states(st_idx).id = state_id;
                                 session_ecg.trials(comp_trial).states(st_idx).onset_t  = state_onset(1);
@@ -225,7 +231,7 @@ function session_ecg = lfp_tfa_process_session_ECG( session_info, lfp_tfa_cfg )
                     end
                 end
                 
-                session_ecg = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpeak, nrblock_combinedFile );
+                session_ecg = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpeak, nrblock_combinedFile, plottrials );
                       
         
             

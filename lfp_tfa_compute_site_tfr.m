@@ -44,19 +44,26 @@ for r = (unique([site_lfp.trials.run]))
     cfg.width        = lfp_tfa_cfg.tfr.width; % width of wavelet in number of cycles
     cfg.taper        = lfp_tfa_cfg.tfr.taper; % taper used
     cfg.pad          = 'nextpow2'; % zero padding for FFT
-    cfg.foi          = lfp_tfa_cfg.tfr.foi;   % freqs of interest
+    %cfg.foi          = lfp_tfa_cfg.tfr.foi;   % freqs of interest
+    cfg.foi          = 0.2:0.2:20;
     cfg.t_ftimwin    = lfp_tfa_cfg.tfr.t_ftimwin;           % length of sliding time window for each foi
     cfg.toi          = concat_time(1):lfp_tfa_cfg.tfr.timestep*ts:...
         concat_time(end);% time window "slides" from start time to and time in steps of timestep number of LFP samples
     cfg.channel      = ft_data_lfp.label;
+    cfg.output       = 'fourier';
     TFR_wavelet      = ft_freqanalysis(cfg, ft_data_lfp);
+    
+    TFR_wavelet.powspctrm = abs(TFR_wavelet.fourierspctrm).^2;
     
     % now divide into trials
     for t = (trials_idx)
-        trial_tfr = TFR_wavelet;
-        trial_tfr.powspctrm = single(TFR_wavelet.powspctrm(1, :, ...
+        trial_tfr = TFR_wavelet;        
+        trial_tfr.powspctrm = single(permute(TFR_wavelet.powspctrm(1, 1, :, ...
             TFR_wavelet.time>=trials_time(trials_idx == t, 1) & ...
-            TFR_wavelet.time<=trials_time(trials_idx == t, 2)));
+            TFR_wavelet.time<=trials_time(trials_idx == t, 2)), [2 3 4 1]));
+        trial_tfr.fourierspctrm = single(permute(TFR_wavelet.fourierspctrm(1, 1, :, ...
+            TFR_wavelet.time>=trials_time(trials_idx == t, 1) & ...
+            TFR_wavelet.time<=trials_time(trials_idx == t, 2)), [2 3 4 1]));
         trial_tfr.time = TFR_wavelet.time(...
             TFR_wavelet.time>=trials_time(trials_idx == t, 1) & ...
             TFR_wavelet.time<=trials_time(trials_idx == t, 2)) ...

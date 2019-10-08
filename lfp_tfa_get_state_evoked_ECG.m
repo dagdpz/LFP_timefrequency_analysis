@@ -17,8 +17,12 @@ for t = 1:length(trials_lfp)
     end
 
     states          = trials_lfp(t).states;
-    state_onset_t   = states([states(:).id] == ...
-        state_id).onset_t;
+    if ismember(state_id, [states(:).id])
+        state_onset_t   = states([states(:).id] == ...
+            state_id).onset_t;
+    else
+        continue;
+    end
     state_start_t   = states([states(:).id] == ...
         state_id).onset_t + state_reftstart;
     state_end_t     = states([states(:).id] == ...

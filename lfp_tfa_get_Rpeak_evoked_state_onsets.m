@@ -16,14 +16,24 @@ Rpeak_evoked_state.state_name = state_name;
 for t = 1:length(trials_ecg)
     
     if isempty(trials_ecg(t).ECG_spikes) || ...
-            isempty(trials_ecg(t).states)
+            isempty(trials_ecg(t).states) 
         continue;
     end
 
     states          = trials_ecg(t).states;
-    state_onset_t   = states([states(:).id] == ...
-        state_id).onset_t;
+    if ismember(state_id, [states(:).id])
+        state_onset_t   = states([states(:).id] == ...
+            state_id).onset_t;
+        state_onset_sample   = states([states(:).id] == ...
+            state_id).onset_s;
+    else
+        continue;
+    end
     
+    if ~trials_ecg(t).ECG_valid(state_onset_sample)
+        continue;
+    end
+        
     % Rpeaks
     trial_Rpeaks = trials_ecg(t).ECG_spikes;
     trial_timestamps = trials_ecg(t).time;
@@ -69,4 +79,14 @@ for t = 1:length(trials_ecg)
         Rpeak_evoked_state.rel_onset_times(t) = Rpeak_rel_onset_time;
     end
     
+end
+
+% get histogram counts
+% absolute time from Rpeak
+[Rpeak_evoked_state.abs_histcounts.prob, Rpeak_evoked_state.abs_histcounts.timebins] = ...
+    histcounts(Rpeak_evoked_state.abs_onset_times, 'BinWidth', 0.05, 'Normalization', 'probability');
+% relative time from Rpeak
+[Rpeak_evoked_state.rel_histcounts.prob, Rpeak_evoked_state.rel_histcounts.timebins] = ...
+    histcounts(Rpeak_evoked_state.rel_onset_times, 'BinWidth', 0.1, 'Normalization', 'probability');
+
 end

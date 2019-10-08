@@ -121,7 +121,7 @@ function [ session_R2Rt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_
                     cond_trials_ecg = session_ecg(i).trials(cond_trials);                    
                      
                     state_evoked = lfp_tfa_get_state_evoked_ECG_b2bt(cond_trials_ecg, ...
-                        analyse_states(st, :));                    
+                        analyse_states(st, :), lfp_tfa_cfg);                    
 
 
                     if ~isempty(state_evoked.ecg_b2bt)

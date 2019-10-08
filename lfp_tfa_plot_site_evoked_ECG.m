@@ -160,6 +160,7 @@ function [ session_evoked_ecg ] = lfp_tfa_plot_site_evoked_ECG( session_ecg, ses
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std = state_evoked.std; 
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time = state_evoked.lfp_time;
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).trials = find(cond_trials);
+                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).npeaks = size(state_evoked.lfp, 1);
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).hs_label = hs_labels(hs);
                         if isfield(state_evoked, 'state_id') && isfield(state_evoked, 'state_name')
                             sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).state = state_evoked.state_id;

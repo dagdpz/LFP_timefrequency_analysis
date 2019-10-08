@@ -42,7 +42,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
         yaxislabel = settings.ylabel;
     end
     
-    ploterr = 0;
+    ploterr = 1;
 
     % number of offset samples to divide between time windows
     noffset = 100;
@@ -129,23 +129,33 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                     state_name = evoked_lfp(state_onsets == so, hs).state_name;
                     ypos = ylim;
                     ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;
-                    text(so+1, ypos, state_name, 'fontsize', 8);
+                    text(so+1, ypos, state_name, 'fontsize', 10);
                 end
             end
             %end
-            set(gca,'xticklabels', round(concat_states_lfp.time(unique(state_samples)), 2), 'fontsize', 8)
+            set(gca,'xticklabels', round(concat_states_lfp.time(unique(state_samples)), 2), 'fontsize', 10)
             set(gca, 'xticklabelrotation', 45);
             xlabel('Time(s)');
             ylabel(yaxislabel);
             
             subplottitle = [concat_states_lfp.label{1}];
             if isfield(evoked_lfp(1, hs), 'nsessions')
-                subplottitle = [subplottitle ' (nsessions = ' num2str(evoked_lfp(1, hs).nsessions) ')'];
-            elseif isfield(evoked_lfp(1, hs), 'nsites')
-                subplottitle = [subplottitle ' (nsites = ' num2str(evoked_lfp(1, hs).nsites) ')'];
-            elseif isfield(evoked_lfp(1, hs), 'trials')
+                subplottitle = [subplottitle ' (nsessions = ' ...
+                    num2str(evoked_lfp(1, hs).nsessions) ')'];
+            end
+            if isfield(evoked_lfp(1, hs), 'nsites')
+                subplottitle = [subplottitle ' (nsites = ' ...
+                    num2str(evoked_lfp(1, hs).nsites) ')'];
+            end
+            if isfield(evoked_lfp(1, hs), 'ntrials') && ...
+                    ~isempty(evoked_lfp(1, hs).ntrials)
                 subplottitle = [subplottitle ' (ntrials = ' ...
-                    num2str(length(evoked_lfp(1, hs).trials)) ')'];            
+                    num2str(evoked_lfp(1, hs).ntrials) ')'];
+            end
+            if isfield(evoked_lfp(1, hs), 'npeaks') && ...
+                    ~isempty(evoked_lfp(1, hs).npeaks)
+                subplottitle = [subplottitle ' (npeaks = ' ...
+                    num2str(evoked_lfp(1, hs).npeaks) ')'];            
             end
             title(subplottitle);
         end

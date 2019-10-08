@@ -145,11 +145,11 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
                     state_name = evoked_R2Rt(state_onsets == so, hs).state_name;
                     ypos = ylim;
                     ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;
-                    text(so+1, ypos, state_name, 'fontsize', 8);
+                    text(so+1, ypos, state_name, 'fontsize', 10);
                 end
             end
             %end
-            set(gca,'xticklabels', round(concat_states_lfp.time(unique(state_samples)), 2), 'fontsize', 8)
+            set(gca,'xticklabels', round(concat_states_lfp.time(unique(state_samples)), 2), 'fontsize', 10)
             set(gca, 'xticklabelrotation', 45);
             xlabel('Time(s)');
             ylabel(yaxislabel);

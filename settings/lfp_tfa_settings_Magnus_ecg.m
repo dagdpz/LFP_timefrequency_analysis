@@ -371,7 +371,7 @@ lfp_tfa_cfg.tfr.method          = 'wavelet';
 % Example: 
 % 1. lfp_tfa_cfg.tfr.foi = logspace(log10(2), log10(120), 60); 60 logspaced
 % frequencies from 2Hz to 120 Hz
-lfp_tfa_cfg.tfr.foi             = 0.1:0.1:5;
+lfp_tfa_cfg.tfr.foi             = 0.2:0.2:20;
 
 % number of lfp samples to step for the sliding time window
 % Example:
@@ -565,7 +565,7 @@ end
 %         lfp_tfa_states.TRI_END], 0.8, 100, 'random'};
 % lfp_tfa_cfg.analyse_states = {lfp_tfa_states.FIX_HOL,   'Fix hold',      -0.5,   0.9;...
 %                              lfp_tfa_states.TAR_HOL,    'Tar hold',    -0.3,   0.5};
-lfp_tfa_cfg.analyse_states = {'ecg', 'ECG peak', -0.4, 0.4};
+lfp_tfa_cfg.analyse_states = {'ecg', 'ECG peak', -0.3, 0.6};
 
 
 % define the epochs to analyse for LFP power spectrum
