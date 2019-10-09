@@ -10,6 +10,7 @@ state_evoked.ecg_b2bt       = {}; % evoked LFP response
 state_evoked.mean_ecg_b2bt  = [];
 state_evoked.state_id       = state_id;
 state_evoked.state_name     = state_name;
+state_evoked.valid_trials   = [];
 
 ft_data_R2Rt = struct();
 ft_data_R2Rt.trial = {};
@@ -38,6 +39,8 @@ for t = 1:length(trials_lfp)
     if isnan(state_onset_t)
         continue;
     end
+    
+    state_evoked.valid_trials = [state_evoked.valid_trials, t];
     state_start_t   = states([states(:).id] == ...
         state_id).onset_t + state_reftstart;
     state_end_t     = states([states(:).id] == ...
@@ -121,5 +124,6 @@ if ~isempty(ft_data_R2Rt.trial)
     % evoked LFP average
     state_evoked.mean = nanmean(arr_state_ecg_b2bt, 1);
     state_evoked.std = nanstd(arr_state_ecg_b2bt, 0, 1);
+    state_evoked.ntrials = size(arr_state_ecg_b2bt, 1);
     
 end

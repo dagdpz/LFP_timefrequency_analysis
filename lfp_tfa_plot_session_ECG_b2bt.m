@@ -133,7 +133,9 @@ function [ session_R2Rt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_
                         session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).std = state_evoked.std; 
                         session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).time = state_evoked.ecg_time;
                         session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).trials = find(cond_trials);
-                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).ntrials = size(state_evoked.ecg_b2bt, 1);
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).valid_trials = ...
+                            session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).trials(state_evoked.valid_trials);
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).ntrials = state_evoked.ntrials;
                         session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).hs_label = hs_labels(hs);
                         if isfield(state_evoked, 'state_id') && isfield(state_evoked, 'state_name')
                             session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).state = state_evoked.state_id;

@@ -152,7 +152,11 @@ function [ session_evoked_ecg ] = lfp_tfa_compute_Rpeak_evoked_state_onsets( ses
                         session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).rel_timefromRpeak = Rpeak_states.rel_onset_times;
                         session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).abs_timeprob = Rpeak_states.abs_histcounts;
                         session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).rel_timeprob = Rpeak_states.rel_histcounts;
+                        session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).ntrials = Rpeak_states.ntrials;
                         session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).trials = find(cond_trials);
+                        % valid trials
+                        session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).valid_trials = ...
+                            session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).trials(Rpeak_states.valid_trials);
                         session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).hs_label = hs_labels(hs);
                         if isfield(Rpeak_states, 'state_id') && isfield(Rpeak_states, 'state_name')
                             session_Rpeak_states(i).condition(cn).Rpeak_evoked(st, hs).state = Rpeak_states.state_id;

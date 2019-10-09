@@ -99,35 +99,52 @@ function [ session_ecg ] = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpe
         % plot individual trials
         if plottrials
             trial = session_ecg.trials(trials_idx(t));
-            figure(1); clf; hold on;
+            h = figure(1); clf; hold on;
             
 %             h1 = uicontrol('Position', [5 5 200 40], 'String', 'Continue', ...
 %                       'Callback', 'uiresume(gcbf)');
+%             h2 = uicontrol('Position', [300 5 200 40], 'String', 'Continue', ...
+%                       'Callback', 'plottrials = 0; close;');
             % plot raw ECG
-            subplot(311);
+            ax1 = subplot(311);
             plot(trial.time, trial.ecg_data);
+            box on;
             set(gca, 'Xlim', [trial.time(1), ...
                 trial.time(end)]);
-            title([session_ecg.session ' Block', num2str(nrblock) ...
-                ' Trial' num2str(trials_idx(t))]);
-            % mark state onsets
-            for state = (trial.states)
-                if ~isnan(state.onset_t) || ~isempty( state.onset_t)
-                    line([state.onset_t state.onset_t], ylim, ...
-                        'Color', 'k', 'LineStyle', '--');
-                end
-            end
+            set(gca, 'Ylim', ax1.YLim);
+                        
             % plot spikes
             subplot(312);
             plot(trial.time, trial.ECG_spikes);
+            box on;
             set(gca, 'Xlim', [trial.time(1), trial.time(end)]);
+            
             % plot ECG R2Rt valid
             subplot(313);
             plot(trial.time, trial.ECG_b2btime);
+            box on;
             set(gca, 'Xlim', [trial.time(1), trial.time(end)]);
+            
+            % title
+            subplot(311);
+            title([strrep(session_ecg.session, '_', ' '), ...
+                ', Block ', num2str(nrblock) ...
+                ', Trial ' num2str(trials_idx(t)) ...
+                ', Completed = ' num2str(trial.completed)]);
+            % mark state onsets
+            for state = (trial.states)
+                if ~isnan(state.onset_t) || ~isempty( state.onset_t)
+                    line([state.onset_t state.onset_t], ax1.YLim, ...
+                        'Color', 'k', 'LineStyle', '--');
+                    text(double(state.onset_t), ax1.YLim(1) + ((ax1.YLim(2) - ax1.YLim(1))*(find([trial.states.id] == state.id)/length(trial.states))), num2str(state.id));
+                end
+            end
+            
 %             uiwait(gcf);
             
-            %disp('Press any key to continue!');
+            if t == 1
+                disp('Press any key to continue! To abort, press Ctrl+C');
+            end
             pause;
         end
     end

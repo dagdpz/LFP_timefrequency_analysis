@@ -6,10 +6,9 @@ Rpeak_reftime = state{3};
 %state_reftend = state{4};
 
 %state_evoked_ecg.ecg_time = {}; % timebins fo spectrogram
-Rpeak_evoked_state.abs_onset_times = ...
-    nan(1, length(trials_ecg)); % evoked LFP response
-Rpeak_evoked_state.rel_onset_times = ...
-    nan(1, length(trials_ecg)); 
+Rpeak_evoked_state.abs_onset_times = [];
+Rpeak_evoked_state.rel_onset_times = [];
+Rpeak_evoked_state.valid_trials = [];
 Rpeak_evoked_state.state_id = state_id;
 Rpeak_evoked_state.state_name = state_name;
 
@@ -33,7 +32,7 @@ for t = 1:length(trials_ecg)
     if ~trials_ecg(t).ECG_valid(state_onset_sample)
         continue;
     end
-        
+    
     % Rpeaks
     trial_Rpeaks = trials_ecg(t).ECG_spikes;
     trial_timestamps = trials_ecg(t).time;
@@ -75,8 +74,11 @@ for t = 1:length(trials_ecg)
     end
     
     if ~isempty(Rpeak_abs_onset_time)
-        Rpeak_evoked_state.abs_onset_times(t) = Rpeak_abs_onset_time;
-        Rpeak_evoked_state.rel_onset_times(t) = Rpeak_rel_onset_time;
+        Rpeak_evoked_state.abs_onset_times = ...
+            [Rpeak_evoked_state.abs_onset_times Rpeak_abs_onset_time];
+        Rpeak_evoked_state.rel_onset_times = ...
+            [Rpeak_evoked_state.rel_onset_times Rpeak_rel_onset_time];
+        Rpeak_evoked_state.valid_trials = [Rpeak_evoked_state.valid_trials, t];
     end
     
 end
@@ -88,5 +90,7 @@ end
 % relative time from Rpeak
 [Rpeak_evoked_state.rel_histcounts.prob, Rpeak_evoked_state.rel_histcounts.timebins] = ...
     histcounts(Rpeak_evoked_state.rel_onset_times, 'BinWidth', 0.1, 'Normalization', 'probability');
+
+Rpeak_evoked_state.ntrials = length(Rpeak_evoked_state.abs_onset_times);
 
 end

@@ -95,36 +95,48 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
 %                 end
 %                 
 %                 % now plot
-                subplot(nhandspacelabels, nstates*2, (hs-1)*nstates*2 + st);
+                subplot(nhandspacelabels*2, nstates, (hs-1)*nstates*2 + st);
                 
 %                 histogram(Rpeak_evoked_states(st, hs).abs_timefromRpeak, 'BinWidth', 0.05, ...
 %                     'Normalization', 'probability')
                 timebinedges = Rpeak_evoked_states(st, hs).abs_timeprob.timebins;
                 timebinmiddle = (timebinedges(1:end-1) + timebinedges(2:end))/2;
-                plot(timebinmiddle, Rpeak_evoked_states(st, hs).abs_timeprob.prob, 's');
+                plot(timebinmiddle, Rpeak_evoked_states(st, hs).abs_timeprob.prob, 'bs');
                 hold on;
                 % join the mean
                 plot(timebinmiddle, ...
                     nanmean(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1), 'r*-');
                 %set(gca, 'XTick', timebinedges);
                 %grid on;
-                title(Rpeak_evoked_states(st, hs).state_name);
+                subplottitle = Rpeak_evoked_states(st, hs).state_name;
+                if isfield(Rpeak_evoked_states(st, hs), 'ntrials') && ...
+                        ~isempty(Rpeak_evoked_states(st, hs).ntrials)
+                    subplottitle = [subplottitle, sprintf(' (%g)', ...
+                        Rpeak_evoked_states(st, hs).ntrials)];
+                end
+                title(subplottitle);
                 xlabel('Time from Rpeak (s)')
                 ylabel('P(state onset)');
                 
-                subplot(nhandspacelabels, nstates*2, (hs-1)*nstates*2 + nstates + st);
+                subplot(nhandspacelabels*2, nstates, (hs-1)*nstates*2 + nstates + st);
                 
 %                 histogram(Rpeak_evoked_states(st, hs).rel_timefromRpeak, 'BinWidth', 0.1, ...
 %                     'Normalization', 'probability')
                 timebinedges = Rpeak_evoked_states(st, hs).rel_timeprob.timebins;
                 timebinmiddle = (timebinedges(1:end-1) + timebinedges(2:end))/2;
-                plot(timebinmiddle, Rpeak_evoked_states(st, hs).rel_timeprob.prob, 's');
+                plot(timebinmiddle, Rpeak_evoked_states(st, hs).rel_timeprob.prob, 'bs');
                 hold on;
                 % join the mean
                 plot(timebinmiddle, ...
                     nanmean(Rpeak_evoked_states(st, hs).rel_timeprob.prob, 1), 'r*-');
                 %set(gca, 'XTick', timebinedges);
-                title(Rpeak_evoked_states(st, hs).state_name);
+                subplottitle = Rpeak_evoked_states(st, hs).state_name;
+                if isfield(Rpeak_evoked_states(st, hs), 'ntrials') && ...
+                        ~isempty(Rpeak_evoked_states(st, hs).ntrials)
+                    subplottitle = [subplottitle, sprintf(' (%g)', ...
+                        Rpeak_evoked_states(st, hs).ntrials)];
+                end
+                title(subplottitle);
                 xlabel('Rel. Time from Rpeak')
                 ylabel('P(state onset)');
 
@@ -181,9 +193,7 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
 %             title(subplottitle);
         end
     end
-    if isfield(Rpeak_evoked_states, 'ntrials')
-        plottitle = [plottitle, ' (ntrials = ' num2str(Rpeak_evoked_states(1, hs).ntrials) ')'];
-    elseif isfield(Rpeak_evoked_states, 'nsessions')
+    if isfield(Rpeak_evoked_states, 'nsessions')
         plottitle = [plottitle, ' (nsessions = ' num2str(Rpeak_evoked_states(1, hs).nsessions) ')'];
     end
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
