@@ -116,7 +116,7 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
                 end
                 title(subplottitle);
                 xlabel('Time from Rpeak (s)')
-                ylabel('P(state onset)');
+                ylabel('P(onset)');
                 
                 subplot(nhandspacelabels*2, nstates, (hs-1)*nstates*2 + nstates + st);
                 
@@ -138,7 +138,7 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
                 end
                 title(subplottitle);
                 xlabel('Rel. Time from Rpeak')
-                ylabel('P(state onset)');
+                ylabel('P(onset)');
 
             end
             
