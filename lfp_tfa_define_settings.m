@@ -79,7 +79,6 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
     % folder to save LFP processing results
     if ~lfp_tfa_cfg.process_LFP && ~exist(lfp_tfa_cfg.proc_lfp_folder, 'dir')
         lfp_tfa_cfg.process_LFP = true;
-        lfp_tfa_cfg.proc_lfp_folder = [];
     end
     if lfp_tfa_cfg.process_LFP
         lfp_tfa_cfg.proc_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'Processed LFP'];
@@ -101,7 +100,7 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
     end
 
     % save settings struct
-    save(fullfile(lfp_tfa_cfg.root_results_fldr, ['lfp_tfa_settings_ver_' num2str(lfp_tfa_cfg.version) '.mat']), ...
+    save(fullfile(lfp_tfa_cfg.root_results_fldr, ['lfp_tfa_settings_' lfp_tfa_cfg.version '.mat']), ...
         'lfp_tfa_cfg');
 
 end
