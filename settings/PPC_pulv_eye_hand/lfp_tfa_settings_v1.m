@@ -4,9 +4,13 @@
 lfp_tfa_cfg = [];
    
 %% Settings for data folders
+
+% absolute path to the folder where the results of analysis should be stored
+lfp_tfa_cfg.results_folder = 'Y:\Projects\PPC_pulv_eye_hand\LFP\Linus';
+
 % versioning, a unique version for the settings file and analysis results
 % the results produced using this settings file would be saved under 
-% the folder [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
+% the folder [lfp_tfa_cfg.results_folder, '\', lfp_tfa_cfg.version]
 % eg: 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\20190506\ver_SN_0.2'
 lfp_tfa_cfg.version = 'Ddre_inst_vs_choi';
 
@@ -125,9 +129,24 @@ lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow'};
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
 lfp_tfa_cfg.compare.targets = {'MIP_R','MIP_L'}; 
 
-       
-% absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'Y:\Projects\PPC_pulv_eye_hand\LFP\Linus';
+% whether to calculate the LFP time frequency spectrograms and noise trial
+% detection
+% if the time frequency spectrograms for the given sessions were already
+% calculated, it can be reused by setting 'lfp_tfa_cfg.proc_lfp_folder' 
+% as the folder where the results are stored. In this case, set this
+% variable to false. If this variable is set to false, but the LFP
+% timefrequency spectrograms are not available in the specified folder, the
+% time frequency spectrograms will be calculated and stored in 
+% lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
+% should be computed, set this variable to true. 
+lfp_tfa_cfg.process_LFP = false;
+
+% folder where the results of LFP time frequency spectrograms are stored
+lfp_tfa_cfg.proc_lfp_folder = [];
+if ~lfp_tfa_cfg.process_LFP
+    lfp_tfa_cfg.proc_lfp_folder = ...
+        'Y:\Projects\PPC_pulv_eye_hand\LFP\Linus\Ddre_inst_vs_choi\Processed LFP';
+end
 
 % Specify events which mark trial start and end
 lfp_tfa_cfg.trialinfo = struct();

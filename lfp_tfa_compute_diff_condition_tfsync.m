@@ -33,7 +33,13 @@ function [ diff_sync ] = lfp_tfa_compute_diff_condition_tfsync( sitepair_sync, d
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    conditions = [sitepair_sync.cfg_condition];
+    diff_sync = [];
+    
+    if ~isempty([sitepair_sync.cfg_condition])
+        conditions = [sitepair_sync.cfg_condition];
+    else
+        return;
+    end
     
     for i = 1:length(diff_condition)/2
         diff_sync = struct();

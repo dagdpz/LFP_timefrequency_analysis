@@ -35,7 +35,7 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
 
     diff_tfr = [];
     
-    if ~isempty(lfp_tfr.cfg_condition)
+    if ~isempty([lfp_tfr.cfg_condition])
         conditions = [lfp_tfr.cfg_condition];
     else
         return;
