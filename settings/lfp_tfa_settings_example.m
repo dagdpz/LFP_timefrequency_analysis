@@ -4,11 +4,34 @@
 lfp_tfa_cfg = [];
    
 %% Settings for data folders
+
+% absolute path to the folder where the results of analysis should be stored
+lfp_tfa_cfg.results_folder = 'Y:\Personal\Sarath\Results\LFP_TFA_Results';
+
 % versioning, a unique version for the settings file and analysis results
 % the results produced using this settings file would be saved under 
-% the folder [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
-% eg: 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\20190506\ver_SN_0.2'
+% the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
+% eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
 lfp_tfa_cfg.version = 'Linus_inactivation_8sessions';
+
+% whether to calculate the LFP time frequency spectrograms and noise trial
+% detection
+% if the time frequency spectrograms for the given sessions were already
+% calculated, it can be reused by setting 'lfp_tfa_cfg.proc_lfp_folder' 
+% as the folder where the results are stored. In this case, set this
+% variable to false. If this variable is set to false, but the LFP
+% timefrequency spectrograms are not available in the specified folder, the
+% time frequency spectrograms will be calculated and stored in 
+% lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
+% should be computed, set this variable to true. 
+lfp_tfa_cfg.process_LFP = true;
+
+% folder where the results of LFP time frequency spectrograms are stored
+lfp_tfa_cfg.proc_lfp_folder = [];
+if ~lfp_tfa_cfg.process_LFP
+    lfp_tfa_cfg.proc_lfp_folder = ...
+        'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions\Processed LFP';
+end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
@@ -18,9 +41,6 @@ lfp_tfa_cfg.info_filepath = 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactiv
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
 % used for analysis
 lfp_tfa_cfg.use_datasets = [31];
-
-% absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'Y:\Personal\Sarath\Results\LFP_TFA_Results';
 
 % info about sessions to be analysed
 % should be a 1 x N struct, N = number of sessions to analyse
