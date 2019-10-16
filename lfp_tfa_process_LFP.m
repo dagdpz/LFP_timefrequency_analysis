@@ -266,35 +266,30 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
                 sitepair_crosspow = lfp_tfa_compute_sitepair_csd(site1_lfp, site2_lfp, lfp_tfa_cfg);
                 % save data
                 results_mat = fullfile(results_fldr, ['sites_crosspow_', sitepair_crosspow.sites{1} '-' sitepair_crosspow.sites{2} '.mat']);
-                save(results_mat, 'site_lfp', '-v7.3');
-
-                % compute ppc spectrogram between sitepair
-                % get the trial conditions for this session
-                conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
-                    {session_info.Preinj_blocks, session_info.Postinj_blocks});
-                sitepair_sync = lfp_tfa_sitepair_averaged_sync(sitepair_crosspow, conditions, lfp_tfa_cfg);                
+                save(results_mat, 'sitepair_crosspow', '-v7.3');
+                                
             end
         end  
     end
     
     %% calculate sync measure spectrum
-    if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
-        % loop through each site
-        for i = 1:length(allsites_lfp)-1
-            site1_lfp = allsites_lfp(i);
-            % pair a site
-            for j = i+1:length(allsites_lfp)
-                site2_lfp = allsites_lfp(j);
-                fprintf('Computing sync spectrum for site pair %s - %s\n', ...
-                    site1_lfp.site_ID, site2_lfp.site_ID);
-                % compute ppc spectrum between sitepair
-                % get the trial conditions for this session
-                conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
-                    {session_info.Preinj_blocks, session_info.Postinj_blocks});
-                sitepair_syncspctrm = lfp_tfa_sitepair_avg_syncspctrum(site1_lfp, site2_lfp, conditions, lfp_tfa_cfg);                
-            end
-        end  
-    end
+%     if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
+%         % loop through each site
+%         for i = 1:length(allsites_lfp)-1
+%             site1_lfp = allsites_lfp(i);
+%             % pair a site
+%             for j = i+1:length(allsites_lfp)
+%                 site2_lfp = allsites_lfp(j);
+%                 fprintf('Computing sync spectrum for site pair %s - %s\n', ...
+%                     site1_lfp.site_ID, site2_lfp.site_ID);
+%                 % compute ppc spectrum between sitepair
+%                 % get the trial conditions for this session
+%                 conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
+%                     {session_info.Preinj_blocks, session_info.Postinj_blocks});
+%                 sitepair_syncspctrm = lfp_tfa_sitepair_avg_syncspctrum(site1_lfp, site2_lfp, conditions, lfp_tfa_cfg);                
+%             end
+%         end  
+%     end
 
 end
 

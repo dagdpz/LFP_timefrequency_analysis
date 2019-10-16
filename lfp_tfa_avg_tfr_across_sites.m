@@ -52,6 +52,14 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
             sites_avg(t).condition(cn).hs_tuned_tfs = struct();
             sites_avg(t).condition(cn).cfg_condition = lfp_tfa_cfg.conditions(cn);
             sites_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
+            % initialize number of site pairs for each handspace
+            % label
+            for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
+                for hs = 1:size(lfp_tfa_cfg.conditions(1).hs_labels, 2)
+                    sites_avg(t).condition(cn).hs_tuned_tfs(st, hs).nsites = 0;
+                    sites_avg(t).condition(cn).hs_tuned_tfs(st, hs).freq.powspctrm = [];
+                end
+            end
             nsites = 0;
             for i = 1:length(lfp_tfr.session)  
                 for j = 1:length(lfp_tfr.session(i).sites)
@@ -62,15 +70,29 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
                         continue;
                     end
                     if ~isempty(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs) && ... 
-                        isfield(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs, 'powspctrm')
-                        nsites = nsites + 1;   
+                        isfield(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs, 'freq')
+                        %nsites = nsites + 1;   
                         for st = 1:size(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs, 1)
                             for hs = 1:size(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs, 2)
-                                if isfield(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs), 'powspctrm') ...
-                                        && ~isempty(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).powspctrm)
-                                    if nsites == 1%~isfield(sessions_avg.cond_based_tfs(cn).tfs_across_sessions, 'powspctrm')
-                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).time ...
-                                        = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).time;
+                                if isfield(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq, 'powspctrm') ...
+                                        && ~isempty(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq.powspctrm)
+                                    sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites = ...
+                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites + 1;
+                                    if sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites == 1%~isfield(sessions_avg.cond_based_tfs(cn).tfs_across_sessions, 'powspctrm')
+                                        
+                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).freq.time ...
+                                            = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq.time;
+                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).freq.cfg ...
+                                            = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq.cfg;
+                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).freq.freq ...
+                                            = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq.freq;
+                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).freq.powspctrm ...
+                                            = nanmean(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq.powspctrm, 1);
+                                        
+                                        sites_avg(t).condition(cn).label = ...
+                                            lfp_tfr.session(i).sites(j).condition(cn).label;
+                                        sites_avg(t).condition(cn).cfg_condition = ...
+                                            lfp_tfr.session(i).sites(j).condition(cn).cfg_condition;
                                         sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).hs_label ...
                                             = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).hs_label;
                                         if isfield(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs), 'state') && ...
@@ -80,34 +102,18 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
                                             sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).state_name ...
                                                 = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).state_name;
                                         end
-                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).cfg ...
-                                            = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).cfg;
-                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).freq ...
-                                            = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq;
-                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm ...
-                                            = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).powspctrm;
-                                        sites_avg(t).condition(cn).label = ...
-                                            lfp_tfr.session(i).sites(j).condition(cn).label;
-                                        sites_avg(t).condition(cn).cfg_condition = ...
-                                            lfp_tfr.session(i).sites(j).condition(cn).cfg_condition;
-                                        if isfield(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs), 'nsites')
-                                            sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites ...
-                                                = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).nsites;
-                                        end
+                                        
                                     else
-                                        ntimebins = size(sites_avg(t).condition(cn).hs_tuned_tfs(st, hs).powspctrm, 3);
+                                        ntimebins = size(sites_avg(t).condition(cn).hs_tuned_tfs(st, hs).freq.powspctrm, 3);
                                         % average same number of time bins
-                                        if ntimebins > length(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).time)
-                                            ntimebins = length(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).time);
+                                        if ntimebins > length(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq.time)
+                                            ntimebins = length(lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq.time);
                                         end
-                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm ...
-                                            = (lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).powspctrm(1,:,1:ntimebins)) + ...
-                                            sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm(1,:,1:ntimebins);
-                                        if isfield(sites_avg(t).condition(cn).hs_tuned_tfs(st,hs), 'nsites')
-                                            sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites ...
-                                                = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).nsites + ...
-                                                sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites;
-                                        end                               
+                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).freq.powspctrm ...
+                                            = cat(1, sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).freq.powspctrm(:,:,1:ntimebins), ...
+                                            nanmean((lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq.powspctrm(:,:,1:ntimebins)), 1));
+                                        sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).freq.time = ...
+                                            sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).freq.time(1:ntimebins);
                                     end
                                 end
                             end
@@ -116,23 +122,23 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
                 end
             end
 
-            % compute average
-            if ~isempty(sites_avg(t).condition(cn).hs_tuned_tfs)
-                if isfield(sites_avg(t).condition(cn).hs_tuned_tfs, 'powspctrm')
-                    for st = 1:size(sites_avg(t).condition(cn).hs_tuned_tfs, 1)
-                        for hs = 1:size(sites_avg(t).condition(cn).hs_tuned_tfs, 2)
-                            sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites = nsites;                                
-                            sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm = ...
-                                (1/nsites) * sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm;
-                        end
-                    end
-                end
-            end
+%             % compute average
+%             if ~isempty(sites_avg(t).condition(cn).hs_tuned_tfs)
+%                 if isfield(sites_avg(t).condition(cn).hs_tuned_tfs, 'powspctrm')
+%                     for st = 1:size(sites_avg(t).condition(cn).hs_tuned_tfs, 1)
+%                         for hs = 1:size(sites_avg(t).condition(cn).hs_tuned_tfs, 2)
+%                             sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites = nsites;                                
+%                             sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm = ...
+%                                 (1/nsites) * sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm;
+%                         end
+%                     end
+%                 end
+%             end
 
 
             if ~isempty(sites_avg(t).condition(cn).hs_tuned_tfs)
                 if isfield(sites_avg(t).condition(cn).hs_tuned_tfs,... 
-                        'powspctrm')
+                        'freq')
                     plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
                         ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
                         sites_avg(t).condition(cn).label];
@@ -150,22 +156,32 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
         for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
             sites_avg(t).difference = [sites_avg(t).difference, ...
-                lfp_tfa_compute_difference_condition_tfr(sites_avg(t).condition, diff_condition)];
+                lfp_tfa_compute_difference_condition_tfr(sites_avg(t).condition, ...
+                diff_condition, 1, lfp_tfa_cfg)];
         end
         % plot Difference TFR
         for dcn = 1:length(sites_avg(t).difference)
             if ~isempty(sites_avg(t).difference(dcn).hs_tuned_tfs)
                 if isfield(sites_avg(t).difference(dcn).hs_tuned_tfs,... 
-                        'powspctrm')
+                        'freq')
                     plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
-                    ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
-                    sites_avg(t).difference(dcn).label];
+                        ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
+                        sites_avg(t).difference(dcn).label];
                     result_file = fullfile(results_fldr, ...
                         ['LFP_DiffTFR_' lfp_tfa_cfg.compare.targets{t} ...
                         '_' 'diff_condition' num2str(dcn) '.png']);
+                    if lfp_tfa_cfg.plot_significant
+                        plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
+                            ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
+                            sites_avg(t).difference(dcn).label ' significant'];
+                        result_file = fullfile(results_fldr, ...
+                            ['LFP_DiffTFR_' lfp_tfa_cfg.compare.targets{t} ...
+                            '_' 'diff_condition' num2str(dcn) ...
+                            '_significant.png']);
+                    end
                         %sites_avg(t).difference(dcn).label '.png']);
                     lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_avg(t).difference(dcn).hs_tuned_tfs, ...
-                        lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
+                        lfp_tfa_cfg, plottitle, result_file, 'bluewhitered', lfp_tfa_cfg.plot_significant);
                 end
             end
         end

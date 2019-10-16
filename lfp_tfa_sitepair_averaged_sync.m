@@ -41,7 +41,7 @@ function [sitepair_sync] = lfp_tfa_sitepair_averaged_sync( sitepair_crosspow, si
     warning ('off', 'MATLAB:hg:willberemoved');
 
     % make a folder to save figures
-    results_folder_session = fullfile(lfp_tfa_cfg.analyse_lfp_folder, 'Condition_based_Sync', sitepair_crosspow.session);
+    results_folder_session = fullfile(lfp_tfa_cfg.analyse_lfp_folder, sitepair_crosspow.session, 'Condition_based_Sync');
     if ~exist(results_folder_session, 'dir')
         mkdir(results_folder_session);
     end

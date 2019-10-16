@@ -1,4 +1,4 @@
-function [ diff_sync ] = lfp_tfa_compute_diff_condition_tfsync( sitepair_sync, diff_condition )
+function [ diff_sync ] = lfp_tfa_compute_diff_condition_tfsync( sitepair_sync, diff_condition, stat_test, lfp_tfa_cfg )
 %lfp_tfa_compute_diff_tfr - function to compute the difference in time freq
 %response between control and inactivation trials
 %
@@ -35,6 +35,10 @@ function [ diff_sync ] = lfp_tfa_compute_diff_condition_tfsync( sitepair_sync, d
 
     diff_sync = [];
     
+    if nargin < 3
+        stat_test = false;
+    end
+
     if ~isempty([sitepair_sync.cfg_condition])
         conditions = [sitepair_sync.cfg_condition];
     else
@@ -153,8 +157,16 @@ function [ diff_sync ] = lfp_tfa_compute_diff_condition_tfsync( sitepair_sync, d
                                     size(preinj_sync.hs_tuned_sync(st, hs).ppc.ppcspctrm, 3)]);
                                 % calculate the difference
                                 diff_sync.difference(dcn).hs_tuned_sync(st, hs).ppc.ppcspctrm = ...
-                                    postinj_tfr.hs_tuned_sync(st, hs).ppc.ppcspctrm(1,:,1:ntimebins) - ...
-                                    preinj_sync.hs_tuned_sync(st, hs).ppc.ppcspctrm(1,:,1:ntimebins);
+                                    postinj_tfr.hs_tuned_sync(st, hs).ppc.ppcspctrm(:,:,1:ntimebins) - ...
+                                    preinj_sync.hs_tuned_sync(st, hs).ppc.ppcspctrm(:,:,1:ntimebins);
+                                % statistical test
+                                if stat_test
+                                    [~, p] = ttest(...
+                                        diff_sync.difference(dcn).hs_tuned_sync(st, hs).ppc.ppcspctrm);
+                                    [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p,lfp_tfa_cfg.fd_rate,...
+                                        lfp_tfa_cfg.fdr_method,'yes');
+                                    diff_sync.difference(dcn).hs_tuned_sync(st, hs).ppc.stat_test.h = h;
+                                end
                                 diff_sync.difference(dcn).hs_tuned_sync(st, hs).ppc.time = ...
                                     postinj_tfr.hs_tuned_sync(st, hs).ppc.time(1:ntimebins);  
                                 if isfield(postinj_tfr.hs_tuned_sync(st, hs), 'ntrials')

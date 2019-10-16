@@ -52,10 +52,10 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
         
         
         % folder to save sitewise results
-        site_results_folder = fullfile(results_folder_psd, states_lfp(i).site_ID);
-        if ~exist(site_results_folder, 'dir')
-            mkdir(site_results_folder);
-        end
+%         site_results_folder = fullfile(results_folder_psd, states_lfp(i).site_ID);
+%         if ~exist(site_results_folder, 'dir')
+%             mkdir(site_results_folder);
+%         end
         % struct to store condition-wise LFP power spectra average
         sites_pow(i).condition = struct();
         sites_pow(i).site_ID = states_lfp(i).site_ID;
@@ -179,7 +179,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 end
                 result_file = fullfile(site_results_folder, ...
                     ['LFP_Power_' states_lfp(i).site_ID '_' site_conditions(cn).label '.png']);
-                lfp_tfa_plot_hs_tuned_psd(sites_pow(i).condition(cn).hs_tuned_power, ...
+                lfp_tfa_plot_hs_tuned_psd_2(sites_pow(i).condition(cn).hs_tuned_power, ...
                     lfp_tfa_cfg, plottitle, result_file);
             end
 
@@ -267,7 +267,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                     for ep = 1:size(session_avg(t).condition(cn).hs_tuned_power, 1)
                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
                             session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean / isite;
-                        session_avg(t).condition(cn).hs_tuned_tfs(ep, hs).nsites = isite;
+                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).nsites = isite;
                     end
                 end
             end 
@@ -284,7 +284,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 end
                 results_file = fullfile(results_folder_psd, ...
                     ['LFP_Power_' session_avg(t).condition(cn).session '_' site_conditions(cn).label '.png']);
-                lfp_tfa_plot_hs_tuned_psd(session_avg(t).condition(cn).hs_tuned_power, ...
+                lfp_tfa_plot_hs_tuned_psd_2(session_avg(t).condition(cn).hs_tuned_power, ...
                             lfp_tfa_cfg, plottitle, results_file);
             end
             

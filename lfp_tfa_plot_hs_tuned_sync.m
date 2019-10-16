@@ -46,6 +46,7 @@ function lfp_tfa_plot_hs_tuned_sync( avg_hs_tuned_sync, lfp_tfa_cfg, plottitle, 
     % default plot settings
     plot_settings.cmap = 'jet';
     plot_settings.imscale = [-1, 1];
+    plot_settings.significant = false;
     def_fields = fieldnames(plot_settings);
     
     if nargin > 4
@@ -96,8 +97,8 @@ function lfp_tfa_plot_hs_tuned_sync( avg_hs_tuned_sync, lfp_tfa_cfg, plottitle, 
             state_info = struct();
             for st = 1:size(avg_hs_tuned_sync, 1)
 
-                concat_states_ppc.ppcspctrm = cat(3, concat_states_ppc.ppcspctrm, ...
-                    avg_hs_tuned_sync(st, hs).ppc.ppcspctrm);
+%                 concat_states_ppc.ppcspctrm = cat(3, concat_states_ppc.ppcspctrm, ...
+%                     avg_hs_tuned_sync(st, hs).ppc.ppcspctrm);
                 concat_states_ppc.state_time = [concat_states_ppc.state_time, ...
                     avg_hs_tuned_sync(st, hs).ppc.time];
                 % append nans to separate the states
@@ -133,18 +134,32 @@ function lfp_tfa_plot_hs_tuned_sync( avg_hs_tuned_sync, lfp_tfa_cfg, plottitle, 
                     state_info(st).onset_s = length(avg_hs_tuned_sync(st-1, hs).ppc.time) + ...
                         state_info(st).onset_s + (st-1)*(100/25);
                 end
+
+                state_ppcspctrm = nanmean(avg_hs_tuned_sync(st, hs).ppc.ppcspctrm, 1);
+                if plot_settings.significant ...
+                        && isfield(avg_hs_tuned_sync(st, hs).ppc, 'stat_test') ...
+                        && ~isempty(avg_hs_tuned_sync(st, hs).ppc.stat_test.h)
+                    state_ppcspctrm = avg_hs_tuned_sync(st, hs).ppc.stat_test.h .* ...
+                        state_ppcspctrm;
+                end
+                        
                 
                 imagesc(linspace(state_info(st).start_s, state_info(st).finish_s, ...
                     state_info(st).finish_s - state_info(st).start_s + 1), ...
-                    linspace(1, length(avg_hs_tuned_sync(st, hs).ppc.freq), length(avg_hs_tuned_sync(st, hs).ppc.freq)), ...
-                    squeeze(avg_hs_tuned_sync(st, hs).ppc.ppcspctrm), plot_settings.imscale);
+                    linspace(1, length(avg_hs_tuned_sync(st, hs).ppc.freq), ...
+                    length(avg_hs_tuned_sync(st, hs).ppc.freq)), ...
+                    squeeze(state_ppcspctrm), plot_settings.imscale);
                 
                 % horizontal lines to separate frequency bands
-                for f = [2, 4, 8, 12, 18, 32, 80]
+                % horizontal lines to separate frequency bands
+                fbandstart = [2, 4, 8, 12, 18, 32, 80];
+                fbandstart_idx = zeros(size(fbandstart));
+                for f = fbandstart
                     f_idx = find(abs(avg_hs_tuned_sync(st, hs).ppc.freq - f) == ...
                         min(abs(avg_hs_tuned_sync(st, hs).ppc.freq - f)), 1, 'first');
                     line([state_info(st).start_s state_info(st).finish_s], ...
                         [f_idx f_idx], 'color', 'k', 'linestyle', '--');
+                    fbandstart_idx(fbandstart == f) = f_idx;
                 end
 
 
@@ -163,9 +178,8 @@ function lfp_tfa_plot_hs_tuned_sync( avg_hs_tuned_sync, lfp_tfa_cfg, plottitle, 
             set(get(cb,'title'),'string', cbtitle, 'fontsize',6);
             set(gca,'TickDir','out')
             % log y axis ticks
-            set(gca, 'ytick', ([1:8:numel(concat_states_ppc.freq)]));
-            set(gca, 'yticklabel', ...
-                round(concat_states_ppc.freq([1:8:numel(concat_states_ppc.freq)])));
+            set(gca, 'ytick', (fbandstart_idx));
+            set(gca, 'yticklabel', fbandstart);
             % add 0.5 at end since the time value is the center of the bin
             % add 0 at beginning to make x-axis visible
             set(gca, 'ylim', [0 numel(avg_hs_tuned_sync(st, hs).ppc.freq) + 0.5]);

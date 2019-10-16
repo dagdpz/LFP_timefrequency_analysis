@@ -60,8 +60,8 @@ arr_state_pow = zeros(1, nfreqbins, ntimebins);
 if ~isempty(state_tfs.powspctrm)
 
     % find the average TFS for each state
-    arr_state_pow = cat(1, state_tfs.powspctrm{:});
-    state_tfs.powspctrm_rawmean = nanmean(arr_state_pow, 1);
+    state_tfs.powspctrm = cat(1, state_tfs.powspctrm{:});
+    state_tfs.powspctrm_rawmean = nanmean(state_tfs.powspctrm, 1);
 
     % baseline normalization
     cfg_baseline.method = lfp_tfa_cfg.baseline_method;
@@ -70,7 +70,8 @@ if ~isempty(state_tfs.powspctrm)
         lfp_tfa_cfg.baseline_use_choice_trial;
     cfg_baseline.mean = site_lfp.baseline(baseline_cnd_idx).pow_mean;
     cfg_baseline.std = site_lfp.baseline(baseline_cnd_idx).pow_std;
-    state_tfs.powspctrm_normmean = lfp_tfa_baseline_normalization(...
-        state_tfs.powspctrm_rawmean, cfg_baseline); 
+    state_tfs.powspctrm = lfp_tfa_baseline_normalization(...
+        state_tfs.powspctrm, cfg_baseline); 
+    state_tfs.baseline = cfg_baseline;
     
 end

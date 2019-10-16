@@ -164,22 +164,22 @@ function [results_fldr, sessions_avg] = lfp_tfa_avg_sessions_sync(sessions_info,
     end
 
     for t = 1:length(lfp_tfa_cfg.compare.target_pairs)
-        % compute average and plot
+        % plot
         for cn = 1:length(sessions_avg(t).condition)
-            if ~isempty(sessions_avg(t).condition(cn).hs_tuned_sync)
-                if isfield(sessions_avg(t).condition(cn).hs_tuned_sync, 'ppc')
-                    for st = 1:size(sessions_avg(t).condition(cn).hs_tuned_sync, 1)
-                        for hs = 1:size(sessions_avg(t).condition(cn).hs_tuned_sync, 2)
-                            sessions_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm = ...
-                                nanmean( ...
-                                sessions_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm, 1);
-                            sessions_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm_std = ...
-                                nanstd( ...
-                                sessions_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm, 0, 1);
-                        end
-                    end
-                end
-            end
+%             if ~isempty(sessions_avg(t).condition(cn).hs_tuned_sync)
+%                 if isfield(sessions_avg(t).condition(cn).hs_tuned_sync, 'ppc')
+%                     for st = 1:size(sessions_avg(t).condition(cn).hs_tuned_sync, 1)
+%                         for hs = 1:size(sessions_avg(t).condition(cn).hs_tuned_sync, 2)
+%                             sessions_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm = ...
+%                                 nanmean( ...
+%                                 sessions_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm, 1);
+%                             sessions_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm_std = ...
+%                                 nanstd( ...
+%                                 sessions_avg(t).condition(cn).hs_tuned_sync(st,hs).ppc.ppcspctrm, 0, 1);
+%                         end
+%                     end
+%                 end
+%             end
 
 
             if ~isempty(sessions_avg(t).condition(cn).hs_tuned_sync)
