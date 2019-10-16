@@ -38,13 +38,12 @@ function [ diff_sync ] = lfp_tfa_compute_diff_condition_tfsync( sitepair_sync, d
     if nargin < 3
         stat_test = false;
     end
-    
+
     if ~isempty([sitepair_sync.cfg_condition])
         conditions = [sitepair_sync.cfg_condition];
     else
         return;
     end
-    %conditions = ;
     
     for i = 1:length(diff_condition)/2
         diff_sync = struct();

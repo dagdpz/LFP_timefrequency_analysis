@@ -6,19 +6,7 @@
 %clear; 
 
 % file containing settings for LFP analysis
-
-settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_v1.m';
-
-
-% whether the LFP should be processed (true) or not (false)
-% if the LFP for the sessions to analyse has already been processed, and no
-% settings need to be changed, this flag can be set to false to skip LFP
-% being processed again
-% If LFP was not previously processed and the flag is set to false,
-% analysis won't happen
-% TODO: check if LFP is processed, of not, process LFP even if flag is set
-% to false
-process_LFP = false;
+settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\PPC_pulv_eye_hand\lfp_tfa_settings_v1.m';
 
 %% INITIALIZATION
 close all;
@@ -47,25 +35,33 @@ lfp_pow = struct();
 
 try
     %% LFP processing
-    if process_LFP
-        % loop through each session to process
-        for i = 1:length(sessions_info)
-            % name of session = [Monkey name '_' Recording date]
-            session_name = [sessions_info(i).Monkey '_' sessions_info(i).Date];
-            fprintf('Processing LFP for session %s\n', session_name);
-            lfp_tfa_cfg.session = session_name;
-            % folder to which results of analysis of this session should be
-            % stored
-            sessions_info(i).proc_results_fldr = ...
-                fullfile(lfp_tfa_cfg.proc_lfp_folder, session_name);
+    % loop through each session to process
+    for i = 1:length(sessions_info)
+        % name of session = [Monkey name '_' Recording date]
+        session_name = [sessions_info(i).Monkey '_' sessions_info(i).Date];
+        fprintf('Processing LFP for session %s\n', session_name);
+        lfp_tfa_cfg.session = session_name;
+        % folder to which results of analysis of this session should be
+        % stored
+        sessions_info(i).proc_results_fldr = ...
+            fullfile(lfp_tfa_cfg.proc_lfp_folder, session_name);
+        % absolute path of file containing LFP data for this session
+        % check if folder exists and there are processed LFP files inside
+        if ~exist(sessions_info(i).proc_results_fldr, 'dir') || ...
+                isempty(dir(fullfile(sessions_info(i).proc_results_fldr, '*.mat')))
+            warning('No mat files with processed LFP found for session %s\n'...
+                , session_name);
+            sessions_info(i) = ...
+                lfp_tfa_process_LFP(sessions_info(i), lfp_tfa_cfg);
+        elseif lfp_tfa_cfg.process_LFP
             % read LFP data for each site and each trial and calculate the 
             % trial-wise time frequency spectrogram
             sessions_info(i) = ...
                 lfp_tfa_process_LFP(sessions_info(i), lfp_tfa_cfg);
-
         end
-        lfp_tfa_cfg.sessions_info = sessions_info;
+
     end
+    lfp_tfa_cfg.sessions_info = sessions_info;
     %% loop through each processed session for analysis
     for i = 1:length(sessions_info)
         % clear variables
@@ -82,14 +78,7 @@ try
         lfp_tfa_cfg.session_results_fldr = ...
             fullfile(lfp_tfa_cfg.analyse_lfp_folder, session_name);        
         
-        % absolute path of file containing LFP data for this session
-        % check if folder exists and there are processed LFP files inside
-        if ~exist(sessions_info(i).proc_results_fldr, 'dir') || ...
-                isempty(dir(fullfile(sessions_info(i).proc_results_fldr, '*.mat')))
-            warning('No mat files with processed LFP found for session %s\n'...
-                , session_name);
-            continue;
-        end            
+        
         % read the processed lfp mat files for all sites of this session
         sites_lfp_files = dir(fullfile(sessions_info(i).proc_results_fldr, '*.mat'));
         session_proc_lfp = [];

@@ -38,7 +38,7 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
     if nargin < 3
         stat_test = false;
     end
-    
+
     if ~isempty([lfp_tfr.cfg_condition])
         conditions = [lfp_tfr.cfg_condition];
     else

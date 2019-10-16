@@ -48,7 +48,7 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
     % root_results_folder = [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
     % eg: 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\20190506\ver_SN_0.2'
     lfp_tfa_cfg.root_results_fldr = fullfile(lfp_tfa_cfg.results_folder, ...
-        ['ver_' num2str(lfp_tfa_cfg.version)]); %date, 
+        lfp_tfa_cfg.version);
     if ~exist(lfp_tfa_cfg.root_results_fldr, 'dir')
         mkdir(lfp_tfa_cfg.root_results_fldr);
     end
@@ -77,7 +77,13 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
     lfp_tfa_cfg.results_folder = lfp_tfa_cfg.root_results_fldr;
     
     % folder to save LFP processing results
-    lfp_tfa_cfg.proc_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'Processed LFP'];
+    if ~lfp_tfa_cfg.process_LFP && ~exist(lfp_tfa_cfg.proc_lfp_folder, 'dir')
+        lfp_tfa_cfg.process_LFP = true;
+        lfp_tfa_cfg.proc_lfp_folder = [];
+    end
+    if lfp_tfa_cfg.process_LFP
+        lfp_tfa_cfg.proc_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'Processed LFP'];
+    end
     % folder to save LFP analysis results
     lfp_tfa_cfg.analyse_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'LFP Analysis'];
     % folder to store LFP-LFP sync results
