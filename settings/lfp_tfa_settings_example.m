@@ -124,6 +124,8 @@ lfp_tfa_cfg.session_info(8) = ...
 %            'Preinj_blocks',  0, ...
 %            'Postinj_blocks', 'allbutfirst');
 
+%% Setting for analysis and averaging
+
 % what kind of analyses should be done on LFP
 % should be a cell array of strings which indicate which kind of analyses
 % should be performed on LFP
@@ -162,18 +164,49 @@ end
 % lateral labeling
 lfp_tfa_cfg.ref_hemisphere = 'R'; 
 
-% maximum no:of sites to analyse from each session
-% If maxsites < total number of sites in a session, only maxsite number of
-% sites will be analysed
-% Examples:
-% 1. lfp_tfa_cfg.maxsites = 2; only first two sites will be analysed from 
-% each session
-% 1. lfp_tfa_cfg.maxsites = inf; all the sites will be analysed from 
-% each session
-lfp_tfa_cfg.maxsites = inf; % inf = analyse all sites
-
 % random seed for random number generator for reproducibility
 lfp_tfa_cfg.random_seed = rng;
+
+% define the time windows to analyse for LFP TFR and evoked LFP response
+% Must be a Nx4 cell array, N = number of windows to analyse
+% Each row corresponds to one state and contain following elements
+% 1. Identifier of state around which the window is referenced, 
+% see lfp_tfa_global_states, Example:  lfp_tfa_states.CUE_ON
+% 2. Name of the reference state (window) - string (used for labeling 
+% purposes in plots) eg: 'Cue'
+% 3. Start time offset - offset in seconds from reference state onset for 
+% the start of time window
+% start time = Reference state onset time + Start time offset
+% 4. End time offset - offset in seconds from ref. state onset for end of
+% time window
+% end time = Ref. state onset time + end time offset
+% 
+% Example row: 
+%   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
+lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
+                             'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};                    
+
+% define the epochs to analyse for LFP power spectrum
+% Must be a Nx4 cell array, N = number of epochs to analyse
+% Each row corresponds to one epoch and contain following elements
+% 1. Identifier of state to which the epoch is referred, see lfp_tfa_global_states, Example:  lfp_tfa_states.CUE_ON
+% 2. Name of the epoch - string (used for labeling purposes in plots) eg: 'FHol'
+% 3. Start time offset - offset in seconds from reference state onset for 
+% the epoch start
+% Epoch start time = Reference state onset time + Start time offset
+% 4. End time offset - offset in seconds from ref. state onset for epoch
+% end
+% Epoch end time = Ref. state onset time + end time offset
+% Example row: 
+%   lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0
+lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0  ;...
+                              lfp_tfa_states.CUE_ON,     'Cue' ,    0.05 ,    0.2 ; ...
+                              lfp_tfa_states.DEL_PER,    'EDel',    0.3 ,     0.6 ; ...
+                              lfp_tfa_states.TAR_ACQ,    'Del',     -0.3 ,    0  ; ...
+                              lfp_tfa_states.REA_INI,    'PreR',    -0.3 ,    -0.05 ; ...
+                              lfp_tfa_states.REA_END,    'PeriR',   -0.2 ,    0.2 ; ...
+                              lfp_tfa_states.SUCCESS,    'THol',    -0.3 ,    0    };
+
 
 %% Settings for averaging TFR and evoked LFP based on conditions
 
@@ -285,6 +318,17 @@ lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
 %     'choice', {0, 1}}};
+
+% minimum number of trials per condition to be satisfied to consider a site
+% for averaging, if for a site, for any condition, the  number of valid 
+% (non-noisy) trials is less than mintrials_percondition, the site is not considered for averaging
+% Set lfp_tfa_cfg.mintrials_percondition = 1 to consider a site if atleast
+% one valid trial is obtained (keep minimum value of 1)
+% Example:
+% consider those sites with atleast 5 trials for each condition
+% lfp_tfa_cfg.mintrials_percondition = 5; 
+% By condition, we mean a combination of choice/instr, pre/post-injection, type and effector, hand-space
+ lfp_tfa_cfg.mintrials_percondition = 0;
 
 %% Time information
 
@@ -482,57 +526,6 @@ else
     % set choice(1) and/or instructed(0) to be used for computing baseline
     lfp_tfa_cfg.baseline_use_choice_trial = 0; 
 end
-
-% define the time windows to analyse for LFP TFR and evoked LFP response
-% Must be a Nx4 cell array, N = number of windows to analyse
-% Each row corresponds to one state and contain following elements
-% 1. Identifier of state around which the window is referenced, 
-% see lfp_tfa_global_states, Example:  lfp_tfa_states.CUE_ON
-% 2. Name of the reference state (window) - string (used for labeling 
-% purposes in plots) eg: 'Cue'
-% 3. Start time offset - offset in seconds from reference state onset for 
-% the start of time window
-% start time = Reference state onset time + Start time offset
-% 4. End time offset - offset in seconds from ref. state onset for end of
-% time window
-% end time = Ref. state onset time + end time offset
-% 
-% Example row: 
-%   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
-lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
-                             'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};                    
-
-% define the epochs to analyse for LFP power spectrum
-% Must be a Nx4 cell array, N = number of epochs to analyse
-% Each row corresponds to one epoch and contain following elements
-% 1. Identifier of state to which the epoch is referred, see lfp_tfa_global_states, Example:  lfp_tfa_states.CUE_ON
-% 2. Name of the epoch - string (used for labeling purposes in plots) eg: 'FHol'
-% 3. Start time offset - offset in seconds from reference state onset for 
-% the epoch start
-% Epoch start time = Reference state onset time + Start time offset
-% 4. End time offset - offset in seconds from ref. state onset for epoch
-% end
-% Epoch end time = Ref. state onset time + end time offset
-% Example row: 
-%   lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0
-lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0  ;...
-                              lfp_tfa_states.CUE_ON,     'Cue' ,    0.05 ,    0.2 ; ...
-                              lfp_tfa_states.DEL_PER,    'EDel',    0.3 ,     0.6 ; ...
-                              lfp_tfa_states.TAR_ACQ,    'Del',     -0.3 ,    0  ; ...
-                              lfp_tfa_states.REA_INI,    'PreR',    -0.3 ,    -0.05 ; ...
-                              lfp_tfa_states.REA_END,    'PeriR',   -0.2 ,    0.2 ; ...
-                              lfp_tfa_states.SUCCESS,    'THol',    -0.3 ,    0    };
-
-% minimum number of trials per condition to be satisfied to consider a site
-% for averaging, if for a site, for any condition, the  number of valid 
-% (non-noisy) trials is less than mintrials_percondition, the site is not considered for averaging
-% Set lfp_tfa_cfg.mintrials_percondition = 1 to consider a site if atleast
-% one valid trial is obtained (keep minimum value of 1)
-% Example:
-% consider those sites with atleast 5 trials for each condition
-% lfp_tfa_cfg.mintrials_percondition = 5; 
-% By condition, we mean a combination of choice/instr, pre/post-injection, type and effector, hand-space
- lfp_tfa_cfg.mintrials_percondition = 0;
 
 % method to be used for baseline normalization
 % can be 'zscore', 'relchange', 'subtraction', 'division'
