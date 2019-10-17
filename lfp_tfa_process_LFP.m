@@ -66,7 +66,7 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
     
     % save data inside struct 
     % first loop through each site
-    for i = 1:min(length(sites), lfp_tfa_cfg.maxsites)
+    for i = 1:length(sites)
         
         
         % for future use
