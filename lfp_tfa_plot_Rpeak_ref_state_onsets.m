@@ -36,16 +36,6 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
     h = figure;
     set(h, 'position', [100, 100,900, 675]);
     
-    yaxislabel = 'LFP amplitude';
-    if nargin > 4
-        settings = struct(varargin{:});
-        yaxislabel = settings.ylabel;
-    end
-    
-
-    % number of offset samples to divide between time windows
-    noffset = 100;
-    
     % number of subplots required
     nstates = size(lfp_tfa_cfg.analyse_Rpeak_states, 1);
     nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
@@ -55,57 +45,74 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
     % loop through handspace
     for hs = 1:size(Rpeak_evoked_states, 2)
         if ~isempty([Rpeak_evoked_states(:,hs).abs_timefromRpeak])
-%             % concatenate states
-%             concat_states_lfp = struct();
-%             concat_states_lfp.mean = [];
-%             concat_states_lfp.std = [];
-%             concat_states_lfp.time = [];
-% 
-%             state_info = struct();
             for st = 1:size(Rpeak_evoked_states, 1)
                 
-%                 state_info(st).onset_s = find(...
-%                     Rpeak_evoked_state_onsets(st, hs).time <= 0, 1, 'last');
-%                 state_info(st).onset_t = 0;
-%                 state_info(st).start_s = 1;
-%                 state_info(st).start_t = Rpeak_evoked_state_onsets(st, hs).time(1);
-%                 state_info(st).finish_s = length(Rpeak_evoked_state_onsets(st, hs).time);
-%                 state_info(st).finish_t = Rpeak_evoked_state_onsets(st, hs).time(end);                    
-% 
-%                 if st > 1
-%                     state_info(st).start_s = length(concat_states_lfp.time) + ...
-%                         state_info(st).start_s;
-%                     state_info(st).finish_s = length(concat_states_lfp.time) + ...
-%                         state_info(st).finish_s;
-%                     state_info(st).onset_s = length(concat_states_lfp.time) + ...
-%                         state_info(st).onset_s;
-%                 end
-% 
-%                 % concatenate mean, std and time of evoked LFP for
-%                 % different states
-%                 concat_states_lfp.mean = [concat_states_lfp.mean, ...
-%                     Rpeak_evoked_state_onsets(st, hs).mean, nan(size(Rpeak_evoked_state_onsets(st, hs).mean, 1), noffset)];
-%                 concat_states_lfp.std = [concat_states_lfp.std, ...
-%                     Rpeak_evoked_state_onsets(st, hs).std, nan(size(Rpeak_evoked_state_onsets(st, hs).std, 1), noffset)];
-%                 concat_states_lfp.time = [concat_states_lfp.time, ...
-%                     Rpeak_evoked_state_onsets(st, hs).time, nan(1, noffset)];
-%                 concat_states_lfp.label = Rpeak_evoked_state_onsets(st, hs).hs_label;
-%                 if isfield(Rpeak_evoked_state_onsets(st, hs), 'legend')
-%                     concat_states_lfp.legend = Rpeak_evoked_state_onsets(st, hs).legend;
-%                 end
-%                 
-%                 % now plot
-                subplot(nhandspacelabels*2, nstates, (hs-1)*nstates*2 + st);
+%               % state onset probability vs. Rpeak phase
+                timebinedges = Rpeak_evoked_states(st, hs).rel_timeprob.timebins * 2*pi;
+                timebinmiddle = (timebinedges(1:end-1) + timebinedges(2:end))/2;
+                mean_prob = nanmean(Rpeak_evoked_states(st, hs).rel_timeprob.prob, 1);
+                null_hyp_prob = ones(size(mean_prob)) * (1/length(mean_prob));
+                std_prob = nanstd(Rpeak_evoked_states(st, hs).rel_timeprob.prob, 1);
                 
-%                 histogram(Rpeak_evoked_states(st, hs).abs_timefromRpeak, 'BinWidth', 0.05, ...
-%                     'Normalization', 'probability')
+                % state onset probability vs relative time from Rpeak
+                subplot(nhandspacelabels*2, nstates, (hs-1)*nstates*2 + st);
+                % join the mean
+                prob_plot = polar([timebinmiddle timebinmiddle(1)], ...
+                    [mean_prob mean_prob(1)], 'r-');
+                prob_plot.LineWidth = 2;
+                % SN(14.10.2019) - not showing polar plot when hold on is written before
+                % first polar plot
+                hold on;
+                polar([timebinmiddle timebinmiddle(1)], ...
+                    [null_hyp_prob null_hyp_prob(1)], 'k-');
+                view([90 -90]);
+                %phase_plot.LineSize = 2;
+                % standard deviation
+                if size(Rpeak_evoked_states(st, hs).rel_timeprob.prob, 1) > 1
+                    polar([timebinmiddle timebinmiddle(1)], ...
+                        [mean_prob mean_prob(1)] + ...
+                        [std_prob std_prob(1)], 'r--');
+                    polar([timebinmiddle timebinmiddle(1)], ...
+                        [mean_prob mean_prob(1)] - ...
+                        [std_prob std_prob(1)], 'r--');
+                end
+                %set(gca, 'XTick', timebinedges);
+                subplottitle = Rpeak_evoked_states(st, hs).state_name;
+                if isfield(Rpeak_evoked_states(st, hs), 'ntrials') && ...
+                        ~isempty(Rpeak_evoked_states(st, hs).ntrials)
+                    subplottitle = [subplottitle, sprintf(' (%g)', ...
+                        Rpeak_evoked_states(st, hs).ntrials)];
+                end
+                title(subplottitle); %box on;
+                %xlabel('Rel. Time from Rpeak')
+                ylabel('Rpeak phase[°]');
+                
+                % state onset probability vs absolute time around Rpeak
+                subplot(nhandspacelabels*2, nstates, (hs-1)*nstates*2 + nstates + st);
+                
                 timebinedges = Rpeak_evoked_states(st, hs).abs_timeprob.timebins;
                 timebinmiddle = (timebinedges(1:end-1) + timebinedges(2:end))/2;
-                plot(timebinmiddle, Rpeak_evoked_states(st, hs).abs_timeprob.prob, 'bs');
+                if size(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1) > 1
+                    plot(timebinmiddle, Rpeak_evoked_states(st, hs).abs_timeprob.prob, ...
+                        'Color', [0.6, 0.6, 0.6], 'LineStyle', '-', 'LineWidth', 0.5);
+                end
                 hold on;
                 % join the mean
                 plot(timebinmiddle, ...
-                    nanmean(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1), 'r*-');
+                    nanmean(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1), 'r*-', 'LineWidth', 2);
+                % standard deviation
+                if size(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1) > 1
+                    plot(timebinmiddle, ...
+                        nanmean(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1) + ...
+                        nanstd(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1), 'r--');
+                    plot(timebinmiddle, ...
+                        nanmean(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1) - ...
+                        nanstd(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1), 'r--');
+                end
+                set(gca, 'XLim', lfp_tfa_cfg.analyse_Rpeak_states{st, 3});
+                box on;
+                % line at Rpeak onset
+                line([0 0], ylim, 'Color', 'k', 'LineStyle', '--');
                 %set(gca, 'XTick', timebinedges);
                 %grid on;
                 subplottitle = Rpeak_evoked_states(st, hs).state_name;
@@ -114,83 +121,12 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
                     subplottitle = [subplottitle, sprintf(' (%g)', ...
                         Rpeak_evoked_states(st, hs).ntrials)];
                 end
-                title(subplottitle);
+                title(subplottitle); box on;
                 xlabel('Time from Rpeak (s)')
                 ylabel('P(onset)');
                 
-                subplot(nhandspacelabels*2, nstates, (hs-1)*nstates*2 + nstates + st);
-                
-%                 histogram(Rpeak_evoked_states(st, hs).rel_timefromRpeak, 'BinWidth', 0.1, ...
-%                     'Normalization', 'probability')
-                timebinedges = Rpeak_evoked_states(st, hs).rel_timeprob.timebins;
-                timebinmiddle = (timebinedges(1:end-1) + timebinedges(2:end))/2;
-                plot(timebinmiddle, Rpeak_evoked_states(st, hs).rel_timeprob.prob, 'bs');
-                hold on;
-                % join the mean
-                plot(timebinmiddle, ...
-                    nanmean(Rpeak_evoked_states(st, hs).rel_timeprob.prob, 1), 'r*-');
-                %set(gca, 'XTick', timebinedges);
-                subplottitle = Rpeak_evoked_states(st, hs).state_name;
-                if isfield(Rpeak_evoked_states(st, hs), 'ntrials') && ...
-                        ~isempty(Rpeak_evoked_states(st, hs).ntrials)
-                    subplottitle = [subplottitle, sprintf(' (%g)', ...
-                        Rpeak_evoked_states(st, hs).ntrials)];
-                end
-                title(subplottitle);
-                xlabel('Rel. Time from Rpeak')
-                ylabel('P(onset)');
-
             end
             
-            %state_onsets = find(concat_states_lfp.time(1:end-1) .* ...
-            %    concat_states_lfp.time(2:end) <= 0);
-%             state_onsets = find(concat_states_lfp.time == 0);
-%             state_samples = sort([state_info.start_s, state_info.onset_s, ...
-%                 state_info.finish_s]);
-% 
-%             % now plot
-%             subplot(nhandspacelabels, nstates, (hs-1)*nstates + st)
-%             hold on;
-%             colors = ['b', 'r', 'g', 'y', 'm', 'c', 'k'];
-%             for i = 1:size(concat_states_lfp.mean, 1)
-%                 plot(concat_states_lfp.mean(i, :), colors(i));
-%             end
-%             if isfield(concat_states_lfp, 'legend')
-%                 legend(concat_states_lfp.legend);
-%             end
-%             for i = 1:size(concat_states_lfp.mean, 1)
-%                 plot(concat_states_lfp.mean(i, :) + concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
-%                 plot(concat_states_lfp.mean(i, :) - concat_states_lfp.std(i, :), [colors(mod(i, length(colors))) ':']);
-%             end
-%             % mark state onsets
-%             %if isfield(evoked_lfp, 'state_name')
-%             set(gca,'xtick',state_samples)
-%             for so = state_onsets
-%                 line([so so], ylim, 'color', 'k'); 
-%                 if isfield(Rpeak_evoked(state_onsets == so, hs), 'state_name') && ...
-%                         ~isempty(Rpeak_evoked(state_onsets == so, hs).state_name)
-%                     state_name = Rpeak_evoked(state_onsets == so, hs).state_name;
-%                     ypos = ylim;
-%                     ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;
-%                     text(so+1, ypos, state_name, 'fontsize', 8);
-%                 end
-%             end
-%             %end
-%             set(gca,'xticklabels', round(concat_states_lfp.time(state_samples), 2), 'fontsize', 8)
-%             set(gca, 'xticklabelrotation', 45);
-%             xlabel('Time(s)');
-%             ylabel(yaxislabel);
-%             
-%             subplottitle = [concat_states_lfp.label{1}];
-%             if isfield(Rpeak_evoked(1, hs), 'nsessions')
-%                 subplottitle = [subplottitle ' (nsessions = ' num2str(Rpeak_evoked(1, hs).nsessions) ')'];
-%             elseif isfield(Rpeak_evoked(1, hs), 'nsites')
-%                 subplottitle = [subplottitle ' (nsites = ' num2str(Rpeak_evoked(1, hs).nsites) ')'];
-%             elseif isfield(Rpeak_evoked(1, hs), 'trials')
-%                 subplottitle = [subplottitle ' (ntrials = ' ...
-%                     num2str(length(Rpeak_evoked(1, hs).trials)) ')'];            
-%             end
-%             title(subplottitle);
         end
     end
     if isfield(Rpeak_evoked_states, 'nsessions')

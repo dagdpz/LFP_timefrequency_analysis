@@ -128,7 +128,7 @@ function [ session_R2Rt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_
 
                         % save evoked ECG
                         session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).ecg_b2bt = state_evoked.ecg_b2bt;
-                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).baseline_mean = state_evoked.mean_ecg_b2bt;
+                        session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).trials_mean = state_evoked.mean_ecg_b2bt;
                         session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).mean = state_evoked.mean;
                         session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).std = state_evoked.std; 
                         session_R2Rt(i).condition(cn).hs_tuned_evoked(st, hs).time = state_evoked.ecg_time;
@@ -162,7 +162,7 @@ function [ session_R2Rt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_
                     ['ECG_b2bt_Evoked_' session_R2Rt(i).session '_' site_conditions(cn).label '.png']);
                    
                 lfp_tfa_plot_evoked_R2Rt (session_R2Rt(i).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
-                    plottitle, result_file, 'normalize', true);
+                    plottitle, result_file);
             end
 
         end
@@ -186,7 +186,7 @@ function [ session_R2Rt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_
                         '_' 'diff_condition' num2str(dcn) '.png']);
                         %sites_avg(t).difference(dcn).label '.png']);
                     lfp_tfa_plot_evoked_R2Rt(session_R2Rt(i).difference(dcn).hs_tuned_evoked, ...
-                        lfp_tfa_cfg, plottitle, result_file, 'normalize', true);
+                        lfp_tfa_cfg, plottitle, result_file);
                 end
             end
         end

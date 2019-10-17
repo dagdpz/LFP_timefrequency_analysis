@@ -140,6 +140,9 @@ function session_ecg = lfp_tfa_read_preproc_ECG( session_info, plottrials )
             effector = trial(t).effector;
             completed = trial(t).completed;
             choice_trial = trial(t).choice;
+            fix_pos = trial(t).fix_pos;
+            tar_pos = trial(t).tar_pos;
+            sac_off = trial(t).sac_off;
             % for future use
             % check if the block is usable
 %                 if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
@@ -198,6 +201,8 @@ function session_ecg = lfp_tfa_read_preproc_ECG( session_info, plottrials )
             session_ecg.trials(comp_trial).choice_trial = choice_trial;
             session_ecg.trials(comp_trial).reach_hand = 0;
             session_ecg.trials(comp_trial).reach_space = 0;
+            session_ecg.trials(comp_trial).fix_pos = fix_pos;
+            session_ecg.trials(comp_trial).eye_pos = tar_pos + sac_off;
             session_ecg.trials(comp_trial).hndspc_lbl  = [];
             session_ecg.trials(comp_trial).time = timestamps;
             session_ecg.trials(comp_trial).ecg_data = ECG;
@@ -234,7 +239,7 @@ function session_ecg = lfp_tfa_read_preproc_ECG( session_info, plottrials )
 
         end
 
-        session_ecg = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpeak, block, plottrials );
+        session_ecg = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpeak, block, plottrials, results_fldr );
 
 
 

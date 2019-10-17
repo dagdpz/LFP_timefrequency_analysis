@@ -157,6 +157,11 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 subplottitle = [subplottitle ' (npeaks = ' ...
                     num2str(evoked_lfp(1, hs).npeaks) ')'];            
             end
+            if isfield(evoked_lfp(1, hs), 'nshuffles') && ...
+                    ~isempty(evoked_lfp(1, hs).nshuffles)
+                subplottitle = [subplottitle ' (nshuffles = ' ...
+                    num2str(evoked_lfp(1, hs).nshuffles) ')'];            
+            end
             title(subplottitle);
         end
     end

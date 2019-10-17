@@ -49,6 +49,7 @@ if ~isempty(ft_data_all.trial)
     ecg_based_sta       = ft_spiketriggeredaverage(cfg, ft_data_all);
     
     ecg_triggered_evoked.lfp = ecg_based_sta.trial;
+    ecg_triggered_evoked.dimord = 'npeaks_time';
     ecg_triggered_evoked.lfp_time = ecg_based_sta.time;
     ecg_triggered_evoked.mean = ecg_based_sta.avg;
     ecg_triggered_evoked.std = permute(nanstd(ecg_based_sta.trial, 0, 1), [2 3 1]);

@@ -160,5 +160,5 @@ function sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets(Rpeak_sta
     end
  
         
-    close all;
+    %close all;
 end

@@ -231,7 +231,7 @@ function session_ecg = lfp_tfa_read_combined_ECG( session_info, plottrials  )
                     end
                 end
                 
-                session_ecg = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpeak, nrblock_combinedFile, plottrials );
+                session_ecg = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpeak, nrblock_combinedFile, plottrials, results_fldr );
                       
         
             

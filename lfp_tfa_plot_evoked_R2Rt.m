@@ -35,7 +35,11 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
 
 
     % defaults
-    yaxislabel = 'Relative R2R time';
+    if lfp_tfa_cfg.normalize_R2Rt
+        yaxislabel = 'Relative R2R time';
+    else
+        yaxislabel = 'R2R time (s)';
+    end
     err = 'stdev'; % standard error
     
     % get settings
@@ -54,7 +58,7 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
     set(h1, 'position', [100, 100,900, 675]);
     
     % number of offset samples to divide between time windows
-    noffset = 100;
+    noffset = 150;
     
     % number of subplots required
     nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
@@ -92,7 +96,18 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
 
                 % concatenate mean, std and time of evoked LFP for
                 % different states
-                state_evoked_R2Rt = evoked_R2Rt(st, hs).ecg_b2bt;
+                if isfield(evoked_R2Rt(1, hs), 'ntrials') && ...
+                     ~isempty(evoked_R2Rt(1, hs).ntrials)
+                    state_evoked_R2Rt = evoked_R2Rt(st, hs).ecg_b2bt;
+                    if lfp_tfa_cfg.normalize_R2Rt
+                           state_evoked_R2Rt = state_evoked_R2Rt ./ ...
+                               repmat(evoked_R2Rt(st, hs).trials_mean', ...
+                               [1 size(state_evoked_R2Rt, 2)]);
+                    end
+                    concat_states_R2Rt.trial = [concat_states_R2Rt.trial, ...
+                    horzcat(state_evoked_R2Rt, nan(size(evoked_R2Rt(st, hs).ecg_b2bt, 1), noffset))];
+                end
+                
                 state_evoked_mean = evoked_R2Rt(st, hs).mean;
                 state_evoked_err = evoked_R2Rt(st, hs).std;
                 if strcmp(err, 'stderr')
@@ -100,10 +115,8 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
                         / sqrt(size(evoked_R2Rt(st, hs).ecg_b2bt, 1));
                 elseif strcmp(err, 'stdev')
                     state_evoked_err = evoked_R2Rt(st, hs).std;
-                end
+                end                
                 
-                concat_states_R2Rt.trial = [concat_states_R2Rt.trial, ...
-                    horzcat(state_evoked_R2Rt, nan(size(evoked_R2Rt(st, hs).ecg_b2bt, 1), noffset))];
                 concat_states_R2Rt.mean = [concat_states_R2Rt.mean, ...
                     state_evoked_mean, nan(size(evoked_R2Rt(st, hs).mean, 1), noffset)];
                 concat_states_R2Rt.err = [concat_states_R2Rt.err, ...
@@ -126,7 +139,7 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
                 state_info.finish_s]);
 
             % now plot
-            subplot(nhandlabels, nspacelabels, hs)
+            subplot(nhandlabels*2, nspacelabels, hs)
             hold on;
             colors = ['b', 'r', 'g', 'y', 'm', 'c', 'k'];
             % plot individual trials
@@ -145,9 +158,9 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
                 legend(concat_states_R2Rt.legend);
             end
             for i = 1:size(concat_states_R2Rt.mean, 1)
-                plot(concat_states_R2Rt.mean(i, :) + concat_states_R2Rt.err(i, :), [colors(mod(i, length(colors))) ':'], ...
+                plot(concat_states_R2Rt.mean(i, :) + concat_states_R2Rt.err(i, :), [colors(mod(i, length(colors))) '--'], ...
                     'LineWidth', 1);
-                plot(concat_states_R2Rt.mean(i, :) - concat_states_R2Rt.err(i, :), [colors(mod(i, length(colors))) ':'], ...
+                plot(concat_states_R2Rt.mean(i, :) - concat_states_R2Rt.err(i, :), [colors(mod(i, length(colors))) '--'], ...
                     'LineWidth', 1);
             end
             % mark state onsets

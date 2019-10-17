@@ -77,7 +77,7 @@ for t = 1:length(trials_lfp)
     
     state_evoked.ecg_time = [state_evoked.ecg_time, trial_ecg_time];
     state_evoked.ecg_b2bt = [state_evoked.ecg_b2bt, ...
-        trial_evoked_ecg_b2bt / trial_mean_ecg_b2bt];
+        trial_evoked_ecg_b2bt];
     state_evoked.mean_ecg_b2bt = [state_evoked.mean_ecg_b2bt, ...
         trial_mean_ecg_b2bt];
     
@@ -122,8 +122,16 @@ if ~isempty(ft_data_R2Rt.trial)
 
     
     % evoked LFP average
-    state_evoked.mean = nanmean(arr_state_ecg_b2bt, 1);
-    state_evoked.std = nanstd(arr_state_ecg_b2bt, 0, 1);
-    state_evoked.ntrials = size(arr_state_ecg_b2bt, 1);
+    if lfp_tfa_cfg.normalize_R2Rt
+        norm_arr_state_ecg_b2bt = arr_state_ecg_b2bt ./ ...
+            repmat(state_evoked.mean_ecg_b2bt', ...
+            [1 size(arr_state_ecg_b2bt, 2)]);
+        state_evoked.mean = nanmean(norm_arr_state_ecg_b2bt, 1);
+        state_evoked.std = nanstd(norm_arr_state_ecg_b2bt, 0, 1);
+    else
+        state_evoked.mean = nanmean(arr_state_ecg_b2bt, 1);
+        state_evoked.std = nanstd(arr_state_ecg_b2bt, 0, 1);
+    end
+    state_evoked.ntrials = sum(~isnan(sum(arr_state_ecg_b2bt, 2)));
     
 end

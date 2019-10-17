@@ -130,7 +130,7 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ecg_b2bt_evoked, lfp
                 result_file = fullfile(results_fldr, ...
                                 ['ECG_b2bt_Evoked_' lfp_tfa_cfg.conditions(cn).label '.png']);
                 lfp_tfa_plot_evoked_R2Rt(sessions_avg(t).condition(cn).hs_tuned_evoked, ...
-                            lfp_tfa_cfg, plottitle, result_file, 'ylabel', 'ECG b2b interval (s)');
+                            lfp_tfa_cfg, plottitle, result_file);
             end
         end
         % save session average tfs
@@ -155,7 +155,7 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ecg_b2bt_evoked, lfp
                     ['ECG_b2bt_DiffEvoked_' 'diff_condition' num2str(dcn) '.png']);
                     %sessions_avg(t).difference(dcn).label '.png']);
                 lfp_tfa_plot_evoked_R2Rt(sessions_avg(t).difference(dcn).hs_tuned_evoked, ...
-                    lfp_tfa_cfg, plottitle, result_file, 'ylabel', 'ECG b2b interval (s)');
+                    lfp_tfa_cfg, plottitle, result_file);
             end
         end
     end

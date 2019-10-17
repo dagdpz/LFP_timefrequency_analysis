@@ -1,4 +1,4 @@
-function [ session_ecg ] = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpeak, nrblock, plottrials )
+function [ session_ecg ] = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpeak, nrblock, plottrials, results_folder )
 %lfp_tfa_compute_site_tfr Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -106,31 +106,18 @@ function [ session_ecg ] = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpe
 %             h2 = uicontrol('Position', [300 5 200 40], 'String', 'Continue', ...
 %                       'Callback', 'plottrials = 0; close;');
             % plot raw ECG
-            ax1 = subplot(311);
+            ax1 = subplot(4,2,[3 4]);
             plot(trial.time, trial.ecg_data);
             box on;
             set(gca, 'Xlim', [trial.time(1), ...
                 trial.time(end)]);
-            set(gca, 'Ylim', ax1.YLim);
-                        
-            % plot spikes
-            subplot(312);
-            plot(trial.time, trial.ECG_spikes);
-            box on;
-            set(gca, 'Xlim', [trial.time(1), trial.time(end)]);
-            
-            % plot ECG R2Rt valid
-            subplot(313);
-            plot(trial.time, trial.ECG_b2btime);
-            box on;
-            set(gca, 'Xlim', [trial.time(1), trial.time(end)]);
-            
-            % title
-            subplot(311);
-            title([strrep(session_ecg.session, '_', ' '), ...
-                ', Block ', num2str(nrblock) ...
-                ', Trial ' num2str(trials_idx(t)) ...
-                ', Completed = ' num2str(trial.completed)]);
+            set(gca, 'Ylim', ylim);
+            ylabel('ECG amplitude');
+%             title([strrep(session_ecg.session, '_', ' '), ...
+%                 ', Block ', num2str(nrblock) ...
+%                 ', Trial ' num2str(trials_idx(t)) ...
+%                 ', Completed = ' num2str(trial.completed)]);
+            title('Raw ECG');
             % mark state onsets
             for state = (trial.states)
                 if ~isnan(state.onset_t) || ~isempty( state.onset_t)
@@ -140,12 +127,65 @@ function [ session_ecg ] = lfp_tfa_get_block_Rpeak_times( session_ecg, block_Rpe
                 end
             end
             
+            % second axis
+%             pos = get(ax1,'position');   % get the position vector
+%             pos1=pos(2);              % save the original bottom position
+%             pos(2)=pos(2)+0.06; %pos(4)=pos(4)-0.01;  % raise bottom/reduce height->same overall upper position
+%             set(ax1,'position',pos)   % and resize first axes
+%             pos(2)=pos1; pos(4)=0.00000000001; % reset bottom to original and small height
+%             ax1(2)=axes('position',pos,'color','none');
+%             trial_period = linspace(trial.trialperiod(1), trial.trialperiod(end), length(trial.time));
+%             plot(trial_period, zeros(length(trial_period)), 'k');
+%             ylabel('Block timestamp (s)');
+%             set(ax1(2), 'Xlim', [trial_period(1), ...
+%                 trial_period(end)]);
+                                    
+            % plot spikes
+            subplot(4,2,[5 6]);
+            plot(trial.time, trial.ECG_spikes);
+            box on;
+            set(gca, 'Xlim', [trial.time(1), trial.time(end)]);
+            title('ECG R peaks');
+            
+            % plot ECG R2Rt valid
+            subplot(4,2,[7 8]);
+            plot(trial.time, trial.ECG_b2btime);
+            box on;
+            set(gca, 'Xlim', [trial.time(1), trial.time(end)]);
+            title('ECG R2R interval')
+            ylabel('R2R time (s)');
+            xlabel('Time (s)');
+            
+            % Eye position
+            ax_eyepos = subplot(422); box on; hold on;
+            title('Eye position');
+            xlabel('xpos'); ylabel('ypos');
+            plot(real(trial.fix_pos), imag(trial.fix_pos), 's', ...
+                'Color', [0.5, 0.5, 0.5], 'MarkerSize', 10, 'MarkerFaceColor', [0.5, 0.5, 0.5]);
+            plot(real(trial.eye_pos), imag(trial.eye_pos), 'ro', ...
+                'MarkerSize', 10, 'MarkerFaceColor', 'r');
+            set(ax_eyepos, 'XLim', [-30 30]);
+            set(ax_eyepos, 'YLim', [-30 30]);
+            
+            % text
+            ax_text = subplot(421);
+            annotation('textbox', get(ax_text, 'OuterPosition'), ...
+                'String', sprintf('Session: %s\nBlock: %s\nTrial: %s\nCompleted: %s\n', ...    
+                strrep(session_ecg.session, '_', ' '), ...
+                num2str(nrblock), ...
+                num2str(trials_idx(t)), ...
+                num2str(trial.completed)), 'FontSize', 14, ...
+                'EdgeColor', 'none', 'HorizontalAlignment', 'center', ...
+                'VerticalAlignment', 'middle');
+            delete(ax_text);
+            
 %             uiwait(gcf);
             
             if t == 1
                 disp('Press any key to continue! To abort, press Ctrl+C');
             end
             pause;
+            %savefig(h, fullfile(results_folder, 'trials', sprintf('Block_%g_Trial_%g', nrblock, trials_idx(t))));
         end
     end
 
