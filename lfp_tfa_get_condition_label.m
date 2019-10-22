@@ -1,4 +1,42 @@
 function condition_label = lfp_tfa_get_condition_label(cfg_condition, label_length)
+%lfp_tfa_get_condition_label - Get a label for a given trial condition (A
+%trial condition is a permutation of perturbation, choice, type and effector)
+%
+% USAGE:
+%   condition_label = lfp_tfa_get_condition_label(cfg_condition)
+%	condition_label = lfp_tfa_get_condition_label(cfg_condition, label_length)
+%
+% INPUTS:
+%       cfg_condition   - structure containing the conditions
+%           Required fields:
+%           type            - trial type
+%           effector        - trial effector
+%           choice          - choice/instructed trial
+%           perturbation    - pre or post injection trial
+%       label_length    - length of the condition label ('long' or
+%       'short'), 'short' for a shorter label
+%
+% OUTPUTS:
+%		condition_label  - label for the given trial condition
+%
+% REQUIRES:	lfp_tfa_read_info_file, lfp_tfa_compare_conditions,
+%
+%
+% See also settings/lfp_tfa_settings_example, lfp_tfa_read_info_file, 
+% lfp_tfa_compare_conditions, lfp_tfa_mainscript
+%
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
 switch cfg_condition.type
     case 1

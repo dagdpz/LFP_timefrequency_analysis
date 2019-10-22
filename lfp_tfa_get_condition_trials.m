@@ -1,14 +1,14 @@
 function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
-%lfp_tfa_get_condition_trials - Function to get the indices fo trials which
-%satisfy a condition
+%lfp_tfa_get_condition_trials - Function to get the indices of trials which
+%satisfy a given trial condition
 %
 % USAGE:
 %	cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
 %
 % INPUTS:
-%       site_lfp                  - struct containing the LFP data for all
-%       trials for one site
-%       condition                 - struct containing the condition to be
+%       site_lfp    - struct containing the condition 
+%       information about all trials for one site
+%       condition   - struct containing the condition to be
 %       analysed
 %           Required fields:
 %               type                - (integer) trial type
@@ -20,7 +20,7 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
 %               'allbutone'
 %
 % OUTPUTS:
-%		cond_trials               - array of length (1 x N, N = number of
+%		cond_trials     - array of length (1 x N, N = number of
 %		trials), with ones at indices of trials belonging to the given
 %		condition
 %

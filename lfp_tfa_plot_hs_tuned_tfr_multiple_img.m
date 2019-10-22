@@ -4,14 +4,15 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
 %
 % USAGE:
 %   lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file )
-%   lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file, 'bluewhitered' )
+%   lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file, cm )
+%   lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file, cm, plot_significant )
 %
 %
 % INPUTS:
 %       avg_tfr         - average LFP time frequency response for different
 %       hand-space conditions to be compared
 %		lfp_tfa_cfg     - struct containing the required settings
-%           Required Fields: see lfp_tfa_settings
+%           Required Fields: see settings/lfp_tfa_settings_example
 %               1. baseline_method             - method used for baseline
 %               normalization
 %               2. compare.reach_hands          - hand labels to compare
@@ -19,13 +20,15 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
 %       plottitle       - title for the plot
 %       results_file    - path to filename to store the resulting image
 %       varargin        - colormap to be used (default = 'jet', can be any 
-%       standard colormap additionally supported is 'bluewhitered')
+%                       standard colormap additionally supported is 'bluewhitered')
+%                       - flag to indicate if only significant difference
+%                       bins should be plotted
 %
-% REQUIRES:	bluewhitered
+% REQUIRES:	bluewhitered, export_fig
 %
-% See also lfp_tfa_settings, lfp_tfa_plot_site_average_tfr, 
+% See also settings/lfp_tfa_settings_example, lfp_tfa_plot_site_average_tfr, 
 % lfp_tfa_avg_tfr_across_sessions, lfp_tfa_avg_tfr_across_sites, 
-% bluewhitered, lfp_tfa_define_settings
+% bluewhitered, colormap, lfp_tfa_compute_difference_condition_tfr
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

@@ -1,17 +1,18 @@
 function lfp_tfa_plot_hs_tuned_sync( avg_hs_tuned_sync, lfp_tfa_cfg, plottitle, results_file, varargin )
-%lfp_tfa_plot_hs_tuned_tfr  - Plots the LFP-LFP phase synchronization
+%lfp_tfa_plot_hs_tuned_sync  - Plots the LFP-LFP phase synchronization
 %spectrogram averages for different hand-space conditions to be compared
 %
 % USAGE:
-%   lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file )
-%   lfp_tfa_plot_hs_tuned_tfr( avg_tfr, lfp_tfa_cfg, plottitle, results_file, 'bluewhitered' )
+%   lfp_tfa_plot_hs_tuned_sync( avg_tfr, lfp_tfa_cfg, plottitle, results_file )
+%   lfp_tfa_plot_hs_tuned_sync( avg_tfr, lfp_tfa_cfg, plottitle, results_file, 'bluewhitered' )
+%   lfp_tfa_plot_hs_tuned_sync( avg_tfr, lfp_tfa_cfg, plottitle, results_file, 'bluewhitered', [-0.3 0.3] )
 %
 %
 % INPUTS:
 %       avg_tfr         - average LFP time frequency response for different
 %       hand-space conditions to be compared
 %		lfp_tfa_cfg     - struct containing the required settings
-%           Required Fields: see lfp_tfa_settings
+%           Required Fields: see settings/lfp_tfa_settings_example
 %               1. baseline_method             - method used for baseline
 %               normalization
 %               2. compare.reach_hands          - hand labels to compare
@@ -19,14 +20,14 @@ function lfp_tfa_plot_hs_tuned_sync( avg_hs_tuned_sync, lfp_tfa_cfg, plottitle, 
 %       plottitle       - title for the plot
 %       results_file    - path to filename to store the resulting image
 %       varargin        - colormap to be used (default = 'jet', can be any 
-%       standard colormap additionally supported is 'bluewhitered')
+%                       standard colormap additionally supported is 'bluewhitered')
 %                       - image scale to be used (1x2 double)
 %
-% REQUIRES:	bluewhitered
+% REQUIRES:	bluewhitered, export_fig
 %
-% See also lfp_tfa_settings, lfp_tfa_plot_site_average_tfr, 
-% lfp_tfa_avg_tfr_across_sessions, lfp_tfa_avg_tfr_across_sites, 
-% bluewhitered, lfp_tfa_define_settings
+% See also settings/lfp_tfa_settings_example, 
+% lfp_tfa_sitepair_averaged_sync, lfp_tfa_avg_sessions_sync
+% lfp_tfa_avg_sitepairs_sync, bluewhitered, colormap
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

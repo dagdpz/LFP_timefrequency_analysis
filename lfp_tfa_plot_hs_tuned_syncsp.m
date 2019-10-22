@@ -1,23 +1,27 @@
 function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottitle, results_file )
-%lfp_tfa_plot_hs_tuned_tfr  - Plots the LFP power spectrum 
+%lfp_tfa_plot_hs_tuned_syncsp  - Plots the LFP-LFP phase sync spectrum 
 %averages for different hand-space conditions to be compared
 %
 % USAGE:
-%   lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results_file )
+%   lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, ...
+%       plottitle, results_file )
 %
 % INPUTS:
-%       avg_lfp_psd      - average LFP power spectrum for different
-%       hand-space conditions to be compared
+%       avg_hs_tuned_syncsp     - average LFP-LFP sync spectrum for 
+%       different hand-space conditions to be compared
 %		lfp_tfa_cfg      - struct containing the required settings
-%           Required Fields: see lfp_tfa_settings
+%           Required Fields: see settings/lfp_tfa_settings_example
 %               1. analyse_epochs - epochs to be analysed
+%               2. compare.reach_hands          - hand labels to compare
+%               3. compare.reach_spaces         - space labels to compare
 %       plottitle       - title for the plot
 %       results_file    - path to filename to store the resulting image
 %
-% REQUIRES:	
+% REQUIRES:	export_fig
 %
-% See also lfp_tfa_settings, lfp_tfa_plot_site_powspctrm, 
-% lfp_tfa_avg_pow_across_sites, lfp_tfa_avg_pow_across_sessions
+% See also settings/lfp_tfa_settings_example, 
+% lfp_tfa_sitepair_averaged_syncspctrm, colormap, export_fig
+% lfp_tfa_avg_sessions_syncspctrm, lfp_tfa_avg_sitepairs_syncspctrm
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag
@@ -37,6 +41,10 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
     
     cm = colormap(othercolor('Cat_12', size(avg_hs_tuned_syncsp, 1)));
     %cm = colormap(jet(size(avg_hs_tuned_syncsp, 1)));
+    
+    % number of subplots required
+    nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
+    nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
        
     % loop through handspace
     for hs = 1:size(avg_hs_tuned_syncsp, 2)
@@ -47,7 +55,7 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
             continue;
         end   
         if ~isempty(cat(2, ppc.ppcspctrm))
-            subplot(2,2,hs)
+            subplot(nhandlabels, nspacelabels, hs)
             for ep = 1:size(avg_hs_tuned_syncsp, 1)
                 % check if no trials exist for this epoch and HS
                 if ~isempty(avg_hs_tuned_syncsp(ep, hs).ppc.ppcspctrm) && ...

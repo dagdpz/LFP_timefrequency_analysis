@@ -1,6 +1,54 @@
 function sitepair_crosspow = lfp_tfa_compute_sitepair_csd(site1_lfp, site2_lfp, lfp_tfa_cfg)
-%lfp_tfa_compute_sitepair_csd Summary of this function goes here
-%   Detailed explanation goes here
+% lfp_tfa_compute_sitepair_csd - Computes the LFP-LFP cross power spectrogram
+% between a pair of sites for all trials of a session. 
+% This function calls the ft_freqanalysis routine
+% of Fieldtrip toolbox for the calculation of LFP-LFP cross spectrum
+%
+% USAGE:
+%	sitepair_crosspow = lfp_tfa_compute_sitepair_csd(site1_lfp, ...
+%       site2_lfp, lfp_tfa_cfg)
+%
+% INPUTS:
+%		site1_lfp        - struct containing LFP signal for each trial for
+%		one site, see lfp_tfa_process_LFP
+%       site2_lfp        - struct containing LFP signal for each trial for
+%		another site, see lfp_tfa_process_LFP
+%       lfp_tfa_cfg      - settings for TFR computation, see 
+%       settings/lfp_tfa_settings_example
+%           Required Fields: 
+%               1. tfr.method   - method to be used for calculating the LFP
+%               power spectra. Can be 'mtmconvol' or 'wavelet'
+%               2. tfr.width    - width of the wavelets in number of
+%               cycles (For method = 'wavelet', Ignored for 'mtmconvol')
+%               3. tfr.taper    - taper (single or multiple) to be used.
+%               Can be 'dpss', 'hanning' or many others (Used when
+%               tfr.method = 'mtmconvol', ignored for 'wavelet'
+%               4. tfr.foi      - frequencies of interest (in Hz), a vector
+%               of freq values or a 1x2 vector with start and end freq
+%               5. tfr.t_ftimwin - length of the sliding time-window in 
+%               seconds, should be vector of length 1 x numfoi (Only used
+%               when tfr.method = 'mtmconvol')
+%               6. tfr.timestep - number of lfp samples to step for the 
+%               sliding time window
+% OUTPUTS:
+%		sitepair_crosspow       - structure containing trial-wise LFP-LFP
+%		cross power spectrograms
+%
+% See also lfp_tfa_process_lfp, settings/lfp_tfa_settings_example,
+% lfp_tfa_sitepair_averaged_sync
+% 
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
     
 % struct to store information about sitepair
 sitepair_crosspow = struct();

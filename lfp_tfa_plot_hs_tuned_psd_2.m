@@ -1,23 +1,26 @@
 function lfp_tfa_plot_hs_tuned_psd_2( avg_lfp_psd, lfp_tfa_cfg, plottitle, results_file )
-%lfp_tfa_plot_hs_tuned_tfr  - Plots the LFP power spectrum 
+%lfp_tfa_plot_hs_tuned_psd_2  - Plots the LFP power spectrum 
 %averages for different hand-space conditions to be compared
 %
 % USAGE:
-%   lfp_tfa_plot_hs_tuned_psd( avg_lfp_psd, lfp_tfa_cfg, plottitle, results_file )
+%   lfp_tfa_plot_hs_tuned_psd_2( avg_lfp_psd, lfp_tfa_cfg, plottitle, results_file )
 %
 % INPUTS:
 %       avg_lfp_psd      - average LFP power spectrum for different
 %       hand-space conditions to be compared
 %		lfp_tfa_cfg      - struct containing the required settings
-%           Required Fields: see lfp_tfa_settings
-%               1. analyse_epochs - epochs to be analysed
+%           Required Fields: see settings/lfp_tfa_settings_example
+%               1. compare.reach_hands  - reach hands to be included
+%               2. compare.reach_spaces - reach spaces to be included
+%               3. analyse_epochs - epochs to be analysed
 %       plottitle       - title for the plot
 %       results_file    - path to filename to store the resulting image
 %
-% REQUIRES:	
+% REQUIRES:	export_fig
 %
-% See also lfp_tfa_settings, lfp_tfa_plot_site_powspctrm, 
-% lfp_tfa_avg_pow_across_sites, lfp_tfa_avg_pow_across_sessions
+% See also settings/lfp_tfa_settings_example, lfp_tfa_plot_site_powspctrm, 
+% lfp_tfa_avg_pow_across_sites, lfp_tfa_avg_pow_across_sessions, 
+% export_fig
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

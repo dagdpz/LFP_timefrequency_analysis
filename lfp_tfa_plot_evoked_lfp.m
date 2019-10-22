@@ -9,16 +9,17 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
 %       evoked_lfp       - average LFP power spectrum for different
 %       hand-space conditions to be compared
 %		lfp_tfa_cfg      - struct containing the required settings
-%           Required Fields: see lfp_tfa_settings
-%               1. 
+%           Required Fields: see settings/lfp_tfa_settings_example
+%               1. compare.reach_hands  - reach hands to be included
+%               2. compare.reach_spaces - reach spaces to be included
 %       plottitle        - title for the plot
 %       results_file     - path to filename to store the resulting image
 %
-% REQUIRES:	
+% REQUIRES:	export_fig
 %
-% See also lfp_tfa_settings, lfp_tfa_plot_site_evoked_LFP, 
-% lfp_tfa_avg_evoked_LFP_across_sites, 
-% lfp_tfa_avg_evoked_LFP_across_sessions
+% See also settings/lfp_tfa_settings_example, lfp_tfa_plot_site_evoked_LFP, 
+% lfp_tfa_avg_evoked_LFP_across_sites,
+% lfp_tfa_avg_evoked_LFP_across_sessions, external/export_fig/export_fig.m
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

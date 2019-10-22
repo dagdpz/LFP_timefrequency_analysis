@@ -1,23 +1,22 @@
-function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
+function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
 %lfp_tfa_define_settings - Function to define LFP time frequency analysis settings 
 %
 % USAGE:
-%	lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
+%	lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
 %
 % INPUTS:
 %       settings_filepath         - absolute path to the matlab script file
-%       where LFP TFA settings are defined, see settings/lfp_tfa_settings
-%       maxsites                  - maximum number of sites to be analysed per session,
-%       set to infinity to analyse all sites
+%       where LFP TFA settings are defined, see
+%       settings/lfp_tfa_settings_example
 %
 % OUTPUTS:
 %		lfp_tfa_cfg               - structure containing all settings
 %
 % REQUIRES:	lfp_tfa_read_info_file, lfp_tfa_compare_conditions,
-% lfp_tfa_define_states, lfp_tfa_define_epochs
 %
-% See also settings/lfp_tfa_settings, lfp_tfa_read_info_file, lfp_tfa_compare_conditions,
-% lfp_tfa_define_states, lfp_tfa_define_epochs
+%
+% See also settings/lfp_tfa_settings_example, lfp_tfa_read_info_file, 
+% lfp_tfa_compare_conditions, lfp_tfa_mainscript
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag
@@ -65,11 +64,6 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
     % load epochs - this will be removed after testing
     % now loading directly from settings file
     lfp_tfa_cfg.epochs = lfp_tfa_define_epochs();
-    
-    % maximum number of sites from each session to analyse
-    if nargin > 2
-        lfp_tfa_cfg.maxsites = maxsites;
-    end
     
     % folder to save noise rejection results
     lfp_tfa_cfg.noise.results_folder = lfp_tfa_cfg.root_results_fldr;

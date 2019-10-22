@@ -1,5 +1,53 @@
 function state_tfs = lfp_tfa_get_state_tfs(site_lfp, cond_trials, state, lfp_tfa_cfg)
+%lfp_tfa_get_state_tfs - Function to get the LFP power spectrogram average 
+%across trials in a time window of interest around a givem state (event)
+%
+% USAGE:
+%	state_tfs = lfp_tfa_get_state_tfs(site_lfp, cond_trials, state, lfp_tfa_cfg)
+%
+% INPUTS:
+%       site_lfp      - struct containing LFP signal for all trials
+%       recorded from a single site during one session
+%       cond_trials   - 1xN logical array where ones represent the indices
+%       of the trials which satisfy a given condition, see lfp_tfa_get_condition_trials
+%       state         - 1x5 cell array containing the information about the 
+%       state (event) which should be analysed, see
+%       settings/lfp_tfa_settings_example (same as one row of
+%       lfp_tfa_cfg.analyse_states)
+%       lfp_tfa_cfg   - settings for baseline normalization of LFP power,
+%       see settings/lfp_tfa_settings_example
+%           Required fields:
+%               baseline_method     - method used for baseline
+%               normalization ('subtraction', 'division', 'zscore' or
+%               'relchange'), see lfp_tfa_baseline_normalization
+%               baseline_perturbation - which perturbation condition should
+%               be used for baseline power calculation (0 for pre and 1 for
+%               post injection)
+%               baseline_use_choice_trial - whether to use choice or
+%               instructed trials for baseline power computation (0 for
+%               instructed, 1 for choice)
+% OUTPUTS:
+%		state_tfs     - structure containing LFP power spectrogram average 
+%       across given trials in a time window of interest around a givem state
+%
+% REQUIRES:	lfp_tfa_baseline_normalization
+%
+% See also settings/lfp_tfa_settings_example,
+% lfp_tfa_baseline_normalization, lfp_tfa_get_condition_trials,
+% lfp_tfa_plot_site_average_tfr
+%
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
 
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 state_id = state{2};
 state_name = state{3};
 state_ref_tstart = state{4};
