@@ -8,17 +8,24 @@ function [ lfp_tfr_normalized ] = lfp_tfa_baseline_normalization( raw_tfs, cfg_b
 %		raw_tfs             - raw lfp power spectrogram (1xMxN array, M =
 %		number of freq bins, N = number of time bins)
 %       cfg_baseline        - structure containing baseline information 
-%            method     : basline normalization method ('subtraction', 'division', 'zscore', 'relchange')%%- state whose onset to which 
-%            mean       : mean power in each frequency bin during the baseline period
-%            std        : stddev of baseline power in each frequency bin
-%                         baseline.period - start and end of baseline
-%                         period wrt refstate onset (seconds)
-%                         baseline.method - method for baseline
-%                         normalization (not implemented now)
+%            method     : basline normalization method. 
+%            Can be 'subtraction', 'division', 'zscore' or 'relchange'
+%            'subtraction'
+%               P_n(t,f) = P(t,f) - mean
+%            'division'
+%               P_n(t,f) = P(t,f) / mean
+%            'zscore'
+%               P_n(t,f) = (P(t,f) - mean) / std
+%            'relchange'
+%               P_n(t,f) = (P(t,f) - mean) / mean
+%            mean       : mean power in each frequency during the baseline period
+%            std        : standard deviation of baseline power in each
+%            frequency during the baseline period. Required if method is
+%            'zscore'
 % OUTPUTS:
 %		lfp_tfr_normalized  - baseline normalized LFP power spectrogram
 %
-% See also lfp_tfa_compute_plot_tfr
+% See also lfp_tfa_get_state_tfs, lfp_tfa_plot_site_average_tfr, lfp_tfa_process_LFP
 
     base_mean = cfg_baseline.mean;
     if strcmp(cfg_baseline.method , 'zscore')

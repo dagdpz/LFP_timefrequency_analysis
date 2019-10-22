@@ -1,24 +1,39 @@
 function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_condition, stat_test, lfp_tfa_cfg )
-%lfp_tfa_compute_diff_tfr - function to compute the difference in time freq
-%response between control and inactivation trials
+%lfp_tfa_compute_difference_condition_tfr - function to compute the difference
+%of LFP time frequency spectrogram averages between different conditions
 %
 % USAGE:
-%	diff_tfr = lfp_tfa_compute_diff_tfr( lfp_tfr, lfp_tfa_cfg )
+%   diff_tfr = lfp_tfa_compute_difference_condition_tfr( lfp_tfr,
+%	diff_condition)
+%	diff_tfr = lfp_tfa_compute_difference_condition_tfr( lfp_tfr,
+%	diff_condition, stat_test, lfp_tfa_cfg )
 %
 % INPUTS:
-%       lfp_tfr         - struct containing the condition-based average LFP time freq spectrogram
-%       for individual sites or average across sites or average across
-%       sessions, see lfp_tfa_site_average_tfr,
-%       lfp_tfa_avg_tfr_across_sessions, lfp_tfa_avg_across_sites
-%		lfp_tfa_cfg     - struct containing the required settings
+%       lfp_tfr   - struct containing the LFP time frequency power
+%       spectrogram averages for different conditions as average across 
+%       multiple trials within a site, or average across sites within 
+%       single or multiple sessions, see lfp_tfa_plot_site_average_tfr,
+%       lfp_tfa_avg_tfr_across_sites, lfp_tfa_avg_tfr_across_sessions
+%       diff_condition  - the conditions between which difference has to be
+%       calculated, see settings/lfp_tfa_settings_example
+%       stat_test       - flag which indicate whether to perform a 
+%       statistical significance test of differences, set to true while 
+%       computing difference of averages across site averages of multiple 
+%       sessions
+%		lfp_tfa_cfg     - struct containing the required settings (required
+%		only if stat_test = true), see settings/lfp_tfa_settings_example
+%           Required fields:
+%           fd_rate: Desired false discovery rate
+%           fdr_method: method to be used for statistical significance test
 %
 % OUTPUTS:
-%		diff_tfr        - struct containing the condition-based LFP time freq spectrogram
-%       average difference between post and pre injection
+%		diff_tfr        - struct containing the LFP time freq spectrogram
+%       difference average between different conditions
 %
 % REQUIRES:	
 %
-% See also lfp_tfa_site_average_tfr, lfp_tfa_avg_tfr_across_sessions, lfp_tfa_avg_across_sites 
+% See also lfp_tfa_plot_site_average_tfr,
+% lfp_tfa_avg_tfr_across_sites, lfp_tfa_avg_tfr_across_sessions
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

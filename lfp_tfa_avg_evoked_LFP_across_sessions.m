@@ -1,31 +1,37 @@
 function sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg)
 %lfp_tfa_avg_evoked_LFP_across_sessions  - Condition-based evoked LFP response
-% average across many session averages
+% grand average of averages across all sites within a session
 %
 % USAGE:
 %	sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg)
 %
 % INPUTS:
-%		lfp_evoked		- struct containing the condition-based evoked LFP response for
-%		indiviual sites, output of lfp_tfa_plot_site_evoked_LFP.m
+%		lfp_evoked		- struct containing the condition-based evoked LFP 
+%                         response average across all sites of each session 
+%                         analysed, i.e., the output of 
+%                         lfp_tfa_plot_site_evoked_LFP.m
 %           Required Fields:
-%               1. session.session_avg - 1xN struct containing condition-based
+%               session.session_avg - 1xN struct containing condition-based
 %               average evoked LFP response for N sessions (session_avg =
 %               Average of site averages for one session)
 %		lfp_tfa_cfg     - struct containing the required settings
 %           Required Fields:
 %               1. conditions          - trial conditions to compare, see
 %               lfp_tfa_settings.m and lfp_tfa_compare_conditions.m
-%               2. root_results_fldr   - root folder where results are saved
+%               2. root_results_fldr   - root folder where results are
+%               saved. Results will be saved under 
+%               [lfp_tfa_cfg.root_results_fldr ...
+%               '/Avg_across_sessions/LFP_Evoked']
 %               3. compare.targets     - targets to compare, see lfp_tfa_settings.m
-%               4. 
+%               4. ref_hemisphere      - reference hemisphere for contra-
+%               and ipsi- labelling, see settings/lfp_tfa_settings_example.m
 % OUTPUTS:
 %		sessions_avg    - structure containing condition-based evoked LFP
 %		response averaged across multiple sessions
 %
 % REQUIRES:	lfp_tfa_plot_evoked_lfp
 %
-% See also lfp_tfa_settings, lfp_tfa_define_settings, lfp_tfa_compare_conditions, 
+% See also lfp_tfa_define_settings, lfp_tfa_compare_conditions, 
 % lfp_tfa_plot_site_evoked_LFP
 %
 % Author(s):	S.Nair, DAG, DPZ
@@ -34,8 +40,9 @@ function sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_t
 % Change log:
 % 2019-02-15:	Created function (Sarath Nair)
 % 2019-03-05:	First Revision
+% 2019-10-22:   Edited documentation
 % ...
-% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+% $Revision: 1.1 $  $Date: 2019-10-22 11:03:00 $
 
 % ADDITIONAL INFO:
 % ...
@@ -60,13 +67,13 @@ function sessions_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_t
             sessions_avg(t).condition(cn).cfg_condition = lfp_tfa_cfg.conditions(cn);
             % initialize number of site pairs for each handspace
             % label
-            for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
-                for hs = 1:size(lfp_tfa_cfg.conditions(1).hs_labels, 2)
+            for st = 1:size(lfp_evoked.session(1).session_avg(1).condition(cn).hs_tuned_evoked, 1)
+                for hs = 1:size(lfp_evoked.session(1).session_avg(1).condition(cn).hs_tuned_evoked, 2)
                     sessions_avg(t).condition(cn).avg_across_sessions(st, hs).nsessions = 0;
                     sessions_avg(t).condition(cn).avg_across_sessions(st, hs).lfp = [];
                 end
             end
-            nsessions = 0;
+            
             for i = 1:length(lfp_evoked.session)
                 for k = 1:length(lfp_evoked.session(i).session_avg)
                     if strcmp(lfp_evoked.session(i).session_avg(k).target, lfp_tfa_cfg.compare.targets{t})

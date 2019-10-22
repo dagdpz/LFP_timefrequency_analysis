@@ -1,28 +1,44 @@
 function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
 %lfp_tfa_avg_tfr_across_sites  - Condition-based LFP time frequency
-%response average across many site averages
+%response average across many site averages (A site average is the LFP TFR 
+%average across multiple trials recorded at a site in a session)
 %
 % USAGE:
 %	sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
 %
 % INPUTS:
-%		lfp_tfr     	- struct containing the condition-based LFP time freq spectrogram for
-%		indiviual sites, output of lfp_tfa_plot_site_average_tfr.m
+%		lfp_tfr     	- struct containing the condition-based LFP time freq spectrogram average for
+%		indiviual sites and sessions, i.e., the output of lfp_tfa_plot_site_average_tfr.m
+%           Required Fields:
+%               session.sites - session is a 1xM struct (M is the
+%               number of sessions) and sites is a 1xN struct (N is
+%               the number of sites) containing LFP TFR average across
+%               sites for a session
 %		lfp_tfa_cfg     - struct containing the required settings
 %           Required Fields:
 %               1. conditions          - trial conditions to compare, see
-%               lfp_tfa_settings.m and lfp_tfa_compare_conditions.m
-%               2. root_results_fldr   - root folder where results are saved
+%               settings/lfp_tfa_settings_example and lfp_tfa_compare_conditions.m
+%               2. root_results_fldr   - root folder where results are
+%               saved. Results will be saved under 
+%               [lfp_tfa_cfg.root_results_fldr ...
+%               '/Avg_across_sites/LFP_TFR']
 %               3. compare.targets     - targets to compare, see lfp_tfa_settings.m
-%               4. 
+%               4. ref_hemisphere      - reference hemisphere for contra-
+%               and ipsi- labelling, see settings/lfp_tfa_settings_example.m
+%               5. analyse_states      - time windows around the states to
+%               be analysed, see settings/lfp_tfa_settings_example
 % OUTPUTS:
-%		sites_avg      - structure containing condition-based evoked LFP
-%		response averaged across multiple sites
+%		sites_avg    - structure containing condition-based LFP
+%		spectrogram response averaged across multiple sites of multiple
+%		sessions
 %
-% REQUIRES:	lfp_tfa_plot_hs_tuned_tfr, lfp_tfa_compute_diff_tfr
+% REQUIRES:	lfp_tfa_plot_hs_tuned_tfr_multiple_img, 
+% lfp_tfa_compute_difference_condition_tfr
 %
-% See also lfp_tfa_settings, lfp_tfa_define_settings, lfp_tfa_compare_conditions, 
-% lfp_tfa_plot_site_average_tfr, lfp_tfa_compute_diff_tfr
+% See also settings/lfp_tfa_settings_example, lfp_tfa_define_settings, 
+% lfp_tfa_compare_conditions, lfp_tfa_plot_site_average_tfr, 
+% lfp_tfa_compute_difference_condition_tfr,
+% lfp_tfa_plot_hs_tuned_tfr_multiple_img, lfp_tfa_avg_tfr_across_sessions
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

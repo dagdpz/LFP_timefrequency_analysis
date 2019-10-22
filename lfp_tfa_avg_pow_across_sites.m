@@ -1,31 +1,40 @@
 function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
 %lfp_tfa_avg_pow_across_sites  - Condition-based LFP power spectrum
-%(Power vs. Frequency) average across many site averages
+%(Power vs. Frequency) grand average across many site averages from
+%multiple sessions
 %
 % USAGE:
 %	sites_avg = lfp_tfa_avg_pow_across_sites(lfp_evoked, lfp_tfa_cfg)
 %
 % INPUTS:
-%		lfp_evoked		- struct containing the condition-based average LFP power spectrum for
-%		multiple sites, output of lfp_tfa_plot_site_evoked_LFP.m
+%		lfp_evoked		- struct containing the condition-based average LFP
+%       power spectrum for	multiple sites, output of lfp_tfa_plot_site_evoked_LFP.m
 %           Required Fields:
-%               1. session.sites - 1xN struct containing condition-based
-%               average LFP power spectrum for N sites
+%               1. session.sites - 1xM struct whose each element in turn is 
+%               a 1xN structs containing condition-based average LFP power 
+%               spectrum for N sites recorded in one session (M = number of
+%               sessions analysed)
 %		lfp_tfa_cfg     - struct containing the required settings
 %           Required Fields:
 %               1. conditions          - trial conditions to compare, see
-%               lfp_tfa_settings.m and lfp_tfa_compare_conditions.m
-%               2. root_results_fldr   - root folder where results are saved
-%               3. compare.targets     - targets to compare, see lfp_tfa_settings.m
-%               4. 
+%               settings/lfp_tfa_settings_example and 
+%               lfp_tfa_compare_conditions.m
+%               2. root_results_fldr   - root folder where results are 
+%               saved. Results will be saved under 
+%               [lfp_tfa_cfg.root_results_fldr ...
+%               '/Avg_across_sites/LFP_Power']
+%               3. compare.targets     - target areas to compare, see 
+%               settings/lfp_tfa_settings_example
+%               4. ref_hemisphere      - reference hemisphere for contra-
+%               and ipsi- labelling, see settings/lfp_tfa_settings_example
 % OUTPUTS:
 %		sites_avg       - structure containing condition-based LFP Power
 %		spectrum response averaged across multiple sites
 %
 % REQUIRES:	lfp_tfa_plot_hs_tuned_psd
 %
-% See also lfp_tfa_settings, lfp_tfa_define_settings, lfp_tfa_compare_conditions, 
-% lfp_tfa_plot_hs_tuned_psd
+% See also settings/lfp_tfa_settings_example, lfp_tfa_define_settings, 
+% lfp_tfa_compare_conditions, lfp_tfa_plot_hs_tuned_psd
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

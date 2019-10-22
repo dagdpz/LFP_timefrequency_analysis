@@ -1,28 +1,52 @@
 function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_sync(sessions_info, lfp_tfa_cfg, varargin)
-%lfp_tfa_avg_tfr_across_sites  - Condition-based LFP time frequency
-%response average across many site averages
+%lfp_tfa_avg_sitepairs_sync  - Condition-based LFP-LFP phase synchronization
+%average across many sitepair averages (A sitepair average is an
+%average across multiple trials recorded in two sites)
 %
 % USAGE:
-%	sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
+%	[results_fldr, sessions_avg] = lfp_tfa_avg_sitepairs_sync(sessions_info,
+%	lfp_tfa_cfg)
+%   [results_fldr, sessions_avg] = lfp_tfa_avg_sitepairs_sync(sessions_info,
+%	lfp_tfa_cfg, results_folder)
 %
 % INPUTS:
-%		lfp_tfr     	- struct containing the condition-based LFP time freq spectrogram for
-%		indiviual sites, output of lfp_tfa_plot_site_average_tfr.m
+%		sessions_info   - 1xM struct containing information about the sessions
+%		to be analysed, see lfp_tfa_define_settings
+%       Required fields: 
+%           lfp_sync_results_fldr - absolute path to the folder containing LFP-LFP
+%           phase synchronization averages of different sitepairs within
+%           a session, see output of lfp_tfa_sitepair_averaged_sync
 %		lfp_tfa_cfg     - struct containing the required settings
 %           Required Fields:
-%               1. conditions          - trial conditions to compare, see
-%               lfp_tfa_settings.m and lfp_tfa_compare_conditions.m
-%               2. root_results_fldr   - root folder where results are saved
-%               3. compare.targets     - targets to compare, see lfp_tfa_settings.m
-%               4. 
+%               1. conditions               - trial conditions to compare, 
+%               see settings/lfp_tfa_settings_example.m and
+%               lfp_tfa_compare_conditions.m
+%               2. root_results_fldr        - root folder where results are
+%               saved. Results will be stored under 
+%               [lfp_tfa_cfg.root_results_fldr
+%               '/Avg_across_sessions/LFP-LFP Sync']
+%               3. compare.target_pairs     - targets to compare, see
+%               settings/lfp_tfa_settings_example
+%               4. analyse_states           - time windows of interest, see
+%               settings/lfp_tfa_settings_example
+%               5. diff_condition           - conditions to be compared, a
+%               difference spectrogram will be calculated between these
+%               conditions, see settings/lfp_tfa_settings_example
+%               6. ref_hemisphere           - reference hemisphere for 
+%               contra- and ipsi- labelling, see
+%               settings/lfp_tfa_settings_example
 % OUTPUTS:
-%		sites_avg      - structure containing condition-based evoked LFP
-%		response averaged across multiple sites
+%       result_matfile  - absolute path to the file where the LFP-LFP sync
+%       average across multiple sessions would be stored
+%		sitepairs_avg   - structure containing LFP-LFP sync average across
+%       multiple sitepair averages
 %
-% REQUIRES:	lfp_tfa_plot_hs_tuned_tfr, lfp_tfa_compute_diff_tfr
+% REQUIRES:	lfp_tfa_plot_hs_tuned_sync, lfp_tfa_compute_diff_condition_tfsync
 %
-% See also lfp_tfa_settings, lfp_tfa_define_settings, lfp_tfa_compare_conditions, 
-% lfp_tfa_plot_site_average_tfr, lfp_tfa_compute_diff_tfr
+% See also settings/lfp_tfa_settings_example, lfp_tfa_define_settings, 
+% lfp_tfa_compare_conditions, lfp_tfa_sitepair_averaged_sync
+% lfp_tfa_compute_diff_condition_tfsync, lfp_tfa_plot_hs_tuned_sync
+% lfp_tfa_avg_sessions_sync
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

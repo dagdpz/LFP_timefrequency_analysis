@@ -1,32 +1,40 @@
 function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, lfp_tfa_cfg )
-
-% lfp_tfa_compute_baseline_power - Computes mean and stddev of baseline power according to
-% the given configuration
+% lfp_tfa_compute_site_baseline - Computes mean and standard deviation of
+% LFP power for a site for each frequency during the defined baseline period
+% for different perturbation and choice conditions
 %
 % USAGE:
 %	session_proc_lfp_out = lfp_tfa_compute_baseline_power( session_lfp_in, cfg_tfs )
 %
 % INPUTS:
-%		sites_lfp_folder        - struct containing LFP data strcture for all
-%		sites for one session, output of lfp_tfa_reject_noisy_lfp or
-%		lfp_tfa_process_lfp
-%       cfg_tfs                 - configuration structure for baseline computation
-%           Required Fields: see lfp_tfa_settings
-%           baseline_refstate           - reference state for baseline
-%           baseline_period             - period around the reference state to be
-%           considered for baseline computation
-%           baseline_perturbation       - perturbation group to be considered for baseline
-%           calculation
-%           baseline_use_choice_trial   - 1/0 whether to consider choice trials (1)
-%           or instructed trials (0) for baseline computation
+%		site_lfp        - struct containing LFP time frequency spectrogram 
+%       average for a site. i.e., the output of lfp_tfa_compute_site_tfr
+%       session_info    - struct containing information about the session
+%       being analysed, see settings/lfp_tfa_settings_example
+%           Required fields:
+%               Preinj_blocks - blocks to be considered as pre-injection,
+%               can be an integer or integer array
+%               Postinj_blocks - blocks to be considered as post-injection,
+%               can be an integer, integer array, 'all' or 'allbutfirst'
+%       lfp_tfa_cfg      - settings for baseline computation, see 
+%       settings/lfp_tfa_settings_example
+%           Required Fields: 
+%               1. compare.perturbations    - perturbation conditions to be
+%               compared, see settings/lfp_tfa_settings_example
+%               2. baseline_refstate           - reference state for baseline
+%               3. baseline_period             - period around the reference state to be
+%               considered for baseline computation
 % OUTPUTS:
-%		session_proc_lfp_out      - same as input struct with additional
-%		fields
-%           baseline_mean   - mean spectral power in baseline period
-%           baseline_std    - standard dev LFP spectral power in baseline
-%           perios
+%		site_lfp         - structure containing mean and standard deviation
+%		of LFP power at each frequency of interest for different
+%		perturbation and choice conditions
+%           baseline.pow_mean   - mean LFP spectral power during the
+%           baseline period
+%           baseline.pow_std    - standard deviation of  LFP spectral power in baseline
+%           period
 %
-% See also lfp_tfa_reject_noisy_lfp, lfp_tfa_process_lfp, lfp_tfa_settings,
+% See also lfp_tfa_compute_site_tfr, lfp_tfa_process_lfp, 
+% settings/lfp_tfa_settings_example
 % 
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag
@@ -103,10 +111,9 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, l
 
     clear('baseline_pow');
         
-    %end    
     
     fprintf(' done\n');
-    %fprintf('=============================================================\n');
+
 end
 
 

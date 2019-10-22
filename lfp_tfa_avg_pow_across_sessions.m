@@ -1,13 +1,15 @@
 function sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg)
 %lfp_tfa_avg_pow_across_sessions  - Condition-based LFP power spectrum
-%(Power vs. Frequency) average across many session averages
+%(Power vs. Frequency) grand average across many session averages (A
+%session average is the average across the sites recorded in one session)
 %
 % USAGE:
 %	sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_evoked, lfp_tfa_cfg)
 %
 % INPUTS:
-%		lfp_evoked		- struct containing the condition-based average LFP power spectrum for
-%		multiple sessions, output of lfp_tfa_plot_site_evoked_LFP.m
+%		lfp_pow		    - struct containing the condition-based average LFP
+%       power spectrum for multiple sessions, i.e., the output of 
+%       lfp_tfa_plot_site_powspctrum
 %           Required Fields:
 %               1. session.session_avg - 1xN struct containing condition-based
 %               average LFP power spectrum for N sessions (session_avg =
@@ -16,14 +18,19 @@ function sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg)
 %           Required Fields:
 %               1. conditions          - trial conditions to compare, see
 %               lfp_tfa_settings.m and lfp_tfa_compare_conditions.m
-%               2. root_results_fldr   - root folder where results are saved
-%               3. compare.targets     - targets to compare, see lfp_tfa_settings.m
-%               4. 
+%               2. root_results_fldr   - root folder where results are 
+%               saved. Results will be saved under 
+%               [lfp_tfa_cfg.root_results_fldr ...
+%               '/Avg_across_sessions/LFP_Power']
+%               3. compare.targets     - target areas to compare, , 
+%               see settings/lfp_tfa_settings_example
+%               4. ref_hemisphere      - reference hemisphere for contra-
+%               and ipsi- labelling, see settings/lfp_tfa_settings_example
 % OUTPUTS:
 %		sessions_avg    - structure containing condition-based LFP Power
 %		spectrum response averaged across multiple sessions
 %
-% REQUIRES:	lfp_tfa_plot_hs_tuned_psd
+% REQUIRES:	lfp_tfa_plot_hs_tuned_psd2
 %
 % See also lfp_tfa_settings, lfp_tfa_define_settings, lfp_tfa_compare_conditions, 
 % lfp_tfa_plot_hs_tuned_psd

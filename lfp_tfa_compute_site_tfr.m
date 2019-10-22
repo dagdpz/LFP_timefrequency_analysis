@@ -1,6 +1,49 @@
 function [ site_lfp ] = lfp_tfa_compute_site_tfr( site_lfp, lfp_tfa_cfg )
-%lfp_tfa_compute_site_tfr Summary of this function goes here
-%   Detailed explanation goes here
+% lfp_tfa_compute_site_tfr - Computes the LFP time frequency spectrogram
+% for all trials of a site. This function calls the ft_freqanalysis routine
+% of Fieldtrip toolbox for the calculation of LFP power spectrogram
+%
+% USAGE:
+%	site_lfp = lfp_tfa_compute_site_tfr( site_lfp, lfp_tfa_cfg )
+%
+% INPUTS:
+%		site_lfp        - struct containing LFP signal for each trial for a
+%		single site
+%       lfp_tfa_cfg      - settings for TFR computation, see 
+%       settings/lfp_tfa_settings_example
+%           Required Fields: 
+%               1. tfr.method   - method to be used for calculating the LFP
+%               power spectra. Can be 'mtmconvol' or 'wavelet'
+%               2. tfr.width    - width of the wavelets in number of
+%               cycles (For method = 'wavelet', Ignored for 'mtmconvol')
+%               3. tfr.taper    - taper (single or multiple) to be used.
+%               Can be 'dpss', 'hanning' or many others (Used when
+%               tfr.method = 'mtmconvol', ignored for 'wavelet'
+%               4. tfr.foi      - frequencies of interest (in Hz), a vector
+%               of freq values or a 1x2 vector with start and end freq
+%               5. tfr.t_ftimwin - length of the sliding time-window in 
+%               seconds, should be vector of length 1 x numfoi (Only used
+%               when tfr.method = 'mtmconvol')
+%               6. tfr.timestep - number of lfp samples to step for the 
+%               sliding time window
+% OUTPUTS:
+%		site_lfp         - structure containing trial-wise LFP power
+%		spectrograms
+%
+% See also lfp_tfa_process_lfp, settings/lfp_tfa_settings_example
+% 
+% Author(s):	S.Nair, DAG, DPZ
+% URL:		http://www.dpz.eu/dag
+%
+% Change log:
+% 2019-02-15:	Created function (Sarath Nair)
+% 2019-03-05:	First Revision
+% ...
+% $Revision: 1.0 $  $Date: 2019-03-05 17:18:00 $
+
+% ADDITIONAL INFO:
+% ...
+%%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % create an ft_datatype_raw
 ft_data_lfp = struct();

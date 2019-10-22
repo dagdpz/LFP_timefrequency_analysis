@@ -4,7 +4,10 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
 %
 % USAGE:
 %	cmp_conditions = lfp_tfa_compare_conditions( lfp_tfa_cfg )
-%
+%   cmp_conditions = lfp_tfa_compare_conditions( lfp_tfa_cfg, {0, [2, 3]})
+%   cmp_conditions = lfp_tfa_compare_conditions( lfp_tfa_cfg, {0, 'all'})
+%   cmp_conditions = lfp_tfa_compare_conditions( lfp_tfa_cfg, {0, 'allbutfirst'})
+%   
 % INPUTS:
 %		lfp_tfa_cfg     - struct containing the required settings
 %           Required Fields: see lfp_tfa_settings
@@ -14,23 +17,22 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
 %               (0 = instructed, 1 = choice trial)
 %               4. compare.perturbation         - perturbations to be compared
 %               (0 = preinjection, 1 = postinjection)
-%               5. compare.perturbation_groups  - perturbation_groups for
-%               pre and post injection (typically 0 for pre and same as
-%               block number for post)
-%               6. compare.reach_hands          - hand labels to compare
+%               5. compare.reach_hands          - hand labels to compare
 %               ('R' = right, 'L' = left)
-%               7. compare.reach_spaces         - space labels to compare
+%               6. compare.reach_spaces         - space labels to compare
 %               ('R' = right, 'L' = left)
-%               8. ref_hemisphere               - reference hemisphere for
+%               7. ref_hemisphere               - reference hemisphere for
 %               hand-space labelling ('R' or 'L', typically, the inactivated
 %               hemisphere)
+%       varargin - should be a 1x2 cell array containing the blocks to be
+%       considered as pre- and post- injection respectively.  
 % OUTPUTS:
 %		cmp_conditions      - structure containing conditions to compare, a
 %		permutation of all given comparison conditions
 %
 % REQUIRES:	
 %
-% See also lfp_tfa_settings, lfp_tfa_define_settings
+% See also settings/lfp_tfa_settings_example, lfp_tfa_define_settings
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

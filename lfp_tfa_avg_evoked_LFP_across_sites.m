@@ -1,31 +1,37 @@
 function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg)
 %lfp_tfa_avg_evoked_LFP_across_sites  - Condition-based evoked LFP response
-% average across many site averages
+% grand average across many site averages
 %
 % USAGE:
-%	sites_avg = lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg)
+%	sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg)
 %
 % INPUTS:
-%		lfp_evoked		- struct containing the condition-based evoked LFP response for
-%		indiviual sites, output of lfp_tfa_plot_site_evoked_LFP.m
+%		lfp_evoked		- struct containing the condition-based evoked LFP 
+%       response average for indiviual sites, i.e., output of 
+%       lfp_tfa_plot_site_evoked_LFP.m
 %           Required Fields:
 %               1. session.sites       - 1xN struct containing condition-based
 %               average evoked LFP response for N sites
 %		lfp_tfa_cfg     - struct containing the required settings
 %           Required Fields:
 %               1. conditions          - trial conditions to compare, see
-%               lfp_tfa_settings.m, lfp_tfa_define_settings.m and lfp_tfa_compare_conditions.m
-%               2. root_results_fldr   - root folder where results are saved
+%               settings/lfp_tfa_settings_example, 
+%               lfp_tfa_define_settings.m and lfp_tfa_compare_conditions.m
+%               2. root_results_fldr   - root folder where results are 
+%               saved. Results will be saved under 
+%               [lfp_tfa_cfg.root_results_fldr ...
+%               '/Avg_across_sites/LFP_Evoked']
 %               3. compare.targets     - targets to compare, see lfp_tfa_settings.m
-%               4. 
+%               4. ref_hemisphere      - reference hemisphere for contra-
+%               and ipsi- labelling, see settings/lfp_tfa_settings_example.m
 % OUTPUTS:
 %		sites_avg    - structure containing condition-based evoked LFP
 %		response averaged across multiple sites
 %
 % REQUIRES:	lfp_tfa_plot_evoked_lfp
 %
-% See also lfp_tfa_settings, lfp_tfa_define_settings, lfp_tfa_compare_conditions, 
-% lfp_tfa_plot_site_evoked_LFP
+% See also see settings/lfp_tfa_settings_example.m, lfp_tfa_define_settings, 
+% lfp_tfa_compare_conditions, lfp_tfa_plot_site_evoked_LFP
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag
