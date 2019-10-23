@@ -1,7 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Script for LFP time frequency analysis
-% Runs functions for reading processed LFP data, rejection of noise trials
-% and task specific analysis using TFR
+% Runs functions for reading LFP data, rejection of noise trials
+% and condition specific analysis using TFR, evoked, spectra, sync
+% spectrograms and sync spectra
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %clear; 
 
