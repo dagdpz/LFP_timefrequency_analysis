@@ -1,40 +1,56 @@
 function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
 
-% lfp_tfa_process_LFP - function to read in the processed lfp and
-% compute the time frequency spectrogram for each trial
+% lfp_tfa_process_LFP - function to read in the trial-wise LFP data for all
+% sites recorded in a session, compute the LFP time frequency spectrogram,
+% detect the noisy trials, and compute site-wise baseline power
 %
 % USAGE:
-%	state_lfp = lfp_tfa_process_LFP( session_lfp, lfp_tfa_cfg )
+%	session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
 %
 % INPUTS:
-%       session_lfp         - structure containing raw LFP data for one
-%       session
+%       session_info        - structure containing information about the
+%       session to be processed, see settings/lfp_tfa_settings_example
+%       Required fields:
+%           Input               - path to the file which contains the
+%                               trial-wise LFP data for all sites recorded
+%                               in a session 
+%           proc_results_folder - folder where the results has to be
+%           stored, see lfp_tfa_define_settings
 %       lfp_tfa_cfg         - structure containing configurations for
-%       reading LFP data and calculating spectrograms
+%       reading LFP data and calculating spectrograms, see
+%       settings/lfp_tfa_settings_example 
 %       Required fields: 
-%           datafile_path    	- filename containing the LFP data ( in the
-%                               format as the processed LFP from Lukas' pipeline)
-%           all_states          - structure containing information about all
-%                               states, see lfp_tfa_define_states
-%           maxsites            - maximum no:of sites to be analysed, set to inf to
-%                               analyse all sites
-%           root_results_fldr   - path to save results
-%           tfr.method          - method to be used for calculating
-%                               spectrogram
-%           tfr.width           - width of window in cycles for
-%                               multitapering the input data
-%           tfr.twin            - length of time windows in seconds
-%                               to be used for spectrogram calculations
+%           ref_hemisphere          - reference hemisphere ('R'/'L') for ipsi-
+%                                   and contra- hand and space labeling
+%           trialinfo.start_state   - the ID of the state(event) which
+%                                   marks the beginning of a trial, see
+%                                   lfp_tfa_global_states
+%           trialinfo.ref_tstart    - the offset from the onset of
+%                                   trialinfo.start_state to be considered
+%                                   as start time of a trial
+%           trialinfo.end_state     - the ID of the state(event) which
+%                                   marks the end of a trial, see
+%                                   lfp_tfa_global_states
+%           trialinfo.ref_tend      - the offset from the onset of
+%                                   trialinfo.start_state to be considered
+%                                   as end time of a trial
+%           noise                   - settings for noisy trial detection,
+%                                   see lfp_tfa_reject_noisy_lfp_trials for
+%                                   more details
+%           analyses                - which kind of analyses should be
+%                                   performed on LFP, (Should be a
+%                                   combination of 'tfs', 'evoked', 'pow',
+%                                   'sync' and 'syncsp')
 %
 % OUTPUTS:
-%		states_lfp      	- structure containing trial data (raw lfp,
-%                               timestamps, choice/instructed, block, 
-%                               control/inactivation, states info and lfp
-%                               time freq spectrogram) for successful 
-%                               trials for all sites in a session
+%		session_info            - same as input structure session_info
 %		
+% REQUIRES: lfp_tfa_compute_site_tfr, lfp_tfa_reject_noisy_lfp_trials,
+% lfp_tfa_compute_site_baseline, lfp_tfa_compute_sitepair_csd
 %
-% See also lfp_tfa_define_states
+% See also settings/lfp_tfa_settings_example, lfp_tfa_define_settings,
+% lfp_tfa_global_states, lfp_tfa_reject_noisy_lfp_trials,
+% lfp_tfa_compute_site_baseline 
     
     close all; 
     
@@ -249,7 +265,8 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
     save(results_mat, 'allsites_lfp', '-v7.3');
     
     %% calculate cross power spectrum between sites and sync measure spectrogram
-    if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
+    if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) || ...
+            any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
         % prepare results folder
         results_fldr = fullfile(session_info.proc_results_fldr, 'crossspectrum');
         if ~exist(results_fldr, 'dir')

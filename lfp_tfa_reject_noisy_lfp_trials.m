@@ -3,14 +3,15 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
 %values of raw lfp amplitude and raw lfp derivative
 %
 % USAGE:
-%	[states_lfp] = lfp_tfa_reject_noisy_trials( states_lfp, cfg_noise )
+%	[site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
 %
 % INPUTS:
-%		states_lfp       - struct containing processed lfp data which is 
-%                           created by lfp_tfa_read_LFP()
-%		cfg_noise        - configuration for noise rejection
+%		site_lfp         - struct containing trial-wise LFP power
+%		spectrograms, see lfp_tfa_process_lfp, lfp_tfa_compute_site_tfr
+%		cfg_noise        - configuration for noise rejection, see
+%		lfp_tfa_cfg.noise in settings/lfp_tfa_settings_example
 %           methods      : methods to be used for noise rejection ('raw',
-%           'diff', 'std', 'pow')
+%                        'diff', 'std', 'pow')
 %           amp_thr      : threshold for lfp raw amplitude (no of stdev)
 %           amp_N        : n consecutive samples beyond the raw amplitude 
 %           threshold to be considered as noisy
@@ -23,10 +24,11 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
 %           results_folder: root folder to save output plots and results
 %
 % OUTPUTS:
-%		states_lfp      - struct containing processed lfp with
-%                          additional field which marks noisy trials
+%		site_lfp      - same as input struct site_lfp, but with an
+%                     additional field which marks noisy trials
 %
-% See also lfp_tfa_read_LFP
+% See also settings/lfp_tfa_settings_example, lfp_tfa_process_lfp,
+% lfp_tfa_compute_site_tfr
 
     results_folder = cfg_noise.results_folder;
     results_folder_noise = fullfile(results_folder, 'LFP_Noise_Rejection');

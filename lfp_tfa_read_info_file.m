@@ -1,5 +1,6 @@
 function [ usable_sites_table ] = lfp_tfa_read_info_file( cfg )
-%lfp_tfa_define_settings - Function to define LFP time frequency analysis settings 
+%lfp_tfa_read_info_file - Function to read the file containing information
+%about the sessions being analysed (for future use)
 %
 % USAGE:
 %	usable_sites_table  = lfp_tfa_read_info_file( cfg );
@@ -17,7 +18,7 @@ function [ usable_sites_table ] = lfp_tfa_read_info_file( cfg )
 %
 % REQUIRES:	
 %
-% See also settings/lfp_tfa_settings_v1
+% See also settings/lfp_tfa_settings_example
 %
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag

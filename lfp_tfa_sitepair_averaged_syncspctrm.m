@@ -1,34 +1,63 @@
 function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_averaged_syncspctrm( sitepair_crosspow, site_conditions, lfp_tfa_cfg ) 
 
-% lfp_tfa_plot_average_powspctrum  - calculate and plot the average lfp power spectrum for
-% different hand-space tuning conditions for each site and across sites for
-% a session
+% lfp_tfa_sitepair_averaged_syncspctrm  - compute and plot the 
+% condition-wise average LFP-LFP phase synchronization spectra during a 
+% specifed epochs averaged across different trials which 
+% satisfy given conditions (A condition is a combination of
+% perturbation/choice/type-effector/hand-space tuning). This function calls
+% the ft_connectivityanalysis funtion of FieldTrip toolbox to calculate the
+% LFP-LFP phase synchronization spectrogram (sync vs. time vs. freq) from 
+% the LFP-LFP cross power spectra for the given epoch. Further the sync
+% spectrogram value is averaged across the time bins in the epoch to obtain
+% a sync spctra (sync vs. freq) for the epoch. 
+% PPC(f) = 1/T\sigma_{t=1..T}PPC(t, f)
 %
 % USAGE:
-%	[ session_pow ] = lfp_tfa_plot_average_powspctrum( states_lfp, lfp_tfa_cfg )
+%	[sitepair_syncspctrm] = lfp_tfa_sitepair_averaged_syncspctrm( ... 
+%       sitepair_crosspow, site_conditions, lfp_tfa_cfg )
 %
 % INPUTS:
-%		states_lfp  	- structure containing processed lfp data for all
-%		sites of one session, output of lfp_tfa_process_lfp or
-%		lfp_tfa_reject_noisy_lfp or lfp_tfa_compute_baseline_power
-%       lfp_tfa_cfg     - struct containing configuration for LFP TFR analysis 
-%           Required fields: see settings\lfp_tfa_settings
-%               session_results_fldr            - folder to which the
-%               results of the session should be saved
-%               mintrials_percondition          - minimum number of trials
+%		sitepair_crosspow  	- struct containing LFP-LFP cross power
+%                           spectrum for a pair of sites. i.e., the output
+%                           of lfp_tfa_compute_sitepair_csd
+%       
+%		site_conditions     - strcuture containing the trial conditions to 
+%                           be analysed (Condition is a combination of
+%                           perturbation/choice/type-effector/hand-space
+%                           tuning)
+%       
+%       lfp_tfa_cfg         - struct containing configuration for sync
+%                           calculation
+%           Required fields:
+%               analyse_lfp_folder      - root folder under which the
+%               results of LFP-LFP sync should be saved. The results of the
+%               session will be saved in a sub-folder
+%               [sitepair_crosspow.session, '/Condition_based_Sync'] under
+%               this root folder
+%               mintrials_percondition  - minimum number of trials
 %               required per condition for considering the site for
 %               averaging
-%               analyse_epochs                  - epochs to analyse 
-%               
+%               analyse_states          - cell array containing states and 
+%               time windows to analyse, see settings/lfp_tfa_settings_example 
+%               ref_hemisphere          - reference hemisphere ('R'/'L')
+%               for ipsi- and contra- hand-space labeling
+%               sync.measure            - measure to be used for LFP-LFP
+%               synchronization (Can only be 'ppc' for now). This setting 
+%               is used by the ft_connectivityanalysis routine of the 
+%               FieldTrip toolbox to calculate the LFP-LFP phase synchronization
+%
 % OUTPUTS:
-%		session_pow     - output structure which saves the average LFP power spectrum for  
-%       trials of a given condition for different handspace 
-%       tunings and periods around the epochs analysed
+%		sitepair_syncspctrm - condition-wise LFP-LFP sync spectral average 
+%                           for the specified time window around the 
+%                           specified states (events) across trials for a 
+%                           given site pair
 %
-% REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_plot_hs_tuned_psd
+% REQUIRES:	lfp_tfa_get_condition_trials, ft_connectivityanalysis,
+% lfp_tfa_plot_hs_tuned_syncsp
 %
-% See also lfp_tfa_process_lfp, lfp_tfa_settings,
-% lfp_tfa_compare_conditions, lfp_tfa_plot_hs_tuned_psd
+% See also settings/lfp_tfa_settings_example, ft_connectivityanalysis, 
+% lfp_tfa_compute_sitepair_csd, lfp_tfa_plot_hs_tuned_syncsp, 
+% lfp_tfa_sitepair_averaged_sync
     
     % suppress warning for xticklabel
     warning ('off', 'MATLAB:hg:willberemoved');

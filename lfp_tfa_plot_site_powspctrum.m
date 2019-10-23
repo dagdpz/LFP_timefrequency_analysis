@@ -1,34 +1,44 @@
 function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg ) 
 
-% lfp_tfa_plot_average_powspctrum  - calculate and plot the average lfp power spectrum for
-% different hand-space tuning conditions for each site and across sites for
-% a session
+% lfp_tfa_plot_site_powspctrum  - calculate and plot the average lfp power spectrum for
+% different trial conditions for each site and across sites for a session
+% (Condition is a combination of
+% perturbation/choice/type-effector/hand-space tuning)
 %
 % USAGE:
-%	[ session_pow ] = lfp_tfa_plot_average_powspctrum( states_lfp, lfp_tfa_cfg )
+%	[ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg )
 %
 % INPUTS:
-%		states_lfp  	- structure containing processed lfp data for all
-%		sites of one session, output of lfp_tfa_process_lfp or
-%		lfp_tfa_reject_noisy_lfp or lfp_tfa_compute_baseline_power
+%		states_lfp  	- 1xN structure containing processed lfp data for all
+%		sites of one session (N=number of sites), see lfp_tfa_process_lfp
 %       lfp_tfa_cfg     - struct containing configuration for LFP TFR analysis 
-%           Required fields: see settings\lfp_tfa_settings
+%           Required fields: see settings\lfp_tfa_settings_example
 %               session_results_fldr            - folder to which the
 %               results of the session should be saved
+%               perturbation_groups             - 1x2 cell array containing
+%               the blocks to be considered as pre- and post- injection
 %               mintrials_percondition          - minimum number of trials
 %               required per condition for considering the site for
 %               averaging
 %               analyse_epochs                  - epochs to analyse 
+%               ref_hemisphere                  - reference hemispehere for
+%               ipsi- and contra-labeling
 %               
 % OUTPUTS:
-%		session_pow     - output structure which saves the average LFP power spectrum for  
-%       trials of a given condition for different handspace 
-%       tunings and periods around the epochs analysed
+%		session_pow	- output structure which saves the condition-wise
+%                   average LFP power spectra for the specified epochs
+%           Fields:
+%           sites       - 1xN struct containing condition-wise average LFP spectra 
+%                       across trials from a single site
+%           session_avg - 1xT struct containing condition-wise average LFP spectra 
+%                       averaged across muliple sites in a target area in
+%                       one session (T = number of target areas)
 %
-% REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_plot_hs_tuned_psd
+% REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_get_condition_trials,
+% lfp_tfa_plot_hs_tuned_psd_2 
 %
-% See also lfp_tfa_process_lfp, lfp_tfa_settings,
-% lfp_tfa_compare_conditions, lfp_tfa_plot_hs_tuned_psd
+% See also lfp_tfa_process_lfp, settings/lfp_tfa_settings_example,
+% lfp_tfa_compare_conditions, lfp_tfa_plot_hs_tuned_psd_2
     
     % suppress warning for xticklabel
     warning ('off', 'MATLAB:hg:willberemoved');
@@ -150,6 +160,8 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                         epoch_psd_mean = nanmean(arr_state_psd, 1);
 
                         % save LFP power spectrum
+                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).psd = arr_state_psd;
+                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).dimord = 'ntrials_freq';
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean = epoch_psd_mean;
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq = epoch_tfs.psd_f;
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).trials = find(cond_trials);
@@ -207,7 +219,15 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             session_avg(t).condition(cn).target = states_lfp(i).target;
             session_avg(t).condition(cn).label = site_conditions(cn).label;% variable to store no:of sites with trials satisfying this
             % condition
-            isite = 0;            
+            % initialize number of site pairs for each handspace
+            % label
+            for st = 1:size(sites_pow(1).condition(cn).hs_tuned_power, 1)
+                for hs = 1:size(sites_pow(1).condition(cn).hs_tuned_power, 2)
+                    session_avg(t).condition(cn).hs_tuned_power(st, hs).nsites = 0;
+                    session_avg(t).condition(cn).hs_tuned_power(st, hs).psd = [];
+                end
+            end
+            isite = 0;
             for i = 1:length(states_lfp)
                 % if site's target is the target beong considered
                 if ~strcmp(states_lfp(i).target, targets{t})
@@ -217,17 +237,19 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 % calculate the average LFP power spectrum across sites for this condition 
                     if ~isempty(sites_pow(i).condition(cn).hs_tuned_power) && ...
                             isfield(sites_pow(i).condition(cn).hs_tuned_power, 'mean')
-                        isite = isite + 1;
+                        %isite = isite + 1;
 
 
                         % hand-space labels
                         for hs = 1:size(sites_pow(i).condition(cn).hs_tuned_power, 2)
                             % epochs
                             for ep = 1:size(sites_pow(i).condition(cn).hs_tuned_power, 1)
-                                if ~isempty(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean)
+                                if ~isempty(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).lfp)
+                                    session_avg(t).condition(cn).hs_tuned_power(st, hs).nsites = ...
+                                        session_avg(t).condition(cn).hs_tuned_power(st, hs).nsites + 1;
 
-                                    if isite == 1
-                                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
+                                    if session_avg(t).condition(cn).hs_tuned_power(st, hs).nsites == 1
+                                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = ...
                                             sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean ;
                                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).freq = ...
                                             sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq;
@@ -239,11 +261,13 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                                             if nfreqs > length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq)
                                                 nfreqs = length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq);
                                             end                               
-                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
-                                                session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs) + ...
-                                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs) ;
+                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = ...
+                                                [session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd(1:nfreqs); ...
+                                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs)];
+                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = ...
+                                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq(1:nfreqs);
                                         else
-                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
+                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = ...
                                                 sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean ;
                                         end
                                     end
@@ -266,8 +290,8 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 for hs = 1:size(session_avg(t).condition(cn).hs_tuned_power, 2)
                     for ep = 1:size(session_avg(t).condition(cn).hs_tuned_power, 1)
                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
-                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean / isite;
-                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).nsites = isite;
+                            nanmean(session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd);
+                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).dimord = 'nsites_freq';
                     end
                 end
             end 

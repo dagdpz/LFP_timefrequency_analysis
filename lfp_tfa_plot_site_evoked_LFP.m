@@ -1,36 +1,54 @@
-function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_states, lfp_tfa_cfg ) 
+function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, analyse_states, lfp_tfa_cfg ) 
 
-% lfp_tfa_plot_average_evoked_LFP  - plots average evoked LFP for
-% different hand-space tuning conditions for each site and across all sites
-% of a session
+% lfp_tfa_plot_site_evoked_LFP  - computes and plots average evoked LFP for
+% different trial conditions for each site and across all sites
+% of a session (Condition is a combination of
+% perturbation/choice/type-effector/hand-space tuning)
 %
 % USAGE:
-%	[ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( states_lfp, analyse_states, lfp_tfa_cfg ) 
+%	[ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, analyse_states, lfp_tfa_cfg ) 
 %
 % INPUTS:
-%		states_lfp  	- struct containing raw lfp data for all sites of a 
-%       session, output from lfp_tfa_process_lfp or
-%       lfp_tfa_compute_baseline or lfp_tfa_reject_noisy_lfp
+%		sites_lfp     	- 1xN struct containing raw lfp data for all sites of a 
+%       session, see lfp_tfa_process_lfp 
 %       analyse_states  - cell array containing states to be
 %       analysed and corresponding time windows
 %       lfp_tfa_cfg     - struct containing configuration for TFR 
 %           Required fields:
 %               session_results_fldr            - folder to which the
 %               results of the session should be saved
+%               perturbation_groups             - 1x2 cell array containing
+%               the blocks to be considered as pre- and post- injection
+%               random_seed                     - for reproducibility of
+%               random numbers, see rng
+%               mintrials_percondition          - minimum number of trials
+%               required per condition for considering the site for
+%               averaging (Condition is a combination of perturbation,
+%               choice, type-effector, and hand-space tuning)
+%               ref_hemisphere                  - reference hemispehere for
+%               ipsi- and contra-labeling
 %               mintrials_percondition          - minimum number of trials
 %               required per condition for considering the site for
 %               averaging
-%               analyse_states                  - states to analyse 
 %
 % OUTPUTS:
-%		session_evoked	- output structure which saves the average evoked LFP for  
-%                         trials of a given condition for different handspace 
-%                         tunings and periods around the states analysed
+%		session_evoked	- output structure which saves the condition-wise
+%                       average evoked for the specified periods around the 
+%                       states analysed
+%           Fields:
+%           sites       - 1xN struct containing condition-wise average evoked 
+%                       across trials from a single site
+%           session_avg - 1xT struct containing condition-wise average evoked 
+%                       averaged across muliple sites in a target area in
+%                       one session (T = number of target areas)
 % 
-% REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_plot_evoked_lfp
+% REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_get_condition_trials, 
+% lfp_tfa_get_combined_evoked_lfp, lfp_tfa_get_state_evoked_lfp,
+% lfp_tfa_plot_evoked_lfp
 %
-% See also lfp_tfa_process_lfp, lfp_tfa_compute_baseline, lfp_tfa_reject_noisy_lfp, 
-% lfp_tfa_compare_conditions, lfp_tfa_plot_evoked_lfp
+% See also lfp_tfa_process_lfp, lfp_tfa_compare_conditions, 
+% lfp_tfa_plot_evoked_lfp, lfp_tfa_plot_site_average_tfr,
+% lfp_tfa_plot_site_powspctrum
     
     % suppress warning for xticklabel
     warning ('off', 'MATLAB:hg:willberemoved');
@@ -44,14 +62,14 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
     % condition based Evoked
     sites_evoked = struct();
     session_evoked = struct();
-    session_evoked.session = site_lfp(1).session;
+    session_evoked.session = sites_lfp(1).session;
     % perturbation groups for this session
     perturbation_groups = lfp_tfa_cfg.perturbation_groups;
     % get trial conditions for this session
     site_conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, perturbation_groups);
     
     % loop through each site
-    for i = 1:length(site_lfp) 
+    for i = 1:length(sites_lfp) 
 
         rng(lfp_tfa_cfg.random_seed); % set random seed for reproducibility
         
@@ -62,9 +80,9 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
         end
         % struct to store condition-wise evoked
         sites_evoked(i).condition = struct();
-        sites_evoked(i).site_ID = site_lfp(i).site_ID;
-        sites_evoked(i).session = site_lfp(i).session;
-        sites_evoked(i).target = site_lfp(i).target;
+        sites_evoked(i).site_ID = sites_lfp(i).site_ID;
+        sites_evoked(i).session = sites_lfp(i).session;
+        sites_evoked(i).target = sites_lfp(i).target;
         % flag to indicate if this site should be used for
         % averaging based on minimum no:of trials per condition
         sites_evoked(i).use_for_avg = 1;
@@ -76,7 +94,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
             hs_labels = site_conditions(cn).hs_labels;
 
             % num sites
-            nsites = length(site_lfp);                 
+            nsites = length(sites_lfp);                 
             
             % store details of analysed condition
             sites_evoked(i).condition(cn).label = site_conditions(cn).label;
@@ -87,16 +105,16 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
             % loop through hand space labels
             for hs = 1:length(hs_labels)
                 % get trial indices for the given condition
-                cond_trials = lfp_tfa_get_condition_trials(site_lfp(i), site_conditions(cn));
+                cond_trials = lfp_tfa_get_condition_trials(sites_lfp(i), site_conditions(cn));
                 % filter trials by hand-space labels
                 if ~strcmp(site_conditions(cn).reach_hands{hs}, 'any')
                     cond_trials = cond_trials & ...
-                        strcmp({site_lfp(i).trials.reach_hand}, ...
+                        strcmp({sites_lfp(i).trials.reach_hand}, ...
                         site_conditions(cn).reach_hands{hs});
                 end
                 if ~strcmp(site_conditions(cn).reach_spaces{hs}, 'any')
                     cond_trials = cond_trials & ...
-                        strcmp({site_lfp(i).trials.reach_space}, ...
+                        strcmp({sites_lfp(i).trials.reach_space}, ...
                         site_conditions(cn).reach_spaces{hs});
                 end
                 
@@ -106,12 +124,12 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                 fprintf('Total number of trials %g\n', sum(cond_trials));
 
                 sites_evoked(i).condition(cn).noisytrials(hs) = ...
-                    sum(cond_trials & [site_lfp(i).trials.noisy]); 
+                    sum(cond_trials & [sites_lfp(i).trials.noisy]); 
 
                 % consider only non noisy trials
                 fprintf('Number of noisy trials %g\n', sum(cond_trials ...
-                    & [site_lfp(i).trials.noisy]));
-                cond_trials = cond_trials & ~[site_lfp(i).trials.noisy];
+                    & [sites_lfp(i).trials.noisy]));
+                cond_trials = cond_trials & ~[sites_lfp(i).trials.noisy];
 
                 % check if the site contains a specified minimum number
                 % of trials for all conditions
@@ -123,7 +141,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
                 % loop through time windows around the states to analyse
                 for st = 1:size(analyse_states, 1)
                     
-                    cond_trials_lfp = site_lfp(i).trials(cond_trials);
+                    cond_trials_lfp = sites_lfp(i).trials(cond_trials);
                     
                     if strcmp(analyse_states{st, 1}, 'single')
                         state_tfs = lfp_tfa_get_state_evoked_lfp(cond_trials_lfp, ...
@@ -184,7 +202,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
     % Average across sites for a session
     session_avg = struct();
     % targets for this session
-    targets = unique({site_lfp.target});
+    targets = unique({sites_lfp.target});
     % average each target separately
     for t = 1:length(targets)
         session_avg(t).target = targets{t};
@@ -193,8 +211,8 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
             session_avg(t).condition(cn).hs_tuned_evoked = struct();
             session_avg(t).condition(cn).condition = site_conditions(cn);
             session_avg(t).condition(cn).label = site_conditions(cn).label;
-            session_avg(t).condition(cn).session = site_lfp(i).session;
-            session_avg(t).condition(cn).target = site_lfp(i).target;
+            session_avg(t).condition(cn).session = sites_lfp(i).session;
+            session_avg(t).condition(cn).target = sites_lfp(i).target;
             % initialize number of site pairs for each handspace
             % label
             for st = 1:size(sites_evoked(1).condition(cn).hs_tuned_evoked, 1)
@@ -206,7 +224,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( site_lfp, analyse_st
             isite = 0;
             for i = 1:length(sites_evoked)
                 % if the site's target is same as target being considered
-                if ~strcmp(site_lfp(i).target, targets{t})
+                if ~strcmp(sites_lfp(i).target, targets{t})
                     continue;
                 end
                 if sites_evoked(i).use_for_avg
