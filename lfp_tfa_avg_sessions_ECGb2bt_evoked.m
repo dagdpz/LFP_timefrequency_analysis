@@ -128,21 +128,21 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ecg_b2bt_evoked, lfp
                 plottitle = [lfp_tfa_cfg.compare.targets{t},...
                      lfp_tfa_cfg.conditions(cn).label];
                 result_file = fullfile(results_fldr, ...
-                                ['ECG_b2bt_Evoked_' lfp_tfa_cfg.conditions(cn).label '.png']);
+                                ['ECG_b2bt_Evoked_' lfp_tfa_cfg.conditions(cn).label]);
                 lfp_tfa_plot_evoked_R2Rt(sessions_avg(t).condition(cn).hs_tuned_evoked, ...
                             lfp_tfa_cfg, plottitle, result_file);
             end
         end
-        % save session average tfs
-        save(fullfile(results_fldr, 'sessions_evoked_ECG.mat'), 'sessions_avg');
+        
     end
 
     % difference between conditions
     sessions_avg(t).difference = [];
     for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
         diff_condition = lfp_tfa_cfg.diff_condition{diff};
+        diff_color = lfp_tfa_cfg.diff_color{diff}{:};
         sessions_avg(t).difference = [sessions_avg(t).difference, ...
-            lfp_tfa_compute_diff_condition_evoked(sessions_avg(t).condition, diff_condition)];
+            lfp_tfa_compute_diff_condition_R2Rt_evoked(sessions_avg(t).condition, diff_condition, diff_color)];
     end
     % plot Difference TFR
     for dcn = 1:length(sessions_avg(t).difference)
@@ -152,13 +152,16 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ecg_b2bt_evoked, lfp
                 plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
                     sessions_avg(t).difference(dcn).label];
                 result_file = fullfile(results_fldr, ...
-                    ['ECG_b2bt_DiffEvoked_' 'diff_condition' num2str(dcn) '.png']);
+                    ['ECG_b2bt_DiffEvoked_' 'diff_condition' num2str(dcn)]);
                     %sessions_avg(t).difference(dcn).label '.png']);
                 lfp_tfa_plot_evoked_R2Rt(sessions_avg(t).difference(dcn).hs_tuned_evoked, ...
                     lfp_tfa_cfg, plottitle, result_file);
             end
         end
     end
+    
+    % save session average tfs
+    save(fullfile(results_fldr, 'sessions_evoked_ECG.mat'), 'sessions_avg');
         
     close all;
 end

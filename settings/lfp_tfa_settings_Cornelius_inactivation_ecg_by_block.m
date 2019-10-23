@@ -131,7 +131,7 @@ lfp_tfa_cfg.random_seed = rng;
 
 % whether to plot ECG data for individual trials
 % Set to 1 for plotting individual trials, zero otherwise
-lfp_tfa_cfg.plottrials = 1;
+lfp_tfa_cfg.plottrials = 0;
 
 %% Settings for averaging TFR and evoked LFP based on conditions
 
@@ -243,6 +243,10 @@ lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 %lfp_tfa_cfg.diff_condition(1) = {{'type_eff', {[4 6], [1 0]}}};%, 'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
 %     'choice', {0, 1}}};
+
+% colors to be used for plotting the comparison plots
+lfp_tfa_cfg.diff_color = {};
+lfp_tfa_cfg.diff_color{1} = {[0, 0.5, 0.5; 0, 1, 1]};
 
 %% Time information
 

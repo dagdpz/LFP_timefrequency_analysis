@@ -55,6 +55,8 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
     end
     
     h1 = figure;
+    
+    %set(h1, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
     set(h1, 'position', [100, 100,900, 675]);
     
     % number of offset samples to divide between time windows
@@ -128,8 +130,6 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
                     concat_states_R2Rt.legend = evoked_R2Rt(st, hs).legend;
                 end
 
-                
-
             end
             
             %state_onsets = find(concat_states_lfp.time(1:end-1) .* ...
@@ -141,7 +141,11 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
             % now plot
             subplot(nhandlabels*2, nspacelabels, hs)
             hold on;
-            colors = ['b', 'r', 'g', 'y', 'm', 'c', 'k'];
+            colors = ['b'; 'r'; 'g'; 'y'; 'm'; 'c'; 'k'];
+            if isfield(evoked_R2Rt(1, hs), 'color') && ...
+                    ~isempty(evoked_R2Rt(1, hs).color)
+                colors = evoked_R2Rt(1, hs).color;
+            end
             % plot individual trials
             if isfield(evoked_R2Rt(1, hs), 'ntrials') && ~isempty(evoked_R2Rt(1, hs).ntrials)
                 xx = [0];
@@ -152,16 +156,16 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
                 end
             end
             for i = 1:size(concat_states_R2Rt.mean, 1)
-                plot(concat_states_R2Rt.mean(i, :), colors(i), 'LineWidth', 2);
+                plot(concat_states_R2Rt.mean(i, :), 'Color', colors(i, :), 'LineWidth', 2);
             end
             if isfield(concat_states_R2Rt, 'legend')
                 legend(concat_states_R2Rt.legend);
             end
             for i = 1:size(concat_states_R2Rt.mean, 1)
-                plot(concat_states_R2Rt.mean(i, :) + concat_states_R2Rt.err(i, :), [colors(mod(i, length(colors))) '--'], ...
-                    'LineWidth', 1);
-                plot(concat_states_R2Rt.mean(i, :) - concat_states_R2Rt.err(i, :), [colors(mod(i, length(colors))) '--'], ...
-                    'LineWidth', 1);
+                plot(concat_states_R2Rt.mean(i, :) + concat_states_R2Rt.err(i, :), ...
+                    '--', 'Color', colors(i, :), 'LineWidth', 1);
+                plot(concat_states_R2Rt.mean(i, :) - concat_states_R2Rt.err(i, :), ...
+                    '--', 'Color', colors(i, :), 'LineWidth', 1);
             end
             % mark state onsets
             %if isfield(evoked_lfp, 'state_name')
@@ -202,7 +206,8 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
     end
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
-    export_fig(h1, results_file);
+    export_fig(h1, [results_file '.png']);
+    print(h1, '-depsc', [results_file '.ai']);
 
 end
 

@@ -180,7 +180,7 @@ function [ session_evoked_ecg ] = lfp_tfa_compute_Rpeak_evoked_state_onsets( ses
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(site_results_folder, ...
-                    ['Rpeak_Evoked_state_onsets_' session_Rpeak_states(i).session '_' site_conditions(cn).label '.png']);
+                    ['Rpeak_Evoked_state_onsets_' session_Rpeak_states(i).session '_' site_conditions(cn).label]);
 
                 lfp_tfa_plot_Rpeak_ref_state_onsets (session_Rpeak_states(i).condition(cn).Rpeak_evoked, lfp_tfa_cfg, ...
                     plottitle, result_file);
@@ -189,28 +189,35 @@ function [ session_evoked_ecg ] = lfp_tfa_compute_Rpeak_evoked_state_onsets( ses
         end
         
         % difference between conditions
-%         session_Rpeak_states(i).difference = [];
-%         for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
-% %             diff_condition = lfp_tfa_cfg.diff_condition{diff};
-% %             session_Rpeak_states(i).difference = [session_Rpeak_states(i).difference, ...
-% %                 lfp_tfa_compute_diff_condition_evoked(session_Rpeak_states(i).condition, diff_condition)];
-%         end
+        session_Rpeak_states(i).difference = [];
+        for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
+            diff_condition = lfp_tfa_cfg.diff_condition{diff};
+            diff_color = [];
+            try
+                diff_color = lfp_tfa_cfg.diff_color{diff}{:};
+            catch e
+                warning('Error reading color value: %s\n', e.message());
+            end
+            session_Rpeak_states(i).difference = [session_Rpeak_states(i).difference, ...
+                lfp_tfa_compute_diff_condition_Rpeak_evoked_states(session_Rpeak_states(i).condition, diff_condition, ...
+                diff_color)];
+        end
         % plot Difference TFR
-%         for dcn = 1:length(session_Rpeak_states(i).difference)
-%             if ~isempty(session_Rpeak_states(i).difference(dcn).hs_tuned_evoked)
-%                 if isfield(session_Rpeak_states(i).difference(dcn).hs_tuned_evoked,... 
+        for dcn = 1:length(session_Rpeak_states(i).difference)
+            if ~isempty(session_Rpeak_states(i).difference(dcn).Rpeak_evoked)
+%                 if isfield(session_Rpeak_states(i).difference(dcn).Rpeak_evoked,... 
 %                         'mean')
-%                     plottitle = ['Session: ', session_Rpeak_states(i).session ...
-%                         session_Rpeak_states(i).difference(dcn).label];
-%                     result_file = fullfile(site_results_folder, ...
-%                         ['Diff_Rpeak_Evoked_state_onsets_' session_Rpeak_states(i).session ...
-%                         '_' 'diff_condition' num2str(dcn) '.png']);
-%                         %sites_avg(t).difference(dcn).label '.png']);
-% %                     lfp_tfa_plot_evoked_lfp(session_Rpeak_states(i).difference(dcn).hs_tuned_evoked, ...
-% %                         lfp_tfa_cfg, plottitle, result_file, 'ylabel', 'ECG amplitude');
-%                 end
-%             end
-%         end
+                    plottitle = ['Session: ', session_Rpeak_states(i).session ...
+                        session_Rpeak_states(i).difference(dcn).label];
+                    result_file = fullfile(site_results_folder, ...
+                        ['Diff_Rpeak_evoked_probability_' session_Rpeak_states(i).session ...
+                        '_' 'diff_condition' num2str(dcn)]);
+                        %sites_avg(t).difference(dcn).label '.png']);
+                    lfp_tfa_plot_Rpeak_ref_state_onsets(session_Rpeak_states(i).difference(dcn).Rpeak_evoked, ...
+                        lfp_tfa_cfg, plottitle, result_file);
+                % end
+            end
+        end
         
         site_evoked_ecg = session_Rpeak_states(i);
         % save mat file for site

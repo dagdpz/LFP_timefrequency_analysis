@@ -35,6 +35,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
 
     h = figure;
     set(h, 'position', [100, 100,900, 675]);
+    %set(h, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
     
     yaxislabel = 'LFP amplitude';
     if nargin > 4

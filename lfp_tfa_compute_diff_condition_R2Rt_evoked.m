@@ -1,4 +1,4 @@
-function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt_evoked, diff_condition )
+function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt_evoked, diff_condition, diff_color )
 %lfp_tfa_compute_diff_tfr - function to compute the difference in time freq
 %response between control and inactivation trials
 %
@@ -185,6 +185,10 @@ function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt
                                 end
                                 diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).legend = ...
                                     legend;
+                                if nargin > 2
+                                    diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).color = ...
+                                        diff_color;
+                                end
                                 
                             else
                                 %diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp = [];
@@ -192,6 +196,7 @@ function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt
                                 diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).mean = [];
                                 diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).std = [];
                                 diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).legend = [];
+                                diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).color = [];
                             end
                         end
                     end

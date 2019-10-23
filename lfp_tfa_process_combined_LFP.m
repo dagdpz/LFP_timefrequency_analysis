@@ -135,10 +135,30 @@ function session_info = lfp_tfa_process_combined_LFP( session_info, lfp_tfa_cfg 
         %                 end
                         choice_trial = sites(i).trial(t).choice;
                         reach_hand = sites(i).trial(t).reach_hand; % 1 = left, 2 = right
-                        perturbation = sites(i).trial(t).perturbation; % 0 = control
+                        
+                        perturbation = nan;
+                        if isfield(session_info, 'Preinj_blocks') && ...
+                            ~isempty(session_info.Preinj_blocks) && ...
+                            ismember(block, session_info.Preinj_blocks)
+                            perturbation = 0;
+                        elseif exist('ses', 'var') && ...
+                            block < ses.first_inj_block
+                            perturbation = 0;
+                        end
+                        if isnan(perturbation)
+                            if isfield(session_info, 'Postinj_blocks') && ...
+                                ~isempty(session_info.Postinj_blocks) && ...
+                                ismember(block, session_info.Postinj_blocks)
+                                perturbation = 1;
+                            elseif exist('ses', 'var') && ...
+                                    block >= ses.first_inj_block
+                                perturbation = 1;
+                            end
+                        end
                         if isnan(perturbation)
                             perturbation = 0;
                         end
+                        
                         tar_pos = sites(i).trial(t).tar_pos;
                         fix_pos = sites(i).trial(t).fix_pos;
 

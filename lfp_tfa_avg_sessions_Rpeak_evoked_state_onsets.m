@@ -66,8 +66,7 @@ function sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets(Rpeak_sta
                 sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).nsessions = 0;
                 sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).abs_timefromRpeak = {}; 
                 sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).rel_timefromRpeak = {}; 
-                sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).abs_timeprob.timebins = {}; 
-                sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).abs_timeprob.prob = {}; 
+                sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).abs_timeprob.prob = []; 
                 sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).rel_timeprob.prob = []; 
             end
         end  
@@ -106,10 +105,9 @@ function sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets(Rpeak_sta
                                 Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked(st, hs).rel_timefromRpeak];
                             % accumulate histogram counts
                             sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins ...
-                                = [sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins, ...
-                                Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked(st, hs).abs_timeprob.timebins];
+                                = Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked(st, hs).abs_timeprob.timebins;
                             sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.prob ...
-                                = [sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.prob, ...
+                                = [sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.prob; ...
                                 Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked(st, hs).abs_timeprob.prob];
                             sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).rel_timeprob.timebins ...
                                 = Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked(st, hs).rel_timeprob.timebins;
@@ -123,42 +121,68 @@ function sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets(Rpeak_sta
         end
         
         % concatenate probability histograms
-        for st = 1:size(sessions_avg(t).condition(cn).Rpeak_evoked, 1)
-            for hs = 1:size(sessions_avg(t).condition(cn).Rpeak_evoked, 2)
-                if isfield(Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked(st, hs), 'abs_timeprob')
-                    nsessions = length(sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins);
-                    [max_ntimebins, idx] = max(cellfun('size', ...
-                        sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins, 2));
-                    sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins = ...
-                        sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins{idx};
-                    state_probability = nan*ones(nsessions, max_ntimebins-1);
-                    for i = 1:nsessions
-                        nprob = length(sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.prob{i});
-                        state_probability(i, 1:nprob) = ...
-                            sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.prob{i};
-                    end
-                    sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.prob = ...
-                        state_probability;
-                end
-            end
-        end                    
+%         for st = 1:size(sessions_avg(t).condition(cn).Rpeak_evoked, 1)
+%             for hs = 1:size(sessions_avg(t).condition(cn).Rpeak_evoked, 2)
+%                 if isfield(Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked(st, hs), 'abs_timeprob')
+%                     nsessions = length(sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins);
+%                     [max_ntimebins, idx] = max(cellfun('size', ...
+%                         sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins, 2));
+%                     sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins = ...
+%                         sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.timebins{idx};
+%                     state_probability = nan*ones(nsessions, max_ntimebins-1);
+%                     for i = 1:nsessions
+%                         nprob = length(sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.prob{i});
+%                         state_probability(i, 1:nprob) = ...
+%                             sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.prob{i};
+%                     end
+%                     sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).abs_timeprob.prob = ...
+%                         state_probability;
+%                 end
+%             end
+%         end                    
 
         if ~isempty(sessions_avg(t).condition(cn).Rpeak_evoked)
             if isfield(sessions_avg(t).condition(cn).Rpeak_evoked,... 
                     'abs_timeprob') && isfield(...
-                    sessions_avg(t).condition(cn).Rpeak_evoked, 'rel_timeprob'); 
+                    sessions_avg(t).condition(cn).Rpeak_evoked, 'rel_timeprob') 
                 plottitle = [lfp_tfa_cfg.compare.targets{t},...
                      lfp_tfa_cfg.conditions(cn).label];
                 result_file = fullfile(results_fldr, ...
-                                ['Rpeak_Evoked_state_onsets_' lfp_tfa_cfg.conditions(cn).label '.png']);
+                                ['Rpeak_trig_P_event_' lfp_tfa_cfg.conditions(cn).label]);
                 lfp_tfa_plot_Rpeak_ref_state_onsets (sessions_avg(t).condition(cn).Rpeak_evoked, ...
                             lfp_tfa_cfg, plottitle, result_file);
             end
         end
         % save session average tfs
-        save(fullfile(results_fldr, 'sessions_evoked_ECG.mat'), 'sessions_avg');
+        %save(fullfile(results_fldr, 'sessions_Rpeak_evoked_onsets.mat'), 'sessions_avg');
     end
  
-        
-    %close all;
+    % difference between conditions
+    sessions_avg(t).difference = [];
+    for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
+        diff_condition = lfp_tfa_cfg.diff_condition{diff};
+        diff_color = lfp_tfa_cfg.diff_color{diff}{:};
+        sessions_avg(t).difference = [sessions_avg(t).difference, ...
+            lfp_tfa_compute_diff_condition_Rpeak_evoked_states(sessions_avg(t).condition, diff_condition, diff_color)];
+    end
+    % plot Difference TFR
+    for dcn = 1:length(sessions_avg(t).difference)
+        if ~isempty(sessions_avg(t).difference(dcn).Rpeak_evoked)
+            if isfield(sessions_avg(t).difference(dcn).Rpeak_evoked,... 
+                    'abs_timeprob') && isfield(...
+                    sessions_avg(t).difference(dcn).Rpeak_evoked, 'rel_timeprob');
+                plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
+                    sessions_avg(t).difference(dcn).label];
+                result_file = fullfile(results_fldr, ...
+                    ['Diff_Rpeak_trig_P_event_' 'diff_condition' num2str(dcn)]);
+                    %sessions_avg(t).difference(dcn).label '.png']);
+                lfp_tfa_plot_Rpeak_ref_state_onsets(sessions_avg(t).difference(dcn).Rpeak_evoked, ...
+                    lfp_tfa_cfg, plottitle, result_file);
+            end
+        end
+    end
+    % save session average tfs
+    save(fullfile(results_fldr, 'sessions_Rpeak_evoked_onsets.mat'), 'sessions_avg');
+    
+    close all;
 end

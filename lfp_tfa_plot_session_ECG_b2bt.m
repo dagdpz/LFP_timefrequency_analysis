@@ -159,7 +159,7 @@ function [ session_R2Rt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(session_results_folder, ...
-                    ['ECG_b2bt_Evoked_' session_R2Rt(i).session '_' site_conditions(cn).label '.png']);
+                    ['ECG_b2bt_Evoked_' session_R2Rt(i).session '_' site_conditions(cn).label]);
                    
                 lfp_tfa_plot_evoked_R2Rt (session_R2Rt(i).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
                     plottitle, result_file);
@@ -171,8 +171,10 @@ function [ session_R2Rt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_
         session_R2Rt(i).difference = [];
         for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
+            diff_color = lfp_tfa_cfg.diff_color{diff}{:};
             session_R2Rt(i).difference = [session_R2Rt(i).difference, ...
-                lfp_tfa_compute_diff_condition_R2Rt_evoked(session_R2Rt(i).condition, diff_condition)];
+                lfp_tfa_compute_diff_condition_R2Rt_evoked(session_R2Rt(i).condition, diff_condition, ...
+                diff_color)];
         end
         % plot Difference TFR
         for dcn = 1:length(session_R2Rt(i).difference)
@@ -183,7 +185,7 @@ function [ session_R2Rt ] = lfp_tfa_plot_session_ECG_b2bt( session_ecg, session_
                         session_R2Rt(i).difference(dcn).label];
                     result_file = fullfile(session_results_folder, ...
                         ['ECG_b2bt_DiffEvoked_' session_R2Rt(i).session ...
-                        '_' 'diff_condition' num2str(dcn) '.png']);
+                        '_' 'diff_condition' num2str(dcn)]);
                         %sites_avg(t).difference(dcn).label '.png']);
                     lfp_tfa_plot_evoked_R2Rt(session_R2Rt(i).difference(dcn).hs_tuned_evoked, ...
                         lfp_tfa_cfg, plottitle, result_file);

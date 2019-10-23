@@ -262,6 +262,10 @@ lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
 %     'choice', {0, 1}}};
 
+% colors to be used for plotting the comparison plots
+lfp_tfa_cfg.diff_color = {};
+lfp_tfa_cfg.diff_color{1} = {[0, 0.5, 0; 0, 1, 0]};
+
 %% Time information
 
 % Specify events which mark trial start and end
