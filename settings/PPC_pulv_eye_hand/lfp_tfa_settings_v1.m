@@ -205,6 +205,14 @@ lfp_tfa_cfg.maxsites = inf; % inf = analyse all sites
 % random seed for random number generator for reproducibility
 lfp_tfa_cfg.random_seed = rng;
 
+% the error measure to be plotted for evoked LFP response
+% Can be 'stddev', 'stderr' or 'bootci'
+% 'stddev' - plots one standard deviation around the mean
+% 'stderr' - plots one standard error around the mean
+% 'bootci' - plots 95% confidence interval around the mean by
+% bootstrapping, see bootci function
+lfp_tfa_cfg.error_measure = 'bootci';
+
 %% Settings for ft_freqanalysis in FieldTrip
 % Configuration for calculating LFP time frequency spectrogram using
 % ft_freqanalysis function of the fieldtrip toolbox

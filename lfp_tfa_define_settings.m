@@ -55,16 +55,6 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
     % get conditions to be included in the analysis
     lfp_tfa_cfg.conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg);
     
-    % load states - this will be removed after testing
-    % now loading directly from settings file
-    % first read in the information about states
-    all_states = lfp_tfa_define_states();
-    lfp_tfa_cfg.all_states = all_states;
-    
-    % load epochs - this will be removed after testing
-    % now loading directly from settings file
-    lfp_tfa_cfg.epochs = lfp_tfa_define_epochs();
-    
     % folder to save noise rejection results
     lfp_tfa_cfg.noise.results_folder = lfp_tfa_cfg.root_results_fldr;
     % folder to save baseline results

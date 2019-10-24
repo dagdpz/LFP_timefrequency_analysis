@@ -206,6 +206,14 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
                               lfp_tfa_states.REA_INI,    'PreR',    -0.3 ,    -0.05 ; ...
                               lfp_tfa_states.REA_END,    'PeriR',   -0.2 ,    0.2 ; ...
                               lfp_tfa_states.SUCCESS,    'THol',    -0.3 ,    0    };
+                          
+% the error measure to be plotted for evoked LFP response
+% Can be 'stddev', 'stderr' or 'bootci'
+% 'stddev' - plots one standard deviation around the mean
+% 'stderr' - plots one standard error around the mean
+% 'bootci' - plots 95% confidence interval around the mean by
+% bootstrapping, see bootci function
+lfp_tfa_cfg.error_measure = 'bootci'; 
 
 
 %% Settings for averaging TFR and evoked LFP based on conditions

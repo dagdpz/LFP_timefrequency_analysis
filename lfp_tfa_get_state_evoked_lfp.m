@@ -87,6 +87,7 @@ if ~isempty(state_evoked_lfp.lfp)
     
     % evoked LFP average
     arr_state_lfp = vertcat(state_evoked_lfp.lfp{:});
+    state_evoked_lfp.lfp = arr_state_lfp;
     state_evoked_lfp.mean = nanmean(arr_state_lfp, 1);
     state_evoked_lfp.std = nanstd(arr_state_lfp, 0, 1);
     
