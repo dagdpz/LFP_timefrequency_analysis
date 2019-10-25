@@ -245,38 +245,34 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                             % epochs
                             for ep = 1:size(sites_pow(i).condition(cn).hs_tuned_power, 1)
                                 if ~isempty(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).psd)
-                                    session_avg(t).condition(cn).hs_tuned_power(st, hs).nsites = ...
-                                        session_avg(t).condition(cn).hs_tuned_power(st, hs).nsites + 1;
+                                    session_avg(t).condition(cn).hs_tuned_power(ep, hs).nsites = ...
+                                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).nsites + 1;
 
-                                    if session_avg(t).condition(cn).hs_tuned_power(st, hs).nsites == 1
+                                    if session_avg(t).condition(cn).hs_tuned_power(ep, hs).nsites == 1
+                                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).hs_label = ...
+                                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).hs_label;
+                                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).epoch_name = ...
+                                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).epoch_name;
                                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = ...
                                             sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean ;
                                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).freq = ...
                                             sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq;
                                     else
-                                        if ~isempty(session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean)
-                                            nfreqs = length(session_avg(t).condition(cn).hs_tuned_power(ep, hs).freq);
-                                            % average same number fo frequency
-                                            % bins
-                                            if nfreqs > length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq)
-                                                nfreqs = length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq);
-                                            end                               
-                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = ...
-                                                [session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd(1:nfreqs); ...
-                                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs)];
-                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = ...
-                                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq(1:nfreqs);
-                                        else
-                                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = ...
-                                                sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean ;
-                                        end
+                                        nfreqs = length(session_avg(t).condition(cn).hs_tuned_power(ep, hs).freq);
+                                        % average same number fo frequency
+                                        % bins
+                                        if nfreqs > length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq)
+                                            nfreqs = length(sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq);
+                                        end                               
+                                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = ...
+                                            [session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd(:,1:nfreqs); ...
+                                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqs)];
+                                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).freq = ...
+                                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq(1:nfreqs);                                        
                                     end
                                     % store lfp power spectra average for
                                     % session
-                                    session_avg(t).condition(cn).hs_tuned_power(ep, hs).hs_label = ...
-                                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).hs_label;
-                                    session_avg(t).condition(cn).hs_tuned_power(ep, hs).epoch_name = ...
-                                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).epoch_name;
+                                    
                                     
                                 end
                             end
@@ -286,7 +282,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             end
             
             % average TFR across sites for a session
-            if isfield(session_avg(t).condition(cn).hs_tuned_power, 'mean')
+            if isfield(session_avg(t).condition(cn).hs_tuned_power, 'psd')
                 for hs = 1:size(session_avg(t).condition(cn).hs_tuned_power, 2)
                     for ep = 1:size(session_avg(t).condition(cn).hs_tuned_power, 1)
                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
