@@ -235,7 +235,8 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_sync(sessions_i
         for diff = 1:length(lfp_tfa_cfg.diff_condition)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
             sitepairs_avg(t).difference = [sitepairs_avg(t).difference, ...
-                lfp_tfa_compute_diff_condition_tfsync(sitepairs_avg(t).condition, diff_condition, 1)];
+                lfp_tfa_compute_diff_condition_tfsync(sitepairs_avg(t).condition, ...
+                diff_condition, 1, lfp_tfa_cfg)];
         end
         % plot Difference TFR
         for dcn = 1:length(sitepairs_avg(t).difference)

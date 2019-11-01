@@ -1,4 +1,4 @@
-function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
+function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow_sessions, lfp_tfa_cfg, varargin)
 %lfp_tfa_avg_pow_across_sites  - Condition-based LFP power spectrum
 %(Power vs. Frequency) grand average across many site averages from
 %multiple sessions
@@ -50,9 +50,11 @@ function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % results folder
-    results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sites', 'LFP_Power');
-    if ~exist(results_fldr, 'dir')
-        mkdir(results_fldr);
+    if nargin < 3
+        results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sites', 'LFP_Power');
+        if ~exist(results_fldr, 'dir')
+            mkdir(results_fldr);
+        end
     end
     
     % Average Evoked LFP across sites
@@ -65,48 +67,48 @@ function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
             sites_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
             sites_avg(t).condition(cn).avg_across_sessions = struct();
             nsites = 0;
-            for i = 1:length(lfp_pow.session)  
-                for j = 1:length(lfp_pow.session(i).sites)
-                    if ~strcmp(lfp_pow.session(i).sites(j).target, lfp_tfa_cfg.compare.targets{t})
+            for i = 1:length(lfp_pow_sessions)  
+                for j = 1:length(lfp_pow_sessions(i).sites)
+                    if ~strcmp(lfp_pow_sessions(i).sites(j).target, lfp_tfa_cfg.compare.targets{t})
                         continue;
                     end
-                    if ~lfp_pow.session(i).sites(j).use_for_avg
+                    if ~lfp_pow_sessions(i).sites(j).use_for_avg
                         continue;
                     end
-                    if ~isempty(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power) && ... 
-                        isfield(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power, 'mean')
+                    if ~isempty(lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power) && ... 
+                        isfield(lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power, 'mean')
                         nsites = nsites + 1;   
-                        for ep = 1:size(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power, 1)
-                            for hs = 1:size(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power, 2)
-                                if isfield(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs), 'mean') ...
-                                        && ~isempty(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).mean)
+                        for ep = 1:size(lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power, 1)
+                            for hs = 1:size(lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power, 2)
+                                if isfield(lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs), 'mean') ...
+                                        && ~isempty(lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).mean)
                                     if nsites == 1%~isfield(sessions_avg.cond_based_tfs(cn).tfs_across_sessions, 'powspctrm')
                                         sites_avg(t).condition(cn).avg_across_sessions(ep,hs).freq ...
-                                        = lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).freq;
+                                        = lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).freq;
                                         sites_avg(t).condition(cn).avg_across_sessions(ep,hs).hs_label ...
-                                            = lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).hs_label;
+                                            = lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).hs_label;
                                         sites_avg(t).condition(cn).avg_across_sessions(ep,hs).epoch_name ...
-                                            = lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).epoch_name;
+                                            = lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).epoch_name;
                                         sites_avg(t).condition(cn).avg_across_sessions(ep,hs).mean ...
-                                            = lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).mean;
-                                        if isfield(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs), 'nsites')
+                                            = lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).mean;
+                                        if isfield(lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs), 'nsites')
                                             sites_avg(t).condition(cn).avg_across_sessions(ep,hs).nsites ...
-                                                = lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).nsites;
+                                                = lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).nsites;
                                         end
                                     else
                                         nfreqbins = length(sites_avg(t).condition(cn).avg_across_sessions(ep, hs).freq);
                                         % average same number of time bins
-                                        if nfreqbins > length(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).freq)
-                                            nfreqbins = length(lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).freq);
+                                        if nfreqbins > length(lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).freq)
+                                            nfreqbins = length(lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).freq);
                                         end
                                         sites_avg(t).condition(cn).avg_across_sessions(ep,hs).freq = ...
-                                            lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).freq(1:nfreqbins);
+                                            lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).freq(1:nfreqbins);
                                         sites_avg(t).condition(cn).avg_across_sessions(ep,hs).mean ...
-                                            = (lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqbins)) + ...
+                                            = (lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqbins)) + ...
                                             sites_avg(t).condition(cn).avg_across_sessions(ep,hs).mean(1:nfreqbins);
                                         if isfield(sites_avg(t).condition(cn).avg_across_sessions(ep,hs), 'nsites')
                                             sites_avg(t).condition(cn).avg_across_sessions(ep,hs).nsites ...
-                                                = lfp_pow.session(i).sites(j).condition(cn).hs_tuned_power(ep, hs).nsites + ...
+                                                = lfp_pow_sessions(i).sites(j).condition(cn).hs_tuned_power(ep, hs).nsites + ...
                                                 sites_avg(t).condition(cn).avg_across_sessions(ep,hs).nsites;
                                         end                               
                                     end
@@ -145,6 +147,8 @@ function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
         end
     end
     % save session average power spectrum
-    save(fullfile(results_fldr, 'LFP_Power_sites_avg.mat'), 'sites_avg');
+    if exist(results_fldr, 'dir') && length(lfp_pow_sessions) > 1
+        save(fullfile(results_fldr, 'LFP_Power_sites_avg.mat'), 'sites_avg');
+    end
     close all;
 end
