@@ -30,7 +30,10 @@ function [ site_lfp ] = lfp_tfa_compute_site_tfr( site_lfp, lfp_tfa_cfg )
 %		site_lfp         - structure containing trial-wise LFP power
 %		spectrograms
 %
-% See also lfp_tfa_process_lfp, settings/lfp_tfa_settings_example
+% REQUIRES: ft_freqanalysis
+%
+% See also lfp_tfa_process_lfp, settings/lfp_tfa_settings_example, 
+% ft_freqanalysis
 % 
 % Author(s):	S.Nair, DAG, DPZ
 % URL:		http://www.dpz.eu/dag
