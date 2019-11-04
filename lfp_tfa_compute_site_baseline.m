@@ -4,7 +4,7 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, l
 % for different perturbation and choice conditions
 %
 % USAGE:
-%	session_proc_lfp_out = lfp_tfa_compute_baseline_power( session_lfp_in, cfg_tfs )
+%	site_lfp = lfp_tfa_compute_site_baseline( site_lfp, session_info, lfp_tfa_cfg )
 %
 % INPUTS:
 %		site_lfp        - struct containing LFP time frequency spectrogram 
