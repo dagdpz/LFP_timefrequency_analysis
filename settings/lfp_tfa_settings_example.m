@@ -24,7 +24,7 @@ lfp_tfa_cfg.version = 'Linus_inactivation_8sessions';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = true;
+lfp_tfa_cfg.process_LFP = false;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
@@ -134,8 +134,10 @@ lfp_tfa_cfg.session_info(8) = ...
 %       'evoked'    - LFP evoked response average for given conditions and time windows
 %       'pow'       - LFP power spectrum average for given conditions and epochs
 %       'sync'      - LFP-LFP phase synchronization measure for given conditions and
-%           time windows
-lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow'}; %, 'sync', 'syncsp'
+%                   time windows
+%       'sync'      - LFP-LFP phase synchronization spectrum for given 
+%                   conditions and epochs
+lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow', 'sync', 'syncsp'}; %, 'sync', 'syncsp'
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names

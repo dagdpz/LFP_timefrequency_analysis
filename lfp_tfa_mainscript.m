@@ -7,12 +7,13 @@
 %clear; 
 
 % file containing settings for LFP analysis
-settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\PPC_pulv_eye_hand\lfp_tfa_settings_v1.m';
+% should have the same format as settings/lfp_tfa_settings_example.m
+settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_example.m';
 
 %% INITIALIZATION
 close all;
 
-
+% read settings file
 lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath);
 
 %% Get info about sessions to be analysed
@@ -40,23 +41,24 @@ try
     for i = 1:length(sessions_info)
         % name of session = [Monkey name '_' Recording date]
         session_name = [sessions_info(i).Monkey '_' sessions_info(i).Date];
-        fprintf('Processing LFP for session %s\n', session_name);
         lfp_tfa_cfg.session = session_name;
         % folder to which results of analysis of this session should be
         % stored
         sessions_info(i).proc_results_fldr = ...
             fullfile(lfp_tfa_cfg.proc_lfp_folder, session_name);
         % absolute path of file containing LFP data for this session
-        % check if folder exists and there are processed LFP files inside
+        % check if folder exists and if there are processed LFP files inside
         if ~exist(sessions_info(i).proc_results_fldr, 'dir') || ...
                 isempty(dir(fullfile(sessions_info(i).proc_results_fldr, '*.mat')))
             warning('No mat files with processed LFP found for session %s\n'...
                 , session_name);
+            fprintf('Processing LFP for session %s\n', session_name);
             sessions_info(i) = ...
                 lfp_tfa_process_LFP(sessions_info(i), lfp_tfa_cfg);
-        elseif lfp_tfa_cfg.process_LFP
+        elseif lfp_tfa_cfg.process_LFP 
             % read LFP data for each site and each trial and calculate the 
             % trial-wise time frequency spectrogram
+            fprintf('Processing LFP for session %s\n', session_name);
             sessions_info(i) = ...
                 lfp_tfa_process_LFP(sessions_info(i), lfp_tfa_cfg);
         end
@@ -84,7 +86,6 @@ try
         sites_lfp_files = dir(fullfile(sessions_info(i).proc_results_fldr, '*.mat'));
         session_proc_lfp = [];
         for file = {sites_lfp_files.name}
-            %fprintf('Reading processed LFP for site %s\n', file{1});
             if ~strcmp(file{1}, 'allsites_lfp.mat')
                 load(fullfile(sessions_info(i).proc_results_fldr, file{1}))
                 session_proc_lfp = [session_proc_lfp site_lfp];
@@ -180,34 +181,35 @@ if length(sessions_info) > 1
     % average session averages
     if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
         % Average of session averages of LFP TFR, LFP evoked responce and
-        % LFP power spectrum response
-    if any(strcmp(lfp_tfa_cfg.analyses, 'tfs'))
-    lfp_tfr.sessions_avg = ...
-        lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg);
-    end
-    if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))
-    lfp_evoked.sessions_avg = ...
-        lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg);
-    end
-    if any(strcmp(lfp_tfa_cfg.analyses, 'pow'))
-    lfp_pow.sessions_avg = ...
-        lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg);
-    end
-    % LFP-LFP phase sync
-    if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
-        lfp_tfa_avg_sessions_sync(sessions_info, lfp_tfa_cfg);
-    end
-    % LFP-LFP phase sync
-    if any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
-        lfp_tfa_avg_sessions_syncspctrm(sessions_info, lfp_tfa_cfg);
-    end
+        % LFP power
+        % LFP TFR
+        if any(strcmp(lfp_tfa_cfg.analyses, 'tfs'))
+            lfp_tfr.sessions_avg = ...
+                lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg);
+        end
+        % LFP evoked response
+        if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))
+            lfp_evoked.sessions_avg = ...
+                lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg);
+        end
+        % LFP spectral power
+        if any(strcmp(lfp_tfa_cfg.analyses, 'pow'))
+            lfp_pow.sessions_avg = ...
+                lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg);
+        end
+        % LFP-LFP phase sync
+        if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
+            lfp_tfa_avg_sessions_sync(sessions_info, lfp_tfa_cfg);
+        end
+        % LFP-LFP phase sync
+        if any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
+            lfp_tfa_avg_sessions_syncspctrm(sessions_info, lfp_tfa_cfg);
+        end
     end
     % average site averages
     if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sites'))
         % Average of site averages of LFP TFR, LFP evoked response and LFP
         % power spectrum
-    % clear memory
-    %clear session_proc_lfp;
         if any(strcmp(lfp_tfa_cfg.analyses, 'tfs'))
             lfp_tfr.sites_avg = ...
                 lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg);

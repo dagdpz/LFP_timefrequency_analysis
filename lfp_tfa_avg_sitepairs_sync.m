@@ -35,6 +35,8 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_sync(sessions_i
 %               6. ref_hemisphere           - reference hemisphere for 
 %               contra- and ipsi- labelling, see
 %               settings/lfp_tfa_settings_example
+%               7. plot_significant         - flag indicating whether to
+%               plot only significant differences
 % OUTPUTS:
 %       result_matfile  - absolute path to the file where the LFP-LFP sync
 %       average across multiple sessions would be stored
@@ -234,8 +236,13 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_sync(sessions_i
         sitepairs_avg(t).difference = [];
         for diff = 1:length(lfp_tfa_cfg.diff_condition)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
+            stat_test = true;
+            if length(sessions_info) == 1
+                stat_test = false;
+            end
             sitepairs_avg(t).difference = [sitepairs_avg(t).difference, ...
-                lfp_tfa_compute_diff_condition_tfsync(sitepairs_avg(t).condition, diff_condition, 1)];
+                lfp_tfa_compute_diff_condition_tfsync(sitepairs_avg(t).condition, diff_condition, ...
+                stat_test, lfp_tfa_cfg)];
         end
         % plot Difference TFR
         for dcn = 1:length(sitepairs_avg(t).difference)
@@ -249,7 +256,7 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_sync(sessions_i
                         sitepairs_avg(t).difference(dcn).label));
                     lfp_tfa_plot_hs_tuned_sync(sitepairs_avg(t).difference(dcn).hs_tuned_sync, ...
                         lfp_tfa_cfg, plottitle, result_file, 'cmap', 'bluewhitered', 'imscale', [-0.3, 0.3], ...
-                        'significant', lfp_tfa_cfg.stat_test.plot_significant);
+                        'significant', lfp_tfa_cfg.plot_significant);
                 end
             end
         end
