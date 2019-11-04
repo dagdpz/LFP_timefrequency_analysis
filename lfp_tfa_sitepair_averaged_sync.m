@@ -1,5 +1,5 @@
 function [sitepair_sync] = lfp_tfa_sitepair_averaged_sync( sitepair_crosspow, site_conditions, lfp_tfa_cfg ) 
-% lfp_tfa_compute_plot_tfr  - compute and plot the condition-wise average
+% lfp_tfa_sitepair_averaged_sync  - compute and plot the condition-wise average
 % LFP-LFP phase synchronization spectrogram during a specifed time window
 % of interest averaged across different trials which satisfy given 
 % conditions (A condition is a combination of
