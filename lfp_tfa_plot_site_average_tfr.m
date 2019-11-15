@@ -1,4 +1,4 @@
-function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_states, lfp_tfa_cfg ) 
+function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditions, lfp_tfa_cfg ) 
 % lfp_tfa_plot_site_average_tfr  - compute and plot average lfp time freq
 % response for different hand-space tuning and trial conditions for each site and
 % across all sites of a session
@@ -71,10 +71,6 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
     session_tfs = struct();
     % session name
     session_tfs.session = states_lfp(1).session;
-    % perturbation groups for this session
-    perturbation_groups = lfp_tfa_cfg.perturbation_groups;
-    % get the trial conditions for this session
-    site_conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, perturbation_groups);
         
     % loop through each site
     for i = 1:length(states_lfp)
@@ -147,16 +143,16 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
                 end
                 % loop through states to analyse 
 
-                for st = 1:size(analyse_states, 1)
+                for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
                     
-                    if strcmp(analyse_states{st, 1}, 'combined')
+                    if strcmp(lfp_tfa_cfg.analyse_states{st, 1}, 'combined')
                         state_tfs = lfp_tfa_get_combined_tfs(states_lfp(i), ...
-                            cond_trials, analyse_states(st, :), lfp_tfa_cfg);
+                            cond_trials, lfp_tfa_cfg.analyse_states(st, :), lfp_tfa_cfg);
                     end
                     
-                    if strcmp(analyse_states{st, 1}, 'single')
+                    if strcmp(lfp_tfa_cfg.analyse_states{st, 1}, 'single')
                         state_tfs = lfp_tfa_get_state_tfs(states_lfp(i), ...
-                            cond_trials, analyse_states(st, :), lfp_tfa_cfg);
+                            cond_trials, lfp_tfa_cfg.analyse_states(st, :), lfp_tfa_cfg);
                     end                                       
 
                     if ~isempty(state_tfs.powspctrm)
@@ -242,7 +238,9 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, analyse_stat
         save(fullfile(site_results_folder, ...
             ['LFP_TFR_' site_tfr.site_ID '.mat']), 'site_tfr');
         % save into a mother struct
-        session_tfs.sites(i) = site_tfr;       
+        session_tfs.sites(i) = site_tfr;
+        
+        close all;
         
     end
        

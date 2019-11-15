@@ -137,7 +137,7 @@ lfp_tfa_cfg.session_info(8) = ...
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow', 'sync', 'syncsp'}; %, 'sync', 'syncsp'
+lfp_tfa_cfg.analyses = {'sync', 'syncsp'}; %'tfs', 'evoked', 'pow', 
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -152,7 +152,7 @@ lfp_tfa_cfg.compare.targets = {'MIP_R', 'MIP_L'};
 % should be a 1xN cell array of 1x2 cell array of strings which indicate
 % the target pairs between which the LFP-LFP phase synchronization should
 % be calculated - valid only if LFP-LFP phase sync should be calculated
-if any(strcmp(lfp_tfa_cfg.analyses, 'sync') | strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
+if any(strcmp(lfp_tfa_cfg.analyses, 'sync') | strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
     lfp_tfa_cfg.compare.target_pairs = {{'MIP_R', 'MIP_R'}, {'MIP_R', 'MIP_L'}, ...
         {'MIP_L', 'MIP_L'}}; 
 end
@@ -218,7 +218,7 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
 lfp_tfa_cfg.error_measure = 'bootci'; 
 
 
-%% Settings for averaging TFR and evoked LFP based on conditions
+%% Settings for trial conditions
 
 % trial types to be included in the analysis
 % should be a vector of integers specifying the types
@@ -340,7 +340,7 @@ lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % By condition, we mean a combination of choice/instr, pre/post-injection, type and effector, hand-space
  lfp_tfa_cfg.mintrials_percondition = 0;
 
-%% Time information
+%% Settings for defining trial start and end
 
 % Specify events which mark trial start and end
 lfp_tfa_cfg.trialinfo = struct();
@@ -378,7 +378,7 @@ lfp_tfa_cfg.trialinfo.end_state = lfp_tfa_states.SUCCESS;
 lfp_tfa_cfg.trialinfo.ref_tend = 0;
 
 
-%% Settings for ft_freqanalysis in FieldTrip
+%% Settings for power spectrogram calculations
 % Configuration for calculating LFP time frequency spectrogram using
 % ft_freqanalysis function of the fieldtrip toolbox
 
@@ -416,7 +416,10 @@ lfp_tfa_cfg.tfr.timestep        = 25;
 % for width = 6, frequency F = 30 Hz, wavelet duration = 6/30/pi = 0.0637 s
 % Example: 
 % 1. lfp_tfa_cfg.tfr.width = 6; % wavelet of width 6 cycles 
-lfp_tfa_cfg.tfr.width           = 6; 
+lfp_tfa_cfg.tfr.width = [];
+if strcmp(lfp_tfa_cfg.tfr.method, 'wavelet')
+    lfp_tfa_cfg.tfr.width       = 6; 
+end
 
 % For method = 'mtmfft' or 'mtmconvol', Ignored for method = 'wavelet'
 
@@ -426,6 +429,9 @@ lfp_tfa_cfg.tfr.width           = 6;
 % 'dpss' - multiple tapers based on discrete prolate spheroidal sequences 
 % (DPSS), also known as the Slepian sequence
 lfp_tfa_cfg.tfr.taper           = [];
+if strcmp(lfp_tfa_cfg.tfr.method, 'mtmconvol')
+    lfp_tfa_cfg.tfr.width       = 'hanning'; 
+end
 
 % the width of frequency smoothing in Hz (fw)
 % Note that 4 Hz smoothing means plus-minus 4 Hz, i.e. a 8 Hz smoothing box.
@@ -434,25 +440,31 @@ lfp_tfa_cfg.tfr.taper           = [];
 % 1. lfp_tfa_cfg.tfr.tapsmofrq  = 0.4 *cfg.foi; 
 %the smoothing will increase with frequency.
 lfp_tfa_cfg.tfr.tapsmofrq       = [];
+if strcmp(lfp_tfa_cfg.tfr.method, 'mtmconvol')
+    lfp_tfa_cfg.tfr.tapsmofrq  = 0.4 *cfg.foi; % the smoothing will increase with frequency.
+end
 
 % length of the sliding time-window in seconds (= tw)
 % should be vector of length 1 x numfoi
 % Following relation must hold: 
-% K = 2twfw-1, where K is required to be larger than 0
+% K = 2*tw*fw-1, where K is required to be larger than 0
 % K is the number of tapers applied
 % Example:
 % lfp_tfa_cfg.tfr.t_ftimwin  = 5./cfg.foi; % 5 cycles per window
 % window length decreases with frequency
 lfp_tfa_cfg.tfr.t_ftimwin       = [];
+if strcmp(lfp_tfa_cfg.tfr.method, 'mtmconvol')
+    lfp_tfa_cfg.tfr.tapsmofrq  = 5./cfg.foi; % 5 cycles per window. 
+end
 
-%% settings for LFP-LFP sync analysis
+%% Settings for LFP-LFP phase synchronization measure
 % measure of LFP-LFP phase synchronization
 % can be only 'ppc' currently
 % 'ppc' calculates pairwise phase consistency
 % entry will be used as cfg.method for performing ft_connectivityanalysis
 lfp_tfa_cfg.sync.measure = 'ppc';
 
-%% Settings to detect noisy trials
+%% Settings for detection of noisy trials
 % configuration for lfp noise rejection
 lfp_tfa_cfg.noise = [];
 % whether or not to apply noise rejection 
@@ -479,7 +491,7 @@ lfp_tfa_cfg.noise.pow_thr = 4;
 % whether single trials should be plotted
 lfp_tfa_cfg.noise.plottrials = 0;
 
-%% Settings to compute baseline power
+%% Settings used for baseline power normalization
 
 % ID of the reference state around which baseline should be considered, see
 % lfp_tfa_global_define_states
@@ -564,7 +576,7 @@ lfp_tfa_cfg.baseline_method = 'zscore';
 % lfp_tfa_cfg.compute_pow = 1;
 
     
-%% Settings for averaging across sessions or sites
+%% Settings for grand averaging
 
 % how to average data across multiple sessions/sites
 % 'sessions' - average the session averages (a session average is the
@@ -575,7 +587,7 @@ lfp_tfa_cfg.baseline_method = 'zscore';
 % both averages across session averages and across site averages
 lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'}; 
 
-%% Settings for statistical test for significance of difference between LFP time-frequency spectrograms
+%% Settings for statistical test for significance of difference between TFR average across sites
 
 % Desired false discovery rate for multiple comparison
 % correction for statistical significance tests

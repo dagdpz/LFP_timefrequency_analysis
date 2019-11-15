@@ -281,7 +281,9 @@ function [sitepair_sync] = lfp_tfa_sitepair_averaged_sync( sitepair_crosspow, si
         save(fullfile(sitepair_results_folder, ...
             ['sitepair_sync_' sitepair_sync.sites{1} '-' sitepair_sync.sites{2} '.mat']), 'sitepair_sync');
         % save into a mother struct
-        % sitepair_sync.sites(i) = site_tfr;       
+        % sitepair_sync.sites(i) = site_tfr;    
+        
+        close all;
         
     %end
        

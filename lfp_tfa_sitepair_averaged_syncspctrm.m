@@ -244,7 +244,8 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_averaged_syncspctrm( sitepai
     save(fullfile(sitepair_results_folder, ...
         ['LFP-LFP_syncspctrm_' sitepair_syncspctrm.sites{1} '-' sitepair_syncspctrm.sites{2} '.mat']), 'sitepair_syncspctrm');
     %end
-        
+    
+    close all;        
     
     
 %     % Calculate average power spectrum across all sites

@@ -1,4 +1,4 @@
-function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg ) 
+function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_conditions, lfp_tfa_cfg ) 
 
 % lfp_tfa_plot_site_powspctrum  - calculate and plot the average lfp power spectrum for
 % different trial conditions for each site and across sites for a session
@@ -53,9 +53,6 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
     sites_pow = struct();
     session_pow = struct();
     session_pow.session = states_lfp(1).session;
-    % perturbation groups for this session
-    perturbation_groups = lfp_tfa_cfg.perturbation_groups;
-    site_conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, perturbation_groups);
     
     % loop through each site
     for i = 1:length(states_lfp)  
@@ -119,7 +116,6 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
                 if sum(cond_trials) < lfp_tfa_cfg.mintrials_percondition
                     sites_pow(i).use_for_avg = 0;
                 end
-
 
                 
                 % loop through epochs to analyse
@@ -202,6 +198,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             ['LFP_Power_' site_pow.site_ID '.mat']), 'site_pow');
         % save into a mother struct
         session_pow.sites(i) = site_pow;
+        close all;
     end
         
     
@@ -219,12 +216,12 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg
             session_avg(t).condition(cn).target = states_lfp(i).target;
             session_avg(t).condition(cn).label = site_conditions(cn).label;% variable to store no:of sites with trials satisfying this
             % condition
-            % initialize number of site pairs for each handspace
+            % initialize number of sites for each handspace
             % label
-            for st = 1:size(sites_pow(1).condition(cn).hs_tuned_power, 1)
+            for ep = 1:size(sites_pow(1).condition(cn).hs_tuned_power, 1)
                 for hs = 1:size(sites_pow(1).condition(cn).hs_tuned_power, 2)
-                    session_avg(t).condition(cn).hs_tuned_power(st, hs).nsites = 0;
-                    session_avg(t).condition(cn).hs_tuned_power(st, hs).psd = [];
+                    session_avg(t).condition(cn).hs_tuned_power(ep, hs).nsites = 0;
+                    session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd = [];
                 end
             end
             isite = 0;

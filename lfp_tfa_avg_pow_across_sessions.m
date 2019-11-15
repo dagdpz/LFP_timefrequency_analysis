@@ -62,6 +62,13 @@ function sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg)
         for cn = 1:length(lfp_tfa_cfg.conditions)
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
             sessions_avg(t).condition(cn).avg_across_sessions = struct();
+            for ep = 1:size(lfp_pow.session(1).session_avg(1).condition(cn).hs_tuned_power, 1)
+                for hs = 1:size(lfp_pow.session(1).session_avg(1).condition(cn).hs_tuned_power, 2)
+                    sessions_avg(t).condition(cn).avg_across_sessions(ep, hs).nsites = 0;
+                    sessions_avg(t).condition(cn).avg_across_sessions(ep, hs).nsessions = 0;
+                    sessions_avg(t).condition(cn).avg_across_sessions(ep, hs).psd = [];
+                end
+            end
             nsessions = 0;
             for i = 1:length(lfp_pow.session)
                 for k = 1:length(lfp_pow.session(i).session_avg)
@@ -73,14 +80,16 @@ function sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg)
                                 for hs = 1:size(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power, 2)
                                     if isfield(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs), 'mean') ...
                                             && ~isempty(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).mean)
-                                        if nsessions == 1%~isfield(sessions_avg(t).cond_based_tfs(cn).tfs_across_sessions, 'powspctrm')
+                                        sessions_avg(t).condition(cn).avg_across_sessions(ep, hs).nsessions = ...
+                                            sessions_avg(t).condition(cn).avg_across_sessions(ep, hs).nsessions + 1;
+                                        if sessions_avg(t).condition(cn).avg_across_sessions(ep, hs).nsessions == 1%~isfield(sessions_avg(t).cond_based_tfs(cn).tfs_across_sessions, 'powspctrm')
                                             sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).freq ...
                                             = lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).freq;
                                             sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).hs_label ...
                                                 = lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).hs_label;
                                             sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).epoch_name ...
                                                 = lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).epoch_name;
-                                            sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).mean ...
+                                            sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).psd ...
                                                 = lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).mean;
                                             if isfield(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs), 'nsites')
                                                 sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).nsites ...
@@ -92,9 +101,11 @@ function sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg)
                                             if nfreqbins > length(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).freq)
                                                 nfreqbins = length(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).freq);
                                             end
-                                            sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).mean ...
-                                                = (lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqbins)) + ...
-                                                sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).mean(1:nfreqbins);
+                                            sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).psd ...
+                                                = [(lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).mean(1:nfreqbins)); ...
+                                                sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).psd(:,1:nfreqbins)];
+                                            sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).freq = ...
+                                                sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).freq(1:nfreqbins);
                                             if isfield(sessions_avg(t).condition(cn).avg_across_sessions(ep,hs), 'nsites')
                                                 sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).nsites ...
                                                     = lfp_pow.session(i).session_avg(k).condition(cn).hs_tuned_power(ep, hs).nsites + ...
@@ -114,10 +125,10 @@ function sessions_avg = lfp_tfa_avg_pow_across_sessions(lfp_pow, lfp_tfa_cfg)
             % compute average
             for ep = 1:size(sessions_avg(t).condition(cn).avg_across_sessions, 1)
                 for hs = 1:size(sessions_avg(t).condition(cn).avg_across_sessions, 2)
-                    if isfield(sessions_avg(t).condition(cn).avg_across_sessions(ep,hs), 'mean')
-                        sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).nsessions = nsessions;                                
+                    if isfield(sessions_avg(t).condition(cn).avg_across_sessions(ep,hs), 'psd')
+                        sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).dimord = 'nsessions_freq';                                
                         sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).mean = ...
-                            (1/nsessions) * sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).mean;
+                            (nanmean(sessions_avg(t).condition(cn).avg_across_sessions(ep,hs).psd, 1));
                     end
                 end
             end

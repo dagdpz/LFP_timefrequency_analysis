@@ -85,33 +85,23 @@ try
         % read the processed lfp mat files for all sites of this session
         sites_lfp_files = dir(fullfile(sessions_info(i).proc_results_fldr, '*.mat'));
         session_proc_lfp = [];
-        for file = {sites_lfp_files.name}
-            if ~strcmp(file{1}, 'allsites_lfp.mat')
-                load(fullfile(sessions_info(i).proc_results_fldr, file{1}))
-                session_proc_lfp = [session_proc_lfp site_lfp];
-            end            
+        if any(strcmp(lfp_tfa_cfg.analyses, 'tfs')) || ...
+                any(strcmp(lfp_tfa_cfg.analyses, 'evoked')) || ...
+                any(strcmp(lfp_tfa_cfg.analyses, 'pow'))
+            for file = {sites_lfp_files.name}
+                if ~strcmp(file{1}, 'allsites_lfp.mat')
+                    fprintf('Reading LFP data from %s\n', file{1});
+                    load(fullfile(sessions_info(i).proc_results_fldr, file{1}))
+                    session_proc_lfp = [session_proc_lfp site_lfp];
+                end            
+            end
         end
 
         lfp_tfa_cfg.data_filepath = lfp_datafiles{i};
-        % perturbation blocks
-        lfp_tfa_cfg.perturbation_groups = {};        
-        % preinjection blocks for this session
-        if isfield(sessions_info, 'Preinj_blocks') && ...
-                ~isempty(sessions_info(i).Preinj_blocks)
-            lfp_tfa_cfg.perturbation_groups = ...
-                [lfp_tfa_cfg.perturbation_groups sessions_info(i).Preinj_blocks];
-        elseif any(lfp_tfa_cfg.compare.perturbations == 0)            
-            lfp_tfa_cfg.perturbation_groups = [lfp_tfa_cfg.perturbation_groups 0];            
-        end
-        % postinjection blocks for this session
-        if isfield(sessions_info, 'Postinj_blocks') && ...
-                ~isempty(sessions_info(i).Postinj_blocks)
-            lfp_tfa_cfg.perturbation_groups{2} = sessions_info(i).Postinj_blocks;
-        elseif any(lfp_tfa_cfg.compare.perturbations == 1)            
-            lfp_tfa_cfg.perturbation_groups = [lfp_tfa_cfg.perturbation_groups 'all'];            
-        end
         
-        
+        % trial conditions to analyse
+        conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
+                {sessions_info(i).Preinj_blocks, sessions_info(i).Postinj_blocks});
                     
         % Calculate and plot the site-wise and session average TFR, 
         % evoked response and power spectral density for 
@@ -119,41 +109,44 @@ try
         if any(strcmp(lfp_tfa_cfg.analyses, 'tfs'))
             lfp_tfr.session(i) = ...
                 lfp_tfa_plot_site_average_tfr( session_proc_lfp, ...
-                lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
+                conditions, lfp_tfa_cfg );
         end
         if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))
             lfp_evoked.session(i) = ...
                 lfp_tfa_plot_site_evoked_LFP( session_proc_lfp, ...
-                lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
+                conditions, lfp_tfa_cfg );
         end
         if any(strcmp(lfp_tfa_cfg.analyses, 'pow'))
             lfp_pow.session(i) = ...
                 lfp_tfa_plot_site_powspctrum( session_proc_lfp, ...
-                lfp_tfa_cfg ) ; 
+                conditions, lfp_tfa_cfg ) ; 
         end
         
         if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) ...
             || any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
             % session cross power spctrum folder
             session_csd_folder = ...
-                fullfile(sessions_info(i).proc_results_fldr, 'crossspectrum');
-            conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, ...
-                {sessions_info(i).Preinj_blocks, sessions_info(i).Postinj_blocks});
+                fullfile(sessions_info(i).proc_results_fldr, 'crossspectrum');            
             % loop through each sitepair
             for sitepair_csd_file = dir(fullfile(session_csd_folder, '*.mat'))'
+                clear sitepair_crosspow;
                 % load mat file
+                fprintf('Reading LFP-LFP cross spectrum from %s\n', ...
+                    sitepair_csd_file.name);
                 load(fullfile(session_csd_folder, ...
                     sitepair_csd_file.name), 'sitepair_crosspow');
                 if any(strcmp(lfp_tfa_cfg.analyses, 'sync'))
                     % compute ppc spectrogram between sitepair
                     % get the trial conditions for this session
-                    sitepair_sync = lfp_tfa_sitepair_averaged_sync(sitepair_crosspow, conditions, lfp_tfa_cfg);
+                    sitepair_sync = lfp_tfa_sitepair_averaged_sync(...
+                        sitepair_crosspow, conditions, lfp_tfa_cfg);
                 end
                 
                 if any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
                     % compute ppc spectrogram between sitepair
                     % get the trial conditions for this session
-                    sitepair_syncsp = lfp_tfa_sitepair_averaged_syncspctrm(sitepair_crosspow, conditions, lfp_tfa_cfg);
+                    sitepair_syncsp = lfp_tfa_sitepair_averaged_syncspctrm(...
+                        sitepair_crosspow, conditions, lfp_tfa_cfg);
                 end
             end
                 
@@ -162,13 +155,15 @@ try
         % Calculate the session-wise average of LFP-LFP phase sync
         if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) && ...
                 any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
-            sessions_info(i).avg_sync_results = lfp_tfa_avg_sitepairs_sync(sessions_info(i), lfp_tfa_cfg);
+            sessions_info(i).avg_sync_results = lfp_tfa_avg_sitepairs_sync(...
+                sessions_info(i), lfp_tfa_cfg);
         end
         
         % Calculate the session-wise average of LFP-LFP phase sync spectrum
         if any(strcmp(lfp_tfa_cfg.analyses, 'syncsp')) && ...
                 any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
-            sessions_info(i).avg_syncspctrm_results = lfp_tfa_avg_sitepairs_syncspctrm(sessions_info(i), lfp_tfa_cfg);
+            sessions_info(i).avg_syncspctrm_results = ...
+                lfp_tfa_avg_sitepairs_syncspctrm(sessions_info(i), lfp_tfa_cfg);
         end
         
     end

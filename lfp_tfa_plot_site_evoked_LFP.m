@@ -1,4 +1,4 @@
-function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, analyse_states, lfp_tfa_cfg ) 
+function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_conditions, lfp_tfa_cfg ) 
 
 % lfp_tfa_plot_site_evoked_LFP  - computes and plots average evoked LFP for
 % different trial conditions for each site and across all sites
@@ -63,10 +63,6 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, analyse_s
     sites_evoked = struct();
     session_evoked = struct();
     session_evoked.session = sites_lfp(1).session;
-    % perturbation groups for this session
-    perturbation_groups = lfp_tfa_cfg.perturbation_groups;
-    % get trial conditions for this session
-    site_conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg, perturbation_groups);
     
     % loop through each site
     for i = 1:length(sites_lfp) 
@@ -139,16 +135,16 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, analyse_s
 
 
                 % loop through time windows around the states to analyse
-                for st = 1:size(analyse_states, 1)
+                for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
                     
                     cond_trials_lfp = sites_lfp(i).trials(cond_trials);
                     
-                    if strcmp(analyse_states{st, 1}, 'single')
+                    if strcmp(lfp_tfa_cfg.analyse_states{st, 1}, 'single')
                         state_tfs = lfp_tfa_get_state_evoked_lfp(cond_trials_lfp, ...
-                            analyse_states(st, :));
-                    elseif strcmp(analyse_states{st, 1}, 'combined')
+                            lfp_tfa_cfg.analyse_states(st, :));
+                    elseif strcmp(lfp_tfa_cfg.analyse_states{st, 1}, 'combined')
                         state_tfs = lfp_tfa_get_combined_evoked_lfp(cond_trials_lfp, ...
-                            analyse_states(st, :));
+                            lfp_tfa_cfg.analyse_states(st, :));
                     end                        
 
 
@@ -197,6 +193,8 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, analyse_s
         save(fullfile(site_results_folder, ['LFP_evoked_' sites_evoked(i).site_ID '.mat']), 'site_evoked_lfp');
         % save to a mother struct
         session_evoked.sites(i) = site_evoked_lfp;
+        
+        close all;
     end
         
     % Average across sites for a session
