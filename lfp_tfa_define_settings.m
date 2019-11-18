@@ -68,7 +68,13 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
         lfp_tfa_cfg.proc_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'Processed LFP'];
     end
     % folder to save LFP analysis results
-    lfp_tfa_cfg.analyse_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'LFP Analysis'];
+    if ~lfp_tfa_cfg.compute_site_average && ~exist(lfp_tfa_cfg.analyse_lfp_folder, 'dir')
+        lfp_tfa_cfg.compute_site_average = true;
+    end
+    %lfp_tfa_cfg.analyse_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'LFP Analysis'];
+    if lfp_tfa_cfg.compute_site_average
+        lfp_tfa_cfg.analyse_lfp_folder = [lfp_tfa_cfg.root_results_fldr filesep 'LFP Analysis'];
+    end
     % folder to store LFP-LFP sync results
     lfp_tfa_cfg.lfp_sync_folder = [lfp_tfa_cfg.analyse_lfp_folder filesep 'Condition_based_Sync'];
     % folder to store session-wise analysis results
@@ -81,6 +87,12 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
             filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_Sync' ];
         lfp_tfa_cfg.session_info(i).lfp_syncspctrm_results_fldr = [lfp_tfa_cfg.analyse_lfp_folder ...
             filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_Syncspectrum' ];
+        lfp_tfa_cfg.session_info(i).lfp_tfs_results_fldr = [lfp_tfa_cfg.analyse_lfp_folder ...
+            filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_TFS' ];
+        lfp_tfa_cfg.session_info(i).lfp_evoked_results_fldr = [lfp_tfa_cfg.analyse_lfp_folder ...
+            filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_Evoked_LFP' ];
+        lfp_tfa_cfg.session_info(i).lfp_pow_results_fldr = [lfp_tfa_cfg.analyse_lfp_folder ...
+            filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_LFP_Power' ];
     end
 
     % save settings struct

@@ -33,6 +33,26 @@ if ~lfp_tfa_cfg.process_LFP
         'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions\Processed LFP';
 end
 
+% whether to calculate the site-wise averages
+% if the site-wise averages for the given sessions were already
+% calculated, it can be reused by setting 'lfp_tfa_cfg.analyse_lfp_folder' 
+% as the folder where the results are stored. In this case, set this
+% variable to false. If this variable is set to false, but the LFP
+% site-wise averages are not available in the specified folder, the
+% site-wise averages will be calculated and stored in 
+% lfp_tfa_cfg.results_folder. If the site-wise averages 
+% should be computed, set this variable to true. 
+% Caution: Set this variable to false only if all settings other than 
+% lfp_tfa_cfg.session_info, remains the same
+lfp_tfa_cfg.compute_site_average = false;
+
+% folder where the results of analysed LFP site averages are stored
+lfp_tfa_cfg.analyse_lfp_folder = [];
+if ~lfp_tfa_cfg.compute_site_average
+    lfp_tfa_cfg.analyse_lfp_folder = ...
+        'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions\LFP Analysis';
+end
+
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
 lfp_tfa_cfg.info_filepath = 'Y:\Projects\PPC_pulv_body_signals\ephys\MIP_inactivation_20190314\Mag_sorted_neurons.xls';
@@ -137,7 +157,7 @@ lfp_tfa_cfg.session_info(8) = ...
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'sync', 'syncsp'}; %'tfs', 'evoked', 'pow', 
+lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow', 'sync', 'syncsp'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
