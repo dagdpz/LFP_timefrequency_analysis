@@ -10,20 +10,22 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditi
 % INPUTS:
 %		states_lfp  	- 1xM struct containing lfp data for all sites of  
 %       a session (M = number of sites), see lfp_tfa_process_LFP
-%       analyse_states  - cell array containing states to be
-%       analysed, see settings/lfp_tfa_settings_example
-%       lfp_tfa_cfg     - struct containing configuration for TFR 
+%       site_conditions - struct containing the conditions to analyse. 
+%       i.e., the output of lfp_tfa_compare_conditions (A condition is a 
+%       combination of type-effector, choice, and perturbation)       
+%       lfp_tfa_cfg     - struct containing configuration for TFR, see 
+%       settings/lfp_tfa_settings_example  
 %           Required fields:
 %               session_results_fldr            - folder to which the
 %               results of the session should be saved
-%               perturbation_groups             - 1x2 cell array containing
-%               the blocks to be considered as pre- and post- injection
 %               random_seed                     - for reproducibility of
 %               random numbers, see rng
 %               mintrials_percondition          - minimum number of trials
 %               required per condition for considering the site for
 %               averaging (Condition is a combination of perturbation,
 %               choice, type-effector, and hand-space tuning)
+%               analyse_states  - cell array containing info about the 
+%               states to be analysed
 %               ref_hemisphere                  - reference hemispehere for
 %               ipsi- and contra-labeling
 %               diff_condition                  - trial conditions between
@@ -46,14 +48,14 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditi
 %                       one session (T = number of target areas)
 %                       
 %
-% REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_get_condition_trials, 
+% REQUIRES:	lfp_tfa_get_condition_trials, 
 % lfp_tfa_get_combined_tfs, lfp_tfa_get_state_tfs, 
 % lfp_tfa_compute_difference_condition_tfr
 %
 % See also settings/lfp_tfa_settings_example, lfp_tfa_define_settings, 
-% lfp_tfa_process_lfp, lfp_tfa_compute_difference_condition_tfr, 
-% lfp_tfa_plot_site_evoked_LFP, lfp_tfa_plot_site_powspctrum, 
-% lfp_tfa_plot_hs_tuned_tfr_multiple_img
+% lfp_tfa_process_lfp, lfp_tfa_compare_conditions, 
+% lfp_tfa_compute_difference_condition_tfr, lfp_tfa_plot_site_evoked_LFP, 
+% lfp_tfa_plot_site_powspctrum, lfp_tfa_plot_hs_tuned_tfr_multiple_img
     
     % suppress warning for xticklabel
     warning ('off', 'MATLAB:hg:willberemoved');

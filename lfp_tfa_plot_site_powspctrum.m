@@ -6,17 +6,18 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
 % perturbation/choice/type-effector/hand-space tuning)
 %
 % USAGE:
-%	[ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, lfp_tfa_cfg )
+%	[ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_conditions, lfp_tfa_cfg )
 %
 % INPUTS:
 %		states_lfp  	- 1xN structure containing processed lfp data for all
 %		sites of one session (N=number of sites), see lfp_tfa_process_lfp
+%       site_conditions - struct containing the conditions to analyse (A
+%       condition is a combination of type-effector, choice, and
+%       perturbation)
 %       lfp_tfa_cfg     - struct containing configuration for LFP TFR analysis 
 %           Required fields: see settings\lfp_tfa_settings_example
 %               session_results_fldr            - folder to which the
 %               results of the session should be saved
-%               perturbation_groups             - 1x2 cell array containing
-%               the blocks to be considered as pre- and post- injection
 %               mintrials_percondition          - minimum number of trials
 %               required per condition for considering the site for
 %               averaging
@@ -34,7 +35,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
 %                       averaged across muliple sites in a target area in
 %                       one session (T = number of target areas)
 %
-% REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_get_condition_trials,
+% REQUIRES:	lfp_tfa_get_condition_trials,
 % lfp_tfa_plot_hs_tuned_psd_2 
 %
 % See also lfp_tfa_process_lfp, settings/lfp_tfa_settings_example,

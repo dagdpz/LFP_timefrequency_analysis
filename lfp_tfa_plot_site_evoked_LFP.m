@@ -6,25 +6,26 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
 % perturbation/choice/type-effector/hand-space tuning)
 %
 % USAGE:
-%	[ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, analyse_states, lfp_tfa_cfg ) 
+%	[ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_conditions, lfp_tfa_cfg ) 
 %
 % INPUTS:
 %		sites_lfp     	- 1xN struct containing raw lfp data for all sites of a 
 %       session, see lfp_tfa_process_lfp 
-%       analyse_states  - cell array containing states to be
-%       analysed and corresponding time windows
+%       site_conditions - struct containing the conditions to analyse. 
+%       i.e., the output of lfp_tfa_compare_conditions (A condition is a 
+%       combination of type-effector, choice, and perturbation)
 %       lfp_tfa_cfg     - struct containing configuration for TFR 
 %           Required fields:
 %               session_results_fldr            - folder to which the
 %               results of the session should be saved
-%               perturbation_groups             - 1x2 cell array containing
-%               the blocks to be considered as pre- and post- injection
 %               random_seed                     - for reproducibility of
 %               random numbers, see rng
 %               mintrials_percondition          - minimum number of trials
 %               required per condition for considering the site for
 %               averaging (Condition is a combination of perturbation,
 %               choice, type-effector, and hand-space tuning)
+%               analyse_states  - cell array containing states to be
+%               analysed and corresponding time windows
 %               ref_hemisphere                  - reference hemispehere for
 %               ipsi- and contra-labeling
 %               mintrials_percondition          - minimum number of trials
@@ -42,7 +43,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
 %                       averaged across muliple sites in a target area in
 %                       one session (T = number of target areas)
 % 
-% REQUIRES:	lfp_tfa_compare_conditions, lfp_tfa_get_condition_trials, 
+% REQUIRES:	lfp_tfa_get_condition_trials, 
 % lfp_tfa_get_combined_evoked_lfp, lfp_tfa_get_state_evoked_lfp,
 % lfp_tfa_plot_evoked_lfp
 %
