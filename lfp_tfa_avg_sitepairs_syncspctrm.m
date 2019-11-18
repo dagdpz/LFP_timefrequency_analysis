@@ -93,82 +93,92 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_syncspctrm(sess
                 end
             end                        
         end
-        for i = 1:length(sessions_info) 
-            sitepairs_fldr = dir(sessions_info(i).lfp_syncspctrm_results_fldr);
-            sitepairs_fldr(1:2) = [];
-            for j = 1:length(sitepairs_fldr)
+    end
+    for i = 1:length(sessions_info) 
+        sitepairs_fldr = dir(sessions_info(i).lfp_syncspctrm_results_fldr);
+        sitepairs_fldr(1:2) = [];
+        for j = 1:length(sitepairs_fldr)
 %                     if ~sessions_info(i).sitepair_info(j).use_for_avg
 %                         continue;
 %                     end
-                % load the analysis results for this sitepair, variable
-                % name is sitepair_syncspctrm
-                %fprintf('Loading site pair %s - %s\n', sessions_info(i).sitepair_info(j).sites{:});
-                if strcmp(sitepairs_fldr(j).name, 'session_avg')
-                    continue;
+            % load the analysis results for this sitepair, variable
+            % name is sitepair_syncspctrm
+            %fprintf('Loading site pair %s - %s\n', sessions_info(i).sitepair_info(j).sites{:});
+            if strcmp(sitepairs_fldr(j).name, 'session_avg')
+                continue;
+            end
+            sitepair_sync_file = dir(fullfile(...
+                sessions_info(i).lfp_syncspctrm_results_fldr, sitepairs_fldr(j).name, '*.mat'));
+            sitepair_sync_filepath = fullfile(sessions_info(i).lfp_syncspctrm_results_fldr, ...
+                sitepairs_fldr(j).name, sitepair_sync_file(1).name);
+            load(sitepair_sync_filepath, 'sitepair_syncspctrm');
+            
+            t = [];
+            for t_idx = 1:length(sitepairs_avg)
+                if find(all(strcmp(sort(sitepair_syncspctrm.targets), ...
+                        sort(sitepairs_avg(t_idx).targets))))
+                    t = t_idx;
+                    fprintf('Target pair: %s - %s\n', sitepair_syncspctrm.targets{1}, sitepair_syncspctrm.targets{2});
+                    break;
                 end
-                sitepair_sync_file = dir(fullfile(...
-                    sessions_info(i).lfp_syncspctrm_results_fldr, sitepairs_fldr(j).name, '*.mat'));
-                sitepair_sync_filepath = fullfile(sessions_info(i).lfp_syncspctrm_results_fldr, ...
-                    sitepairs_fldr(j).name, sitepair_sync_file(1).name);
-                load(sitepair_sync_filepath, 'sitepair_syncspctrm');
-                
-                if ~all(strcmp(sort(sitepair_syncspctrm.targets), sort(lfp_tfa_cfg.compare.target_pairs{t})))
-                    continue;
-                end
-                
-                sitepair_syncspctrm.use_for_avg = 1;
-                for cn = 1:length(lfp_tfa_cfg.conditions)
-                    sitepair_syncspctrm.use_for_avg = ...
-                        ~any(sitepair_syncspctrm.condition(cn).ntrials - sitepair_syncspctrm.condition(cn).noisytrials < 5);
-                end
-                if sitepair_syncspctrm.use_for_avg == 0
-                    continue;
-                end
-                % compute condition-based average across sitepairs
-                for cn = 1:length(lfp_tfa_cfg.conditions)
-                    fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);     
-                                
-                    if ~isempty(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp) && ... 
-                        isfield(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp, 'ppc') 
-                        
-                        for ep = 1:size(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp, 1)
-                            for hs = 1:size(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp, 2)
-                                if isfield(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs), 'ppc') ...
-                                        && ~isempty(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc) ...
-                                        && isfield(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc, 'ppcspctrm') ...
-                                        && ~isempty(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm)
-                                    % increment number of site pairs
-                                    sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).nsites = ...
-                                        sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).nsites + 1;
-                                    if sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).nsites == 1%~isfield(sessions_avg.cond_based_tfs(cn).tfs_across_sessions, 'powspctrm')
-                                        sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep,hs).hs_label ...
-                                            = sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).hs_label;
-                                        sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep,hs).epoch_name ...
-                                            = sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).epoch_name;
-                                        sitepairs_avg(t).condition(cn).label = ...
-                                            sitepair_syncspctrm.condition(cn).label;
-                                        sitepairs_avg(t).condition(cn).cfg_condition = ...
-                                            sitepair_syncspctrm.condition(cn).cfg_condition;
+            end
+
+            if isempty(t)%~all(strcmp(sort(sitepair_syncspctrm.targets), sort(lfp_tfa_cfg.compare.target_pairs{t})))
+                continue;
+            end
+
+            sitepair_syncspctrm.use_for_avg = 1;
+            for cn = 1:length(lfp_tfa_cfg.conditions)
+                sitepair_syncspctrm.use_for_avg = ...
+                    ~any(sitepair_syncspctrm.condition(cn).ntrials - sitepair_syncspctrm.condition(cn).noisytrials < 5);
+            end
+            if sitepair_syncspctrm.use_for_avg == 0
+                continue;
+            end
+            % compute condition-based average across sitepairs
+            for cn = 1:length(lfp_tfa_cfg.conditions)
+                fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);     
+
+                if ~isempty(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp) && ... 
+                    isfield(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp, 'ppc') 
+
+                    for ep = 1:size(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp, 1)
+                        for hs = 1:size(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp, 2)
+                            if isfield(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs), 'ppc') ...
+                                    && ~isempty(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc) ...
+                                    && isfield(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc, 'ppcspctrm') ...
+                                    && ~isempty(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm)
+                                % increment number of site pairs
+                                sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).nsites = ...
+                                    sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).nsites + 1;
+                                if sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).nsites == 1%~isfield(sessions_avg.cond_based_tfs(cn).tfs_across_sessions, 'powspctrm')
+                                    sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep,hs).hs_label ...
+                                        = sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).hs_label;
+                                    sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep,hs).epoch_name ...
+                                        = sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).epoch_name;
+                                    sitepairs_avg(t).condition(cn).label = ...
+                                        sitepair_syncspctrm.condition(cn).label;
+                                    sitepairs_avg(t).condition(cn).cfg_condition = ...
+                                        sitepair_syncspctrm.condition(cn).cfg_condition;
 %                                         sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.time ...
 %                                             = sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.time;
-                                        sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.freq ...
-                                            = sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.freq;                                        
-                                        sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.cfg ...
-                                            = sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.cfg;
-                                        sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm ...
-                                            = [sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm; sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm];
+                                    sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.freq ...
+                                        = sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.freq;                                        
+                                    sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.cfg ...
+                                        = sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.cfg;
+                                    sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm ...
+                                        = [sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm; sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm];
 
-                                    else
-                                        sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm ...
-                                            = [sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm; ...
-                                            (sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm) ...
-                                            ];
+                                else
+                                    sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm ...
+                                        = [sitepairs_avg(t).condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm; ...
+                                        (sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc.ppcspctrm) ...
+                                        ];
 %                                         if isfield(sitepairs_avg(t).condition(cn).hs_tuned_tfs(st,hs), 'nsites')
 %                                             sitepairs_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites ...
 %                                                 = lfp_tfr.session(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).nsites + ...
 %                                                 sitepairs_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites;
 %                                         end                               
-                                    end
                                 end
                             end
                         end
@@ -176,7 +186,9 @@ function [result_matfile, sitepairs_avg] = lfp_tfa_avg_sitepairs_syncspctrm(sess
                 end
             end
         end
+    end
 
+    for t = 1:length(sitepairs_avg)
         % compute average and plot
         for cn = 1:length(sitepairs_avg(t).condition)
             if ~isempty(sitepairs_avg(t).condition(cn).hs_tuned_syncsp)
