@@ -42,10 +42,10 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
     %cm = colormap(othercolor('Cat_12', size(avg_hs_tuned_syncsp, 1)));
     % color scheme for plotting spectra for each epoch
     if isfield(lfp_tfa_cfg, 'epoch_colors') && ...
-            length(lfp_tfa_cfg.epoch_colors) == size(avg_lfp_psd, 1)
+            length(lfp_tfa_cfg.epoch_colors) == size(avg_hs_tuned_syncsp, 1)
         cm = colormap(lfp_tfa_cfg.epoch_colors);
     else % default color scheme
-        cm = colormap(othercolor('Cat_12', size(avg_lfp_psd, 1)));
+        cm = colormap(othercolor('Cat_12', size(avg_hs_tuned_syncsp, 1)));
     end
     %cm = colormap(jet(size(avg_hs_tuned_syncsp, 1)));
     
