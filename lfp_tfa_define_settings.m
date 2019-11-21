@@ -32,7 +32,7 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % add external functions to path
-    addpath(genpath('./external'));
+    addpath(genpath(fullfile(pwd, 'external')));
 
     % define state IDs
     lfp_tfa_global_define_states;    

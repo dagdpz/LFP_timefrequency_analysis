@@ -38,7 +38,13 @@ function lfp_tfa_plot_hs_tuned_psd_2( avg_lfp_psd, lfp_tfa_cfg, plottitle, resul
     h = figure;
     set(h, 'position', [100, 100,900, 675]);
     
-    cm = colormap(othercolor('Cat_12', size(avg_lfp_psd, 1)));
+    % color scheme for plotting spectra for each epoch
+    if isfield(lfp_tfa_cfg, 'epoch_colors') && ...
+            length(lfp_tfa_cfg.epoch_colors) == size(avg_lfp_psd, 1)
+        cm = colormap(lfp_tfa_cfg.epoch_colors);
+    else % default color scheme
+        cm = colormap(othercolor('Cat_12', size(avg_lfp_psd, 1)));
+    end
     %cm = colormap(jet(size(avg_lfp_psd, 1)));
     
     % number of subplots required

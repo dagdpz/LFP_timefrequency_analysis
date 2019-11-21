@@ -8,7 +8,7 @@
 
 % file containing settings for LFP analysis
 % should have the same format as settings/lfp_tfa_settings_example.m
-settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_example.m';
+settings_filepath = 'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\LFP_LFP_Linus_MIP_8sessions\lfp_tfa_settings.m';
 
 %% INITIALIZATION
 close all;

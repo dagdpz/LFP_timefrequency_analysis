@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Personal\Sarath\Results\LFP_TFA_Results';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'Linus_inactivation_8sessions';
+lfp_tfa_cfg.version = 'LFP_LFP_Linus_inactivation_8sessions';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -228,16 +228,14 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
                               lfp_tfa_states.REA_INI,    'PreR',    -0.3 ,    -0.05 ; ...
                               lfp_tfa_states.REA_END,    'PeriR',   -0.2 ,    0.2 ; ...
                               lfp_tfa_states.SUCCESS,    'THol',    -0.3 ,    0    };
-              
+                          
 % color scheme to be used for plotting the power spectra and ppc spectra
-% curve for each epoch. This could either be a Kx3 array,
+% curve for each epoch. This could either be a colormap or a Kx3 array,
 % where K is the number of epochs to be analysed i.e.
 % K=length(lfp_tfa_cfg.analyse_epochs). The three columns represent R, G,
-% and B values normalized to 1. A standard or user-defined colormap with K
-% colors can also be used to generate the required colors. 
-lfp_tfa_cfg.epoch_colors = flip(othercolor('Cat_12', ...
-    length(lfp_tfa_cfg.analyse_epochs)));
-
+% and B values normalized to 1
+lfp_tfa_cfg.epoch_colors = flip(othercolor('Cat_12', length(lfp_tfa_cfg.analyse_epochs)));
+                          
 % the error measure to be plotted for evoked LFP response
 % Can be 'stddev', 'stderr' or 'bootci'
 % 'stddev' - plots one standard deviation around the mean
