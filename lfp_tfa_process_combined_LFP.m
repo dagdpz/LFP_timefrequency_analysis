@@ -47,17 +47,17 @@ function session_info = lfp_tfa_process_combined_LFP( session_info, lfp_tfa_cfg 
         combined_sites = cell(1, length(session_info.Input_LFP));
         for s = 1:length(combined_sites)
             % Read input LFP file
-            load(session_info.Input{s}, 'sites');
+            load(session_info.Input_LFP{s}, 'sites');
             combined_sites{s} = sites;
         end
     end
         
     if isfield(session_info, 'Input_ECG')
-        load(session_info.Input_ECG);
-        if exist('out', 'var')
-            block_ECG = out;
-            clear out;
-        end
+        block_ECG = load(session_info.Input_ECG);
+%         if exist('out', 'var')
+%             block_ECG = out;
+%             clear out;
+%         end
     end
     
     % prepare results folder
@@ -278,8 +278,8 @@ function session_info = lfp_tfa_process_combined_LFP( session_info, lfp_tfa_cfg 
                 if s == length(combined_sites)
                     
                     % Get ECG raw data
-                    if isfield(session_info, 'Input_ECG_raw')
-                        site_lfp = lfp_tfa_get_ECG_raw( site_lfp, session_info.Input_ECG_raw );
+                    if isfield(session_info, 'Input_ECG_combined')
+                        site_lfp = lfp_tfa_get_ECG_raw( site_lfp, session_info.Input_ECG_combined );
                     end
                     
                     % Get ECG spikes

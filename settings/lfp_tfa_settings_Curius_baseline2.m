@@ -150,7 +150,17 @@ lfp_tfa_cfg.compare.effectors = [0];
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = inf; 
+lfp_tfa_cfg.compare.choice_trials = inf;
+
+% which type of trial success are to be included in the analysis
+% Examples:
+% 1. lfp_tfa_cfg.compare.success = 0; % analyse only successful trials
+% 2. lfp_tfa_cfg.compare.success = 1; % analyse only unsuccessful trials
+% 3. lfp_tfa_cfg.compare.sucess = [0, 1]; % analyse successful and 
+% unsuccessful trials separately
+% 3. lfp_tfa_cfg.compare.sucess = inf; % ignore success of trial (both successful
+% and unsuccessful trials are combined)
+lfp_tfa_cfg.compare.success = inf; 
 
 % reach hands to be included for analysis
 % should be 'any' or a cell array that contain only values 'R', 'L'

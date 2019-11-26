@@ -67,7 +67,9 @@ function sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets(Rpeak_sta
                 sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).abs_timefromRpeak = {}; 
                 sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).rel_timefromRpeak = {}; 
                 sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).abs_timeprob.prob = []; 
-                sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).rel_timeprob.prob = []; 
+                sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).rel_timeprob.prob = [];
+                sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).abs_timeprob.timebins = []; 
+                sessions_avg(t).condition(cn).Rpeak_evoked(st, hs).rel_timeprob.timebins = [];
             end
         end  
 
@@ -75,8 +77,7 @@ function sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets(Rpeak_sta
             if isempty(Rpeak_state_onset.session(i).condition)
                 continue;
             end
-            if ~isempty(Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked) && ... 
-                isfield(Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked, 'abs_timefromRpeak') && ...
+            if isfield(Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked, 'abs_timefromRpeak') && ...
                 isfield(Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked, 'rel_timefromRpeak')
                 for st = 1:size(Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked, 1)
                     for hs = 1:size(Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked, 2)
@@ -114,6 +115,8 @@ function sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets(Rpeak_sta
                             sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).rel_timeprob.prob ...
                                 = [sessions_avg(t).condition(cn).Rpeak_evoked(st,hs).rel_timeprob.prob; ...
                                 Rpeak_state_onset.session(i).condition(cn).Rpeak_evoked(st, hs).rel_timeprob.prob];
+                        else
+                            sessions_avg(t).condition(cn).Rpeak_evoked(st, hs) = struct();
                         end
                     end
                 end
@@ -143,8 +146,10 @@ function sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets(Rpeak_sta
 
         if ~isempty(sessions_avg(t).condition(cn).Rpeak_evoked)
             if isfield(sessions_avg(t).condition(cn).Rpeak_evoked,... 
-                    'abs_timeprob') && isfield(...
-                    sessions_avg(t).condition(cn).Rpeak_evoked, 'rel_timeprob') 
+                    'abs_timefromRpeak') && isfield(...
+                    sessions_avg(t).condition(cn).Rpeak_evoked, 'rel_timefromRpeak') && ...
+                    ~isempty([sessions_avg(t).condition(cn).Rpeak_evoked.abs_timefromRpeak]) && ...
+                    ~isempty([sessions_avg(t).condition(cn).Rpeak_evoked.rel_timefromRpeak])
                 plottitle = [lfp_tfa_cfg.compare.targets{t},...
                      lfp_tfa_cfg.conditions(cn).label];
                 result_file = fullfile(results_fldr, ...
@@ -161,16 +166,24 @@ function sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets(Rpeak_sta
     sessions_avg(t).difference = [];
     for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
         diff_condition = lfp_tfa_cfg.diff_condition{diff};
-        diff_color = lfp_tfa_cfg.diff_color{diff}{:};
+        diff_color = []; diff_legend = [];
+        if isfield(lfp_tfa_cfg, 'diff_color')
+            diff_color = lfp_tfa_cfg.diff_color{diff};
+        end
+        if isfield(lfp_tfa_cfg, 'diff_legend')
+            diff_legend = lfp_tfa_cfg.diff_legend{diff};
+        end
         sessions_avg(t).difference = [sessions_avg(t).difference, ...
-            lfp_tfa_compute_diff_condition_Rpeak_evoked_states(sessions_avg(t).condition, diff_condition, diff_color)];
+            lfp_tfa_compute_diff_condition_Rpeak_evoked_states(sessions_avg(t).condition, diff_condition, diff_color, diff_legend)];
     end
     % plot Difference TFR
     for dcn = 1:length(sessions_avg(t).difference)
         if ~isempty(sessions_avg(t).difference(dcn).Rpeak_evoked)
             if isfield(sessions_avg(t).difference(dcn).Rpeak_evoked,... 
-                    'abs_timeprob') && isfield(...
-                    sessions_avg(t).difference(dcn).Rpeak_evoked, 'rel_timeprob');
+                    'abs_timefromRpeak') && isfield(...
+                    sessions_avg(t).difference(dcn).Rpeak_evoked, 'rel_timefromRpeak') && ...
+                    ~isempty([sessions_avg(t).difference(dcn).Rpeak_evoked.abs_timefromRpeak]) && ...
+                    ~isempty([sessions_avg(t).difference(dcn).Rpeak_evoked.rel_timefromRpeak])
                 plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
                     sessions_avg(t).difference(dcn).label];
                 result_file = fullfile(results_fldr, ...

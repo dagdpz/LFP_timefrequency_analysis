@@ -76,8 +76,15 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
             concat_states_R2Rt.err = [];
             concat_states_R2Rt.time = [];
 
-            state_info = struct();
-            for st = 1:size(evoked_R2Rt, 1)
+            state_info = struct();             
+            
+            nstates = size(evoked_R2Rt, 1);
+            ax = cell(1, numel(evoked_R2Rt));
+            for st = 1:nstates
+                
+                if isempty(evoked_R2Rt(st,hs).mean) && isempty(evoked_R2Rt(st,hs).std)
+                    continue;
+                end
                 
                 state_info(st).onset_s = find(...
                     evoked_R2Rt(st, hs).time <= 0, 1, 'last');
@@ -129,79 +136,86 @@ function lfp_tfa_plot_evoked_R2Rt( evoked_R2Rt, lfp_tfa_cfg, plottitle, results_
                 if isfield(evoked_R2Rt(st, hs), 'legend')
                     concat_states_R2Rt.legend = evoked_R2Rt(st, hs).legend;
                 end
-
-            end
-            
-            %state_onsets = find(concat_states_lfp.time(1:end-1) .* ...
-            %    concat_states_lfp.time(2:end) <= 0);
-            state_onsets = find(concat_states_R2Rt.time == 0);
-            state_samples = sort([state_info.start_s, state_info.onset_s, ...
-                state_info.finish_s]);
-
-            % now plot
-            subplot(nhandlabels*2, nspacelabels, hs)
-            hold on;
-            colors = ['b'; 'r'; 'g'; 'y'; 'm'; 'c'; 'k'];
-            if isfield(evoked_R2Rt(1, hs), 'color') && ...
-                    ~isempty(evoked_R2Rt(1, hs).color)
-                colors = evoked_R2Rt(1, hs).color;
-            end
-            % plot individual trials
-            if isfield(evoked_R2Rt(1, hs), 'ntrials') && ~isempty(evoked_R2Rt(1, hs).ntrials)
-                xx = [0];
-                for s = 1:length(concat_states_R2Rt.trial)
-                    xx = linspace(1, size(concat_states_R2Rt.trial{s}, 2), ...
-                        size(concat_states_R2Rt.trial{s}, 2)) + xx(end);
-                    plot(xx, concat_states_R2Rt.trial{s}, 'Color', [0.6, 0.6, 0.6])
+                
+                % now plot
+                ax{st} = subplot(nhandlabels*nspacelabels*2, nstates, (((hs-1)*nstates) + st));
+                hold on;
+                colors = ['b'; 'r'; 'g'; 'y'; 'm'; 'c'; 'k'];
+                if isfield(evoked_R2Rt(1, hs), 'color') && ...
+                        ~isempty(evoked_R2Rt(1, hs).color)
+                    colors = evoked_R2Rt(1, hs).color;
                 end
-            end
-            for i = 1:size(concat_states_R2Rt.mean, 1)
-                plot(concat_states_R2Rt.mean(i, :), 'Color', colors(i, :), 'LineWidth', 2);
-            end
-            if isfield(concat_states_R2Rt, 'legend')
-                legend(concat_states_R2Rt.legend);
-            end
-            for i = 1:size(concat_states_R2Rt.mean, 1)
-                plot(concat_states_R2Rt.mean(i, :) + concat_states_R2Rt.err(i, :), ...
-                    '--', 'Color', colors(i, :), 'LineWidth', 1);
-                plot(concat_states_R2Rt.mean(i, :) - concat_states_R2Rt.err(i, :), ...
-                    '--', 'Color', colors(i, :), 'LineWidth', 1);
-            end
-            % mark state onsets
-            %if isfield(evoked_lfp, 'state_name')
-            set(gca,'xtick', unique(state_samples))
-            set(gca, 'YLim', ylim);
-            for so = state_onsets
-                line([so so], ylim, 'color', 'k'); 
-                if isfield(evoked_R2Rt(state_onsets == so, hs), 'state_name') && ...
-                        ~isempty(evoked_R2Rt(state_onsets == so, hs).state_name)
-                    state_name = evoked_R2Rt(state_onsets == so, hs).state_name;
+                % plot individual trials
+                if isfield(evoked_R2Rt(st, hs), 'ntrials') && ~isempty(evoked_R2Rt(st, hs).ntrials)
+                    xx = [0];
+                    %for s = 1:length(evoked_R2Rt(st, hs).ecg_b2bt)
+                    xx = linspace(1, size(evoked_R2Rt(st, hs).ecg_b2bt, 2), ...
+                        size(evoked_R2Rt(st, hs).ecg_b2bt, 2)) + xx(end);
+                    state_evoked_R2Rt = evoked_R2Rt(st, hs).ecg_b2bt;
+                    if lfp_tfa_cfg.normalize_R2Rt
+                           state_evoked_R2Rt = state_evoked_R2Rt ./ ...
+                               repmat(evoked_R2Rt(st, hs).trials_mean', ...
+                               [1 size(state_evoked_R2Rt, 2)]);
+                    end
+                    plot(ax{st}, evoked_R2Rt(st, hs).time, state_evoked_R2Rt, 'Color', [0.6, 0.6, 0.6])
+                    %end
+                end
+                for i = 1:size(evoked_R2Rt(st, hs).mean, 1)
+                    shadedErrorBar(evoked_R2Rt(st, hs).time, evoked_R2Rt(st, hs).mean(i, :), evoked_R2Rt(st, hs).std(i, :), 'lineprops', colors(i, :));
+                end
+                if isfield(evoked_R2Rt(st, hs), 'legend')
+                    legend(ax{st}, evoked_R2Rt(st, hs).legend);
+                end
+%                 for i = 1:size(evoked_R2Rt(st, hs).mean, 1)
+%                     plot(ax{st}, evoked_R2Rt(st, hs).time, ...
+%                         evoked_R2Rt(st, hs).mean(i, :) + evoked_R2Rt(st, hs).std(i, :), ...
+%                         '--', 'Color', colors(i, :), 'LineWidth', 1);
+%                     plot(ax{st}, evoked_R2Rt(st, hs).time, ...
+%                         evoked_R2Rt(st, hs).mean(i, :) - evoked_R2Rt(st, hs).std(i, :), ...
+%                         '--', 'Color', colors(i, :), 'LineWidth', 1);
+%                 end
+                % mark state onsets
+                %if isfield(evoked_lfp, 'state_name')
+                %set(gca,'xtick', unique(state_samples))
+                %set(ax{st}, 'YLim', ylim);
+
+                line([0 0], ylim, 'color', 'k'); 
+                if isfield(evoked_R2Rt(st, hs), 'state_name') && ...
+                        ~isempty(evoked_R2Rt(st, hs).state_name)
+                    state_name = evoked_R2Rt(st, hs).state_name;
                     plottxt = state_name;
-                    if isfield(evoked_R2Rt(state_onsets == so, hs), 'ntrials') && ...
-                        ~isempty(evoked_R2Rt(state_onsets == so, hs).ntrials)
-                        ntrials = (evoked_R2Rt(state_onsets == so, hs).ntrials);
-                        plottxt = sprintf('%s \n(%g)', plottxt, ntrials);
+                    if isfield(evoked_R2Rt(st, hs), 'ntrials') && ...
+                        ~isempty(evoked_R2Rt(st, hs).ntrials)
+                        ntrials = (evoked_R2Rt(st, hs).ntrials);
+                        plottxt = sprintf('%s (%g)', plottxt, ntrials);
+                    end
+                    if isfield(evoked_R2Rt(st, hs), 'nsessions')
+                        nsessions = (evoked_R2Rt(st, hs).nsessions);
+                        plottxt = [plottxt ' (nsessions = ' nsessions ')'];
                     end
                     ypos = ylim;
                     ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;
-                    text(so+1, ypos, plottxt, 'fontsize', 10);
+                    title(plottxt);
                 end
+                %end
+                %set(gca,'xticklabels', round(concat_states_R2Rt.time(unique(state_samples)), 2), 'fontsize', 10)
+                %set(gca, 'xticklabelrotation', 45);
+                
+                %subplottitle = [evoked_R2Rt(1, hs).hs_label{1}];
+                
+                %title(subplottitle);
+                
+                xlabel(ax{st}, 'Time(s)');
+                ylabel(ax{st}, yaxislabel);
+
             end
-            %end
-            set(gca,'xticklabels', round(concat_states_R2Rt.time(unique(state_samples)), 2), 'fontsize', 10)
-            set(gca, 'xticklabelrotation', 45);
-            xlabel('Time(s)');
-            ylabel(yaxislabel);
             
-            subplottitle = [concat_states_R2Rt.label{1}];
-            if isfield(evoked_R2Rt(1, hs), 'nsessions')
-                subplottitle = [subplottitle ' (nsessions = ' num2str(evoked_R2Rt(1, hs).nsessions) ')'];
-%             elseif isfield(evoked_R2Rt(1, hs), 'ntrials') && ...
-%                     ~isempty(evoked_R2Rt(1, hs).ntrials)
-%                 subplottitle = [subplottitle ' (ntrials = ' ...
-%                     num2str(evoked_R2Rt(1, hs).ntrials) ')'];            
-            end
-            title(subplottitle);
+            linkaxes([ax{:}],'y');
+            
+            %state_onsets = find(concat_states_lfp.time(1:end-1) .* ...
+            %    concat_states_lfp.time(2:end) <= 0)
+
+            
         end
     end
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...

@@ -49,9 +49,19 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
     
     % loop through handspace
     for hs = 1:size(Rpeak_evoked_states, 2)
-        if ~isempty([Rpeak_evoked_states(:,hs).abs_timefromRpeak])
+        if ~isempty([Rpeak_evoked_states(:,hs).abs_timeprob]) && ...
+                ~isempty([Rpeak_evoked_states(:,hs).rel_timeprob])
             for st = 1:size(Rpeak_evoked_states, 1)
+                if isempty(Rpeak_evoked_states(st,hs).abs_timeprob)
+                    continue;
+                end
+                if isempty(Rpeak_evoked_states(st,hs).rel_timeprob)
+                    continue;
+                end
                 for cn = 1:length(Rpeak_evoked_states(st, hs).rel_timeprob)
+                    if isempty(Rpeak_evoked_states(st, hs).rel_timeprob(cn).prob)
+                        continue;
+                    end
     %               % state onset probability vs. Rpeak phase
                     timebinedges = Rpeak_evoked_states(st, hs).rel_timeprob(cn).timebins * 2*pi;
                     timebinmiddle = (timebinedges(1:end-1) + timebinedges(2:end))/2;
@@ -109,7 +119,10 @@ function lfp_tfa_plot_Rpeak_ref_state_onsets( Rpeak_evoked_states, lfp_tfa_cfg, 
                     colors = Rpeak_evoked_states(st, hs).colors;
                 end
                 
-                for cn = 1:length(Rpeak_evoked_states(st, hs).abs_timeprob)                
+                for cn = 1:length(Rpeak_evoked_states(st, hs).abs_timeprob)    
+                    if isempty(Rpeak_evoked_states(st, hs).abs_timeprob(cn).prob)
+                        continue;
+                    end
                     timebinedges = Rpeak_evoked_states(st, hs).abs_timeprob(cn).timebins;
                     timebinmiddle = (timebinedges(1:end-1) + timebinedges(2:end))/2;
     %                 if size(Rpeak_evoked_states(st, hs).abs_timeprob.prob, 1) > 1

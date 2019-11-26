@@ -1,4 +1,4 @@
-function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt_evoked, diff_condition, diff_color )
+function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt_evoked, diff_condition, diff_color, diff_legend )
 %lfp_tfa_compute_diff_tfr - function to compute the difference in time freq
 %response between control and inactivation trials
 %
@@ -48,6 +48,10 @@ function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt
             if sum([compare.values{:}] == unique([conditions.choice])) < 2
                 continue;
             end
+        elseif strcmp(compare.field, 'success')
+            if sum([compare.values{:}] == unique([conditions.success])) < 2
+                continue;
+            end
         elseif strcmp(compare.field, 'type_eff')
             if sum(ismember(vertcat(compare.values{:}), ...
                 unique([conditions.type; conditions.effector]', 'rows'), 'rows')) < 2
@@ -61,6 +65,9 @@ function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt
             condition_found = false;
             if strcmp(compare.field, 'choice')
                 condition_found = R2Rt_evoked(cn).cfg_condition.choice == compare.values{1};
+                
+            elseif strcmp(compare.field, 'success')
+                condition_found = R2Rt_evoked(cn).cfg_condition.success == compare.values{1};
 
             elseif strcmp(compare.field, 'perturbation')
                 condition_found = R2Rt_evoked(cn).cfg_condition.perturbation == compare.values{1};
@@ -84,19 +91,29 @@ function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt
                     comparison_pair_found = R2Rt_evoked(d).cfg_condition.type == R2Rt_evoked(cn).cfg_condition.type ...
                         & R2Rt_evoked(d).cfg_condition.effector == R2Rt_evoked(cn).cfg_condition.effector ...
                         & R2Rt_evoked(d).cfg_condition.choice == compare.values{2} ...
-                        & R2Rt_evoked(d).cfg_condition.perturbation == R2Rt_evoked(cn).cfg_condition.perturbation;
-
+                        & R2Rt_evoked(d).cfg_condition.perturbation == R2Rt_evoked(cn).cfg_condition.perturbation ...
+                        & R2Rt_evoked(d).cfg_condition.success == R2Rt_evoked(cn).cfg_condition.success;
+                    
+                elseif strcmp(compare.field, 'success')
+                    comparison_pair_found = R2Rt_evoked(d).cfg_condition.type == R2Rt_evoked(cn).cfg_condition.type ...
+                        & R2Rt_evoked(d).cfg_condition.effector == R2Rt_evoked(cn).cfg_condition.effector ...
+                        & R2Rt_evoked(d).cfg_condition.success == compare.values{2} ...
+                        & R2Rt_evoked(d).cfg_condition.perturbation == R2Rt_evoked(cn).cfg_condition.perturbation ...;
+                        & R2Rt_evoked(d).cfg_condition.choice == R2Rt_evoked(cn).cfg_condition.choice;
+                    
                 elseif strcmp(compare.field, 'perturbation')
                     comparison_pair_found = R2Rt_evoked(d).cfg_condition.type == R2Rt_evoked(cn).cfg_condition.type ...
                         & R2Rt_evoked(d).cfg_condition.effector == R2Rt_evoked(cn).cfg_condition.effector ...
                         & R2Rt_evoked(d).cfg_condition.choice == R2Rt_evoked(cn).cfg_condition.choice ...
-                        & R2Rt_evoked(d).cfg_condition.perturbation == compare.values{2};
+                        & R2Rt_evoked(d).cfg_condition.perturbation == compare.values{2} ...
+                        & R2Rt_evoked(d).cfg_condition.success == R2Rt_evoked(cn).cfg_condition.success;
                     
                 elseif strcmp(compare.field, 'type_eff')
                     comparison_pair_found = R2Rt_evoked(d).cfg_condition.type == compare.values{2}(1) ...
                         & R2Rt_evoked(d).cfg_condition.effector == compare.values{2}(2) ...
                         & R2Rt_evoked(d).cfg_condition.choice == R2Rt_evoked(cn).cfg_condition.choice ...
-                        & R2Rt_evoked(d).cfg_condition.perturbation == R2Rt_evoked(cn).cfg_condition.perturbation;
+                        & R2Rt_evoked(d).cfg_condition.perturbation == R2Rt_evoked(cn).cfg_condition.perturbation ...
+                        & R2Rt_evoked(d).cfg_condition.success == R2Rt_evoked(cn).cfg_condition.success;
                 end
                 if comparison_pair_found
 
@@ -104,12 +121,12 @@ function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt
                     %diff_tfr.difference(dcn) = struct();
                     % pre injection
                     cond1_evoked = R2Rt_evoked(cn);
-                    if isempty(cond1_evoked.hs_tuned_evoked) 
+                    if isempty(fieldnames(cond1_evoked.hs_tuned_evoked)) 
                         continue;
                     end
                     % post injection
                     cond2_evoked = R2Rt_evoked(d);
-                    if isempty(cond2_evoked.hs_tuned_evoked)
+                    if isempty(fieldnames(cond2_evoked.hs_tuned_evoked))
                         continue;
                     end
 
@@ -120,38 +137,45 @@ function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt
                     diff_evoked_R2Rt.difference(dcn) = cond2_evoked;
                     
                     % change the condition label
-                    diff_evoked_R2Rt.difference(dcn).label = ['( ' cond2_evoked.label, ' vs. ', ...
-                                cond1_evoked.label ' )'];  
+%                     diff_evoked_R2Rt.difference(dcn).label = ['( ' cond2_evoked.label, ' vs. ', ...
+%                                 cond1_evoked.label ' )'];  
                     
                     diff_evoked_R2Rt.difference(dcn).cfg_condition = cond2_evoked.cfg_condition;
-                    legend = cell(1, 2);
-                    if strcmp(compare.field, 'choice')                        
-                        diff_evoked_R2Rt.difference(dcn).cfg_condition.choice = ['diff' num2str(i)];
-                        if cond2_evoked.cfg_condition.choice == 0
-                            legend(1) = {'Instructed'};
-                        else
-                            legend(1) = {'Choice'};
-                        end
-                        if cond1_evoked.cfg_condition.choice == 0
-                            legend(2) = {'Instructed'};
-                        else
-                            legend(2) = {'Choice'};
-                        end
-                    elseif strcmp(compare.field, 'perturbation')
-                        diff_evoked_R2Rt.difference(dcn).cfg_condition.perturbation = ['diff' num2str(i)];
-                        if cond2_evoked.cfg_condition.perturbation == 0
-                            legend(1) = {'Pre-injection'};
-                        else
-                            legend(1) = {'Post-injection'};
-                        end
-                        if cond1_evoked.cfg_condition.perturbation == 0
-                            legend(2) = {'Pre-injection'};
-                        else
-                            legend(2) = {'Post-injection'};
-                        end
-                    elseif strcmp(compare.field, 'type_eff')
-                        diff_evoked_R2Rt.difference(dcn).cfg_condition.type_eff = ['diff' num2str(i)];
+                    legend = cell(1,2);
+%                     if strcmp(compare.field, 'choice')                        
+%                         diff_evoked_R2Rt.difference(dcn).cfg_condition.choice = ['diff' num2str(i)];
+%                         cfg_condition1.choice = cond2_evoked.cfg_condition.choice;
+%                         cfg_condition2.choice = cond1_evoked.cfg_condition.choice;
+%                         legend{1} = lfp_tfa_get_condition_label(cfg_condition1, 'long');
+%                         legend{2} = lfp_tfa_get_condition_label(cfg_condition2, 'long');                        
+%                     elseif strcmp(compare.field, 'perturbation')
+%                         diff_evoked_R2Rt.difference(dcn).cfg_condition.perturbation = ['diff' num2str(i)];
+%                         cfg_condition1.perturbation = cond2_evoked.cfg_condition.perturbation;
+%                         cfg_condition2.perturbation = cond1_evoked.cfg_condition.perturbation;
+%                         legend{1} = lfp_tfa_get_condition_label(cfg_condition1, 'long');
+%                         legend{2} = lfp_tfa_get_condition_label(cfg_condition2, 'long');
+%                     elseif strcmp(compare.field, 'success')
+%                         diff_evoked_R2Rt.difference(dcn).cfg_condition.success = ['diff' num2str(i)];
+%                         cfg_condition1.success = cond2_evoked.cfg_condition.success;
+%                         cfg_condition2.success = cond1_evoked.cfg_condition.success;
+%                         legend{1} = lfp_tfa_get_condition_label(cfg_condition1, 'long');
+%                         legend{2} = lfp_tfa_get_condition_label(cfg_condition2, 'long');
+%                     elseif strcmp(compare.field, 'type_eff')
+%                         diff_evoked_R2Rt.difference(dcn).cfg_condition.type_eff = ['diff' num2str(i)];
+%                         cfg_condition1.type = cond2_evoked.cfg_condition.type_eff(0);
+%                         cfg_condition1.effector = cond2_evoked.cfg_condition.type_eff(1);
+%                         cfg_condition2.type = cond1_evoked.cfg_condition.type_eff(0);
+%                         cfg_condition2.effector = cond1_evoked.cfg_condition.type_eff(1);
+%                         legend{1} = lfp_tfa_get_condition_label(cfg_condition1, 'long');
+%                         legend{2} = lfp_tfa_get_condition_label(cfg_condition2, 'long');
+%                     end
+                    if nargin > 3 && ~isempty(diff_legend)
+                        legend = diff_legend;
                     end
+                    
+                    % change the condition label
+                    diff_evoked_R2Rt.difference(dcn).label = lfp_tfa_get_condition_label(...
+                        diff_evoked_R2Rt.difference(dcn).cfg_condition, 'long'); 
 
                     % loop through handspace tunings
                     diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked = cond2_evoked.hs_tuned_evoked;
@@ -169,14 +193,14 @@ function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt
 %                                     cat(cond2_evoked.hs_tuned_evoked(st, hs).lfp(:,1:ntimebins), ...
 %                                     cond1_evoked.hs_tuned_evoked(st, hs).lfp(:,1:ntimebins));
                                 diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).mean = ...
-                                    [cond2_evoked.hs_tuned_evoked(st, hs).mean(1:ntimebins); ...
-                                    cond1_evoked.hs_tuned_evoked(st, hs).mean(1:ntimebins)];
+                                    [cond2_evoked.hs_tuned_evoked(st, hs).mean(:,1:ntimebins); ...
+                                    cond1_evoked.hs_tuned_evoked(st, hs).mean(:,1:ntimebins)];
 %                                 diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).baseline_mean = ...
 %                                     [cond2_evoked.hs_tuned_evoked(st, hs).baseline_mean; ...
 %                                     cond1_evoked.hs_tuned_evoked(st, hs).baseline_mean];
                                 diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).std = ...
-                                    [cond2_evoked.hs_tuned_evoked(st, hs).std(1:ntimebins); ...
-                                    cond1_evoked.hs_tuned_evoked(st, hs).std(1:ntimebins)];
+                                    [cond2_evoked.hs_tuned_evoked(st, hs).std(:,1:ntimebins); ...
+                                    cond1_evoked.hs_tuned_evoked(st, hs).std(:,1:ntimebins)];
                                 diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).time = ...
                                     cond2_evoked.hs_tuned_evoked(st, hs).time(1:ntimebins);  
                                 if isfield(cond2_evoked.hs_tuned_evoked(st, hs), 'ntrials')
@@ -185,7 +209,7 @@ function [ diff_evoked_R2Rt ] = lfp_tfa_compute_diff_condition_R2Rt_evoked( R2Rt
                                 end
                                 diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).legend = ...
                                     legend;
-                                if nargin > 2
+                                if nargin > 2 && ~isempty(diff_color)
                                     diff_evoked_R2Rt.difference(dcn).hs_tuned_evoked(st, hs).color = ...
                                         diff_color;
                                 end

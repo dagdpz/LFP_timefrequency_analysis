@@ -48,7 +48,7 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath, maxsites)
     % root_results_folder = [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
     % eg: 'C:\Data\MIP_timefreq_analysis\LFP_timefrequency_analysis\Data\LFP_TFA_Results\20190506\ver_SN_0.2'
     lfp_tfa_cfg.root_results_fldr = fullfile(lfp_tfa_cfg.results_folder, ...
-        date, ['ver_' num2str(lfp_tfa_cfg.version)]);
+        num2str(lfp_tfa_cfg.version));
     if ~exist(lfp_tfa_cfg.root_results_fldr, 'dir')
         mkdir(lfp_tfa_cfg.root_results_fldr);
     end

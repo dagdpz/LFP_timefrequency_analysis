@@ -65,6 +65,12 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
             ([site_lfp.trials.choice_trial] == condition.choice);
     end
     
+    % filter by success
+    if ~isnan(condition.success) && ~isinf(condition.success)
+        cond_trials = cond_trials & ...
+            ([site_lfp.trials.success] == condition.success);
+    end
+    
     % filter by perturbation
     
     % commented on 08.05.2019, to be tested

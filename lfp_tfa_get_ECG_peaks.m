@@ -36,32 +36,31 @@ for b = (unique([site_lfp.trials.block]))
     end
     
     % get ECG timestamps for this block
-    ECG_timestamps = block_ECG(b).Rpeak_t;
+    ECG_timestamps = block_ECG.out(b).Rpeak_t;
+    ECG_R2Rt = block_ECG.out(b).R2R_t;
+    ECG_R2Rvalid = block_ECG.out(b).R2R_valid;
+    ECG_R2Rvalid_bpm = block_ECG.out(b).R2R_valid_bpm;
+    
+    ECG_peaksamples = round(ECG_timestamps/ts) + 1;
+    ECG_R2Rsamples = round(ECG_R2Rt/ts) + 1;
+    trials_samples = round(trials_time / ts) + 1;
+    
     % ECG spikes based on ECG timestamps
     ECG_spikes = false(size(concat_time));
-    % get ECG peak to peak interval and beat rate
-    for k = 1:length(ECG_timestamps)
-        if min(abs(concat_time - ECG_timestamps(k))) < ts
-%             time_idx = find(abs(concat_time - ECG_timestamps(k)) < ts*0.5);
-%             time_lgcl_idx = abs(concat_time - ECG_timestamps(k)) == ...
-%                 min(abs(concat_time - ECG_timestamps(k)));
-            ECG_spikes(...
-                find(abs(concat_time - ECG_timestamps(k)) < ts*0.5, 1)) = true;            
-        end
-        
-    end
-    ECG_b2btime = [nan diff(ECG_timestamps)];
-    ECG_beatidx = cumsum(ECG_spikes);
-    ECG_b2bt = nan(size(ECG_beatidx));
-    ECG_bpm = nan(size(ECG_beatidx));
-    for k = 1:length(ECG_b2btime)
-        ECG_beatrate = k/ECG_timestamps(k);
-        ECG_b2bt(ECG_beatidx ==k) = ECG_b2btime(k);
-        ECG_bpm(ECG_beatidx ==k) = ECG_beatrate/60;
-    end
-        
-        
-            
+    ECG_spikes(ECG_peaksamples) = true;
+    ECG_b2bt = single(nan(size(concat_time)));
+    ECG_b2bt(ECG_R2Rsamples) = ECG_R2Rvalid;
+    ECG_bpm = single(nan(size(concat_time)));
+    ECG_bpm(ECG_R2Rsamples) = ECG_R2Rvalid_bpm;
+    
+    % fill missing values
+    nanx = isnan(ECG_b2bt);
+    t    = 1:numel(ECG_b2bt);
+    ECG_b2bt(nanx) = interp1(t(~nanx), ECG_b2bt(~nanx), t(nanx));
+    nanx = isnan(ECG_bpm);
+    t    = 1:numel(ECG_bpm);
+    ECG_bpm(nanx) = interp1(t(~nanx), ECG_bpm(~nanx), t(nanx));
+               
     % now divide into trials
     for t = 1:length(trials_idx)
         

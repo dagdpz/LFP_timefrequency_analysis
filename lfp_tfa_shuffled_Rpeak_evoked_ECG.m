@@ -1,9 +1,9 @@
-function shuffled_ecg_evoked = lfp_tfa_shuffled_Rpeak_evoked_ECG( trials_ecg, cfg_ecg )
+function shuffled_ecg_evoked = lfp_tfa_shuffled_Rpeak_evoked_ECG( trials_ecg, cfg_ecg, nshuffles )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
-nshuffles = 100;
-distplot = true;
+%nshuffles = 100;
+distplot = false;
 
 shuffled_ecg_evoked.lfp = {};
 shuffled_ecg_evoked.lfp_time = {};

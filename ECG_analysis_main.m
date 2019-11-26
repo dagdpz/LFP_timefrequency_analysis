@@ -7,10 +7,11 @@
 
 % file containing settings for LFP analysis
 
-settings_filepaths = {'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Curius_inactivation.m', ...
-    'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Curius_baseline1.m', ...
-    'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Cornelius_inactivation_ecg_by_block.m', ...
-    'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Cornelius_baseline_ecg_by_block.m'};
+settings_filepaths = {'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Magnus_dPul_ECG_LFP.m'};
+%    {'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Curius_inactivation.m'};%, ...
+%     'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Curius_baseline1.m', ...
+%     'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Cornelius_inactivation_ecg_by_block.m', ...
+%     'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysis\settings\lfp_tfa_settings_Cornelius_baseline_ecg_by_block.m'};
 
 
 % whether the LFP should be processed (true) or not (false)
@@ -21,7 +22,7 @@ settings_filepaths = {'C:\Users\snair\Documents\GitHub\LFP_timefrequency_analysi
 % analysis won't happen
 % TODO: check if LFP is processed, of not, process LFP even if flag is set
 % to false
-process_ECG = 0;
+process_ECG = 1;
 
 %% INITIALIZATION
 close all;
@@ -39,13 +40,13 @@ for s = 1:length(settings_filepaths)
 
     %% initialize structs to store intermediate results
     % struct to store average ECG evoked response for different conditions
-    ecg_evoked = struct();
-    Rpeak_state_onset = struct();
-    ecg_b2bt = struct();
+    Rpeak_evoked_ECG = struct();
+    Rpeak_evoked_event_prob = struct();
+    ECG_b2bt_evoked = struct();
     % struct to store average LFP TFR for different conditions
-    lfp_tfr = struct();
+    Rpeak_evoked_lfp_tfr = struct();
     % struct to store average LFP evoked response for different conditions
-    lfp_evoked = struct();
+    Rpeak_evoked_lfp_raw = struct();
 
     %try
         % loop through each session to process
@@ -99,16 +100,21 @@ for s = 1:length(settings_filepaths)
             % stored
             sessions_info(i).analyse_lfp_fldr = ...
                 fullfile(lfp_tfa_cfg.analyse_lfp_folder, session_name);
-
+            lfp_tfa_cfg.session_results_fldr = ...
+            fullfile(lfp_tfa_cfg.analyse_lfp_folder, session_name);  
+        
             % Calculate and plot the session average ECG, 
             % evoked response for different conditions 
-            ecg_evoked.session(i) = lfp_tfa_plot_site_evoked_ECG( session_ecg, ...
+            
+            Rpeak_evoked_ECG.session(i) = lfp_tfa_compute_session_evoked_ECG( session_ecg, ...
                 sessions_info(i), lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
-            Rpeak_state_onset.session(i) = lfp_tfa_compute_Rpeak_evoked_state_onsets...
+            
+            Rpeak_evoked_event_prob.session(i) = lfp_tfa_compute_session_Rpeak_evoked_state_onsets...
                 ( session_ecg, sessions_info(i), lfp_tfa_cfg.analyse_Rpeak_states, ...
                 lfp_tfa_cfg );
-            ecg_b2bt.session(i) = lfp_tfa_plot_session_ECG_b2bt( session_ecg, ...
-                sessions_info(i), lfp_tfa_cfg.event_triggers, lfp_tfa_cfg );
+            
+            ECG_b2bt_evoked.session(i) = lfp_tfa_compute_session_evoked_ECG_b2bt( session_ecg, ...
+                    sessions_info(i), lfp_tfa_cfg.event_triggers, lfp_tfa_cfg );
             
             %clear session_ecg;
             
@@ -128,13 +134,13 @@ for s = 1:length(settings_filepaths)
             end
             
             if any(strcmp(lfp_tfa_cfg.analyses, 'Rpeak_evoked_LFP'))
-                lfp_evoked.session(i) = ...
-                    lfp_tfa_compute_Rpeak_evoked_LFP( session_proc_lfp, ...
+                Rpeak_evoked_lfp_raw.session(i) = ...
+                    lfp_tfa_compute_session_Rpeak_evoked_LFP( session_proc_lfp, ...
                     lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
             end
             if any(strcmp(lfp_tfa_cfg.analyses, 'Rpeak_evoked_TFS'))
-                lfp_tfr.session(i) = ...
-                    lfp_tfa_compute_Rpeak_evoked_TFS( session_proc_lfp, ...
+                Rpeak_evoked_lfp_tfr.session(i) = ...
+                    lfp_tfa_compute_session_Rpeak_evoked_TFS( session_proc_lfp, ...
                     lfp_tfa_cfg.analyse_states, lfp_tfa_cfg );
             end
             
@@ -149,37 +155,37 @@ for s = 1:length(settings_filepaths)
     %% average across sessions
     if length(sessions_info) > 1
         % Average task evoked ECG
-        ecg_evoked.sessions_avg = lfp_tfa_avg_sessions_ECG_evoked(ecg_evoked, ...
+        Rpeak_evoked_ECG.sessions_avg = lfp_tfa_avg_sessions_ECG_evoked(Rpeak_evoked_ECG, ...
             lfp_tfa_cfg);
         % Average task evoked ECG b2bt
-        ecg_b2bt.sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ecg_b2bt, ...
+        ECG_b2bt_evoked.sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ECG_b2bt_evoked, ...
             lfp_tfa_cfg);
     % %     % Average task evoked ECG time frequency spectrogram
     %     tfs_ecg.sessions_avg = lfp_tfa_avg_sessions_ECG_tfs(tfs_ecg, ...
     %         lfp_tfa_cfg);
         % Average Rpeak evoked state onset probability
-        Rpeak_state_onset.sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets( ...
-            Rpeak_state_onset, lfp_tfa_cfg);
+        Rpeak_evoked_event_prob.sessions_avg = lfp_tfa_avg_sessions_Rpeak_evoked_state_onsets( ...
+            Rpeak_evoked_event_prob, lfp_tfa_cfg);
         
         if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
             if any(strcmp(lfp_tfa_cfg.analyses, 'Rpeak_evoked_TFS'))
-                lfp_tfr.sessions_avg = ...
-                    lfp_tfa_avg_sessions_Rpeak_evoked_TFS(lfp_tfr, lfp_tfa_cfg);
+                Rpeak_evoked_lfp_tfr.sessions_avg = ...
+                    lfp_tfa_avg_sessions_Rpeak_evoked_TFS(Rpeak_evoked_lfp_tfr, lfp_tfa_cfg);
             end
             if any(strcmp(lfp_tfa_cfg.analyses, 'Rpeak_evoked_LFP'))
-                lfp_evoked.sessions_avg = ...
-                    lfp_tfa_avg_sessions_Rpeak_evoked_LFP(lfp_evoked, lfp_tfa_cfg);
+                Rpeak_evoked_lfp_raw.sessions_avg = ...
+                    lfp_tfa_avg_sessions_Rpeak_evoked_LFP(Rpeak_evoked_lfp_raw, lfp_tfa_cfg);
             end
         end
         
         if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sites'))
             if any(strcmp(lfp_tfa_cfg.analyses, 'Rpeak_evoked_TFS'))
-                lfp_tfr.sessions_avg = ...
-                    lfp_tfa_avg_sites_Rpeak_evoked_TFS(lfp_tfr, lfp_tfa_cfg);
+                Rpeak_evoked_lfp_tfr.sessions_avg = ...
+                    lfp_tfa_avg_sites_Rpeak_evoked_TFS(Rpeak_evoked_lfp_tfr, lfp_tfa_cfg);
             end
             if any(strcmp(lfp_tfa_cfg.analyses, 'Rpeak_evoked_LFP'))
-                lfp_evoked.sessions_avg = ...
-                    lfp_tfa_avg_sites_Rpeak_evoked_LFP(lfp_evoked, lfp_tfa_cfg);
+                Rpeak_evoked_lfp_raw.sessions_avg = ...
+                    lfp_tfa_avg_sites_Rpeak_evoked_LFP(Rpeak_evoked_lfp_raw, lfp_tfa_cfg);
             end
         end
         

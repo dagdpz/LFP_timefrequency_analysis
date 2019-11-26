@@ -72,8 +72,7 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ecg_b2bt_evoked, lfp
             if isempty(ecg_b2bt_evoked.session(i).condition)
                 continue;
             end
-            if ~isempty(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked) && ... 
-                isfield(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked, 'mean')
+            if isfield(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked, 'mean')
                 for st = 1:size(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked, 1)
                     for hs = 1:size(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked, 2)
                         if isfield(ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs), 'mean') ...
@@ -95,7 +94,9 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ecg_b2bt_evoked, lfp
                             end
                             sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt ...
                                 = [sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs).ecg_b2bt, ...
-                                ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs).mean];                                                             
+                                ecg_b2bt_evoked.session(i).condition(cn).hs_tuned_evoked(st, hs).mean];  
+                        else
+                            sessions_avg(t).condition(cn).hs_tuned_evoked(st,hs) = struct();
                         end
                     end
                 end
@@ -140,9 +141,15 @@ function sessions_avg = lfp_tfa_avg_sessions_ECGb2bt_evoked(ecg_b2bt_evoked, lfp
     sessions_avg(t).difference = [];
     for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
         diff_condition = lfp_tfa_cfg.diff_condition{diff};
-        diff_color = lfp_tfa_cfg.diff_color{diff}{:};
+        diff_color = []; diff_legend = [];
+        if isfield(lfp_tfa_cfg, 'diff_color')
+            diff_color = lfp_tfa_cfg.diff_color{diff};
+        end
+        if isfield(lfp_tfa_cfg, 'diff_legend')
+            diff_legend = lfp_tfa_cfg.diff_legend{diff};
+        end
         sessions_avg(t).difference = [sessions_avg(t).difference, ...
-            lfp_tfa_compute_diff_condition_R2Rt_evoked(sessions_avg(t).condition, diff_condition, diff_color)];
+            lfp_tfa_compute_diff_condition_R2Rt_evoked(sessions_avg(t).condition, diff_condition, diff_color,diff_legend)];
     end
     % plot Difference TFR
     for dcn = 1:length(sessions_avg(t).difference)

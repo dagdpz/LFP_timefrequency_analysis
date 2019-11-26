@@ -185,6 +185,16 @@ lfp_tfa_cfg.compare.effectors = [0];
 % and instructed trials are combined)
 lfp_tfa_cfg.compare.choice_trials = inf; 
 
+% which type of trial success are to be included in the analysis
+% Examples:
+% 1. lfp_tfa_cfg.compare.success = 0; % analyse only successful trials
+% 2. lfp_tfa_cfg.compare.success = 1; % analyse only unsuccessful trials
+% 3. lfp_tfa_cfg.compare.sucess = [0, 1]; % analyse successful and 
+% unsuccessful trials separately
+% 3. lfp_tfa_cfg.compare.sucess = inf; % ignore success of trial (both successful
+% and unsuccessful trials are combined)
+lfp_tfa_cfg.compare.success = [0, 1]; 
+
 % reach hands to be included for analysis
 % should be 'any' or a cell array that contain only values 'R', 'L'
 % Examples:
@@ -256,15 +266,24 @@ lfp_tfa_cfg.compare.perturbations = [0, 1];
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
 lfp_tfa_cfg.diff_condition = {};
-lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
-% lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
+lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}...
+     'success', {0, 1}}};
+% lfp_tfa_cfg.diff_condition(2) = {{'choice', [0, 1]}};
 %lfp_tfa_cfg.diff_condition(1) = {{'type_eff', {[4 6], [1 0]}}};%, 'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
 %     'choice', {0, 1}}};
 
 % colors to be used for plotting the comparison plots
 lfp_tfa_cfg.diff_color = {};
-lfp_tfa_cfg.diff_color{1} = {[0, 0.5, 0.5; 0, 1, 1]};
+lfp_tfa_cfg.diff_color{1} = [0, 0.5, 0.5; 0, 1, 1; 0.5, 0.5, 0; 1, 1, 0];
+
+% legends to be used for the comparison plots
+lfp_tfa_cfg.diff_legend = {};
+lfp_tfa_cfg.diff_legend{1} = {
+    'Post-injection Successful', ...
+    'Pre-injection Successful',  ...
+    'Post-injection Unsuccessful', ...
+    'Pre-injection Unsuccessful'};
 
 %% Time information
 

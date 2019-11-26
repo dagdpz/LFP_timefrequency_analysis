@@ -50,6 +50,8 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
     
     choices = lfp_tfa_cfg.compare.choice_trials;
     perturbations = lfp_tfa_cfg.compare.perturbations;
+    trial_success = lfp_tfa_cfg.compare.success;
+    
     % if different sessions have different perturbation groups
     if nargin > 1
         perturbation_groups = varargin{1};
@@ -111,56 +113,50 @@ function [ cmp_conditions ] = lfp_tfa_compare_conditions( lfp_tfa_cfg, varargin 
     % create conditions
     cmp_conditions = struct();
     
+    % get all combinations of conditions
+    conditions = {task_types,effectors,choices,perturbations};
+    tmp = conditions;
+    [tmp{:}] = ndgrid(conditions{:});
+    combinations = cell2mat(cellfun(@(m)m(:),tmp,'uni',0));
+
     i = 0;
     % should clarify if target belongs to condition
     %for target = targets
         %target_label = target{1};
     for type = task_types
-        type_label = ['Type_' num2str(type)];
         for eff = effectors
-            eff_label = ['Eff_' num2str(eff)];            
             for ch = choices
-                if ch == 0
-                    ch_label = 'Instr';
-                elseif ch == 1
-                    ch_label = 'Choice';
-                else
-                    ch_label = [];
-                end
-                for p = 1:length(perturbations)
-                    if perturbations(p) == 0
-                        p_label = 'Pre';
-                    elseif perturbations(p) == 1
-                        p_label = 'Post';
-                    else
-                        p_label = [];
-                    end 
-
-                    i = i + 1;
-                    cmp_conditions(i).type = type;
-                    cmp_conditions(i).effector = eff;
-                    cmp_conditions(i).choice = ch;
-                    cmp_conditions(i).perturbation = perturbations(p);
-                    condition_label = lfp_tfa_get_condition_label(cmp_conditions(i), 'long');
-                    % pre-injection
-                    if ~isempty(perturbation_groups)
-                        if cmp_conditions(i).perturbation == 0
-                            if ~isempty(perturbation_groups(1))
-                                cmp_conditions(i).perturbation_group = ...
-                                    perturbation_groups(1);
+                for p = perturbations
+                    for s = trial_success
+                    
+                        i = i + 1;
+                        cmp_conditions(i).type = type;
+                        cmp_conditions(i).effector = eff;
+                        cmp_conditions(i).choice = ch;
+                        cmp_conditions(i).success = s;
+                        cmp_conditions(i).perturbation = p;
+                        condition_label = lfp_tfa_get_condition_label(cmp_conditions(i), 'long');
+                        % pre-injection
+                        if ~isempty(perturbation_groups)
+                            if cmp_conditions(i).perturbation == 0
+                                if ~isempty(perturbation_groups(1))
+                                    cmp_conditions(i).perturbation_group = ...
+                                        perturbation_groups(1);
+                                end
+                            end
+                            if cmp_conditions(i).perturbation == 1
+                                if ~isempty(perturbation_groups(2))
+                                    cmp_conditions(i).perturbation_group = ...
+                                        perturbation_groups(2);
+                                end
                             end
                         end
-                        if cmp_conditions(i).perturbation == 1
-                            if ~isempty(perturbation_groups(2))
-                                cmp_conditions(i).perturbation_group = ...
-                                    perturbation_groups(2);
-                            end
-                        end
+                        cmp_conditions(i).hs_labels = hs_labels;
+                        cmp_conditions(i).reach_hands = reach_hands;
+                        cmp_conditions(i).reach_spaces = reach_spaces;
+                        cmp_conditions(i).label = condition_label;
+                    
                     end
-                    cmp_conditions(i).hs_labels = hs_labels;
-                    cmp_conditions(i).reach_hands = reach_hands;
-                    cmp_conditions(i).reach_spaces = reach_spaces;
-                    cmp_conditions(i).label = condition_label;
                 end
             end
         end

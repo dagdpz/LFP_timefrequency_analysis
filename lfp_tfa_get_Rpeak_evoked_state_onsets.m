@@ -29,7 +29,7 @@ for t = 1:length(trials_ecg)
         continue;
     end
     
-    if ~trials_ecg(t).ECG_valid(state_onset_sample)
+    if ~all(trials_ecg(t).ECG_valid)%(state_onset_sample)
         continue;
     end
     
