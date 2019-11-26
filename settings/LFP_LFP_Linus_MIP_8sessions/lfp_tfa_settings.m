@@ -44,7 +44,7 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = false;
+lfp_tfa_cfg.compute_site_average = true;
 
 % folder where the results of analysed LFP site averages are stored
 lfp_tfa_cfg.analyse_lfp_folder = [];
@@ -636,3 +636,15 @@ lfp_tfa_cfg.fdr_method = 'pdep';
 % Set to true (1) for plotting only the significant difference
 % between site averages, false (0) otherwise
 lfp_tfa_cfg.plot_significant = 1;
+
+%% settings for saving figures
+
+% formats to save the resulting figures
+% should be a cell array with one or more figure formats
+% formats  can be '-pdf', '-eps', '-svg', '-png', '-tif', '-jpg' and '-bmp'
+% (default 'png')
+% Examples:
+%   lfp_tfa_cfg.save_fig_format = {'png'}; % save figure as png only
+%   lfp_tfa_cfg.save_fig_format = {'png', 'pdf'}; % save figure as png and
+%   pdf
+lfp_tfa_cfg.save_fig_format = {'png', 'pdf'};

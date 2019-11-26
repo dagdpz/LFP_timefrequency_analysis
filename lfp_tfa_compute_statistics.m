@@ -1,8 +1,6 @@
-function [avg, error] = lfp_tfa_compute_statistics(lfp_tfa_data, lfp_tfa_cfg)
+function [avg, error] = lfp_tfa_compute_statistics(lfp_tfa_data, error_measure)
 
-if nargin > 2 && isfield(lfp_tfa_cfg, 'error_measure')
-    error_measure = lfp_tfa_cfg.error_measure;
-else
+if nargin < 2  || isempty(error_measure)
     error_measure = 'bootci';
 end 
 
@@ -19,7 +17,7 @@ elseif strcmp(error_measure, 'stderr')
 elseif strcmp(error_measure, 'bootci')
     
     fn_mean = @(x) nanmean(x, 1);
-    rng(lfp_tfa_cfg.random_seed);
+    %rng(random_seed);
     error = bootci(1000, fn_mean, lfp_tfa_data);
 end
     

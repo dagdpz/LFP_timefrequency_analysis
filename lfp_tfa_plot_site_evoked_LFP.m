@@ -68,7 +68,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
     % loop through each site
     for i = 1:length(sites_lfp) 
 
-        rng(lfp_tfa_cfg.random_seed); % set random seed for reproducibility
+        %rng(lfp_tfa_cfg.random_seed); % set random seed for reproducibility
         
         % folder to save sitewise results
         site_results_folder = fullfile(results_folder_evoked, 'sites');
@@ -153,8 +153,10 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
 
                         % save evoked LFP
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).lfp = state_tfs.lfp;
-                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean = state_tfs.mean;
-                        sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).std = state_tfs.std; 
+                        [sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).mean, ...
+                            sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).error] = ...
+                            lfp_tfa_compute_statistics(state_tfs.lfp, lfp_tfa_cfg.error_measure);
+                        %sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).error = state_tfs.error; 
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).time = state_tfs.lfp_time;
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).dimord = 'ntrials_time';
                         sites_evoked(i).condition(cn).hs_tuned_evoked(st, hs).trials = find(cond_trials);
@@ -182,7 +184,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(site_results_folder, ...
-                    ['LFP_Evoked_' sites_evoked(i).site_ID '_' site_conditions(cn).label '.png']);
+                    ['LFP_Evoked_' sites_evoked(i).site_ID '_' site_conditions(cn).label ]);
 
                 lfp_tfa_plot_evoked_lfp (sites_evoked(i).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
                     plottitle, result_file);
@@ -280,10 +282,12 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
             if isfield(session_avg(t).condition(cn).hs_tuned_evoked, 'lfp') 
                 for st = 1:size(session_avg(t).condition(cn).hs_tuned_evoked, 1)
                     for hs = 1:size(session_avg(t).condition(cn).hs_tuned_evoked, 2)                    
-                        session_avg(t).condition(cn).hs_tuned_evoked(st, hs).mean = ...
-                            nanmean(session_avg(t).condition(cn).hs_tuned_evoked(st, hs).lfp, 1);
-                        session_avg(t).condition(cn).hs_tuned_evoked(st, hs).std = ...
-                            nanstd(session_avg(t).condition(cn).hs_tuned_evoked(st, hs).lfp, 0, 1);
+                        [session_avg(t).condition(cn).hs_tuned_evoked(st, hs).mean, ...
+                            session_avg(t).condition(cn).hs_tuned_evoked(st, hs).error] = ...
+                            lfp_tfa_compute_statistics(...
+                            session_avg(t).condition(cn).hs_tuned_evoked(st, hs).lfp, lfp_tfa_cfg.error_measure);
+%                         session_avg(t).condition(cn).hs_tuned_evoked(st, hs).std = ...
+%                             nanstd(session_avg(t).condition(cn).hs_tuned_evoked(st, hs).lfp, 0, 1);
                         session_avg(t).condition(cn).hs_tuned_evoked(st, hs).dimord = 'nsites_time';
                     end
                 end
@@ -299,7 +303,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
                     plottitle = [plottitle 'Choice trials'];
                 end
                 result_file = fullfile(results_folder_evoked, ['LFP_Evoked_' ...
-                    session_avg(t).condition(cn).session '_' site_conditions(cn).label '.png']);
+                    session_avg(t).condition(cn).session '_' site_conditions(cn).label]);
                 lfp_tfa_plot_evoked_lfp (session_avg(t).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
                     plottitle, result_file);
             end

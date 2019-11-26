@@ -154,12 +154,14 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
                     if ~isempty(epoch_tfs.psd)
                         % power spectrum average
                         arr_state_psd = vertcat(epoch_tfs.psd{:});
-                        epoch_psd_mean = nanmean(arr_state_psd, 1);
+                        %epoch_psd_mean = nanmean(arr_state_psd, 1);
 
                         % save LFP power spectrum
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).psd = arr_state_psd;
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).dimord = 'ntrials_freq';
-                        sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean = epoch_psd_mean;
+                        [sites_pow(i).condition(cn).hs_tuned_power(ep, hs).mean, ...
+                            sites_pow(i).condition(cn).hs_tuned_power(ep, hs).error] = ...
+                            lfp_tfa_compute_statistics(arr_state_psd, lfp_tfa_cfg.error_measure);
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).freq = epoch_tfs.psd_f;
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).trials = find(cond_trials);
                         sites_pow(i).condition(cn).hs_tuned_power(ep, hs).hs_label = hs_labels(hs);
@@ -187,7 +189,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
                     mkdir(site_results_folder);
                 end
                 result_file = fullfile(site_results_folder, ...
-                    ['LFP_Power_' states_lfp(i).site_ID '_' site_conditions(cn).label '.png']);
+                    ['LFP_Power_' states_lfp(i).site_ID '_' site_conditions(cn).label]);
                 lfp_tfa_plot_hs_tuned_psd_2(sites_pow(i).condition(cn).hs_tuned_power, ...
                     lfp_tfa_cfg, plottitle, result_file);
             end
@@ -283,8 +285,9 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
             if isfield(session_avg(t).condition(cn).hs_tuned_power, 'psd')
                 for hs = 1:size(session_avg(t).condition(cn).hs_tuned_power, 2)
                     for ep = 1:size(session_avg(t).condition(cn).hs_tuned_power, 1)
-                        session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean = ...
-                            nanmean(session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd);
+                        [session_avg(t).condition(cn).hs_tuned_power(ep, hs).mean, ...
+                            session_avg(t).condition(cn).hs_tuned_power(ep, hs).error] = ...
+                            lfp_tfa_compute_statistics(session_avg(t).condition(cn).hs_tuned_power(ep, hs).psd, lfp_tfa_cfg.error_measure);
                         session_avg(t).condition(cn).hs_tuned_power(ep, hs).dimord = 'nsites_freq';
                     end
                 end
@@ -301,7 +304,7 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
                     plottitle = [plottitle 'Choice trials'];
                 end
                 results_file = fullfile(results_folder_psd, ...
-                    ['LFP_Power_' session_avg(t).condition(cn).session '_' site_conditions(cn).label '.png']);
+                    ['LFP_Power_' session_avg(t).condition(cn).session '_' site_conditions(cn).label]);
                 lfp_tfa_plot_hs_tuned_psd_2(session_avg(t).condition(cn).hs_tuned_power, ...
                             lfp_tfa_cfg, plottitle, results_file);
             end

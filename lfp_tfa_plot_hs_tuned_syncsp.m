@@ -73,7 +73,8 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
 
                     hold on;
 
-                    plot(1:numel(avg_hs_tuned_syncsp(ep, hs).ppc.freq), avg_hs_tuned_syncsp(ep, hs).ppc.ppcspctrm, ...
+                    plot(1:numel(avg_hs_tuned_syncsp(ep, hs).ppc.freq), ...
+                        nanmean(avg_hs_tuned_syncsp(ep, hs).ppc.ppcspctrm, 1), ...
                         'Color', cm(ep,:), 'LineWidth', 2);                
 
 
@@ -126,7 +127,14 @@ function lfp_tfa_plot_hs_tuned_syncsp( avg_hs_tuned_syncsp, lfp_tfa_cfg, plottit
         
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
-    export_fig(h, results_file);
+    
+    fig_formats = {'png'}; %default
+    if isfield(lfp_tfa_cfg, 'save_fig_format') && ~isempty(lfp_tfa_cfg.save_fig_format)
+        fig_formats = lfp_tfa_cfg.save_fig_format;
+    end
+    for fmt = fig_formats
+        export_fig(h, results_file, ['-' fmt{:}]);
+    end
 
 end
 

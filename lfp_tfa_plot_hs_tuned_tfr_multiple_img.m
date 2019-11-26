@@ -224,7 +224,14 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
     %cm(1,:,:) = [1,1,1];
     colormap(cm);
     
-    export_fig(h, results_file);
+    %export_fig(h, results_file);
+    fig_formats = {'png'}; %default
+    if isfield(lfp_tfa_cfg, 'save_fig_format') && ~isempty(lfp_tfa_cfg.save_fig_format)
+        fig_formats = lfp_tfa_cfg.save_fig_format;
+    end
+    for fmt = fig_formats
+        export_fig(h, results_file, ['-' fmt{:}]);
+    end
 
 end
 

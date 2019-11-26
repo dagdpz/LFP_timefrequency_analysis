@@ -40,6 +40,9 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
     % load the specified settings file
     run(settings_filepath);
     
+    % set random seed for reproducibility
+    rng(lfp_tfa_cfg.random_seed);
+    
     % read info excel file (Sorted neurons file)
     lfp_tfa_cfg.sites_info = lfp_tfa_read_info_file(lfp_tfa_cfg);
      

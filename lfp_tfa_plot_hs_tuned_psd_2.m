@@ -109,7 +109,14 @@ function lfp_tfa_plot_hs_tuned_psd_2( avg_lfp_psd, lfp_tfa_cfg, plottitle, resul
         
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
-    export_fig(h, results_file);
-
+    
+    fig_formats = {'png'}; %default
+    if isfield(lfp_tfa_cfg, 'save_fig_format') && ~isempty(lfp_tfa_cfg.save_fig_format)
+        fig_formats = lfp_tfa_cfg.save_fig_format;
+    end
+    for fmt = fig_formats
+        export_fig(h, results_file, ['-' fmt{:}]);
+    end
+        
 end
 

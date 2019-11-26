@@ -76,7 +76,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
                 % concatenate mean, std and time of evoked LFP for
                 % different states
                 [state_mean, state_error] = ...
-                    lfp_tfa_compute_statistics(evoked_lfp(st, hs).lfp, lfp_tfa_cfg);
+                    lfp_tfa_compute_statistics(evoked_lfp(st, hs).lfp, lfp_tfa_cfg.error_measure);
                 concat_states_lfp.mean = [concat_states_lfp.mean, ...
                     state_mean, nan(1, noffset)];
                 concat_states_lfp.error = [concat_states_lfp.error, ...
@@ -133,7 +133,14 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
     end
     ann = annotation('textbox', [0 0.9 1 0.1], 'String', strrep(plottitle, '_', '\_')...
         , 'EdgeColor', 'none', 'HorizontalAlignment', 'center');
-    export_fig(h, results_file);
+    
+    fig_formats = {'png'}; %default
+    if isfield(lfp_tfa_cfg, 'save_fig_format') && ~isempty(lfp_tfa_cfg.save_fig_format)
+        fig_formats = lfp_tfa_cfg.save_fig_format;
+    end
+    for fmt = fig_formats
+        export_fig(h, results_file, ['-' fmt{:}]);
+    end
 
 end
 

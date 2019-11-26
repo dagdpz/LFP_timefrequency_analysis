@@ -4,7 +4,7 @@
 % and condition specific analysis using TFR, evoked, spectra, sync
 % spectrograms and sync spectra
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%clear; 
+clear; 
 
 % file containing settings for LFP analysis
 % should have the same format as settings/lfp_tfa_settings_example.m
@@ -316,3 +316,6 @@ if length(sessions_info) > 1
         end
     end
 end
+
+close all;
+clear;

@@ -77,7 +77,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditi
     % loop through each site
     for i = 1:length(states_lfp)
         
-        rng(lfp_tfa_cfg.random_seed); % set random seed for reproducibility        
+        %rng(lfp_tfa_cfg.random_seed); % set random seed for reproducibility        
         
         % folder to save sitewise results
         site_results_folder = fullfile(results_folder_tfr, 'sites');
@@ -199,7 +199,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditi
                 end
                 
                 result_file = fullfile(site_results_folder, ...
-                    ['LFP_TFR_' sites_tfr(i).site_ID '_' site_conditions(cn).label '.png']);
+                    ['LFP_TFR_' sites_tfr(i).site_ID '_' site_conditions(cn).label ]);
                 lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
                     lfp_tfa_cfg, plottitle, result_file);
             end
@@ -228,7 +228,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditi
 
                 result_file = fullfile(site_results_folder, ...
                     ['LFP_DiffTFR_' sites_tfr(i).site_ID '_' ...
-                    'diff_condition' num2str(dcn) '.png']);%sites_tfr(i).difference(dcn).label '.png']);
+                    'diff_condition' num2str(dcn) ]);%sites_tfr(i).difference(dcn).label '.png']);
                 lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).difference(dcn).hs_tuned_tfs, ...
                     lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
             end
@@ -369,7 +369,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditi
                     end
                     result_file = fullfile(results_folder_tfr, ...
                                     ['LFP_TFR_' session_avg(t).target '_'...
-                                    session_avg(t).condition(cn).session '_' site_conditions(cn).label '.png']);
+                                    session_avg(t).condition(cn).session '_' site_conditions(cn).label ]);
                     lfp_tfa_plot_hs_tuned_tfr_multiple_img(session_avg(t).condition(cn).hs_tuned_tfs, ...
                                 lfp_tfa_cfg, plottitle, result_file);
                 end
@@ -404,7 +404,7 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditi
                 result_file = fullfile(results_folder_tfr, ...
                                 ['LFP_DiffTFR_' session_avg(t).target '_' ...
                                 session_avg(t).difference(dcn).session '_' ...
-                                'diff_condition' num2str(dcn) '.png']); 
+                                'diff_condition' num2str(dcn) ]); 
                                 %session_avg(t).difference(dcn).label '.png']);
                 lfp_tfa_plot_hs_tuned_tfr_multiple_img(session_avg(t).difference(dcn).hs_tuned_tfs, ...
                             lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');

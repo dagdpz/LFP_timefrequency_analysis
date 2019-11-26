@@ -214,8 +214,8 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_averaged_syncspctrm( sitepai
                 % average sync across time bins to get sync spectrum
                 epoch_sync = rmfield(epoch_sync, 'time');
                 epoch_sync.dimord = 'chancmb_freq';
-                epoch_sync.ppcspctrm = nanmean(...
-                    epoch_sync.ppcspctrm, 3);
+                % find the mean ppc for each freq during the epoch
+                epoch_sync.ppcspctrm = nanmean(epoch_sync.ppcspctrm, 3);
 
                 % save LFP power spectrum
                 sitepair_syncspctrm.condition(cn).hs_tuned_syncsp(ep, hs).ppc = epoch_sync;
@@ -234,7 +234,8 @@ function [ sitepair_syncspctrm ] = lfp_tfa_sitepair_averaged_syncspctrm( sitepai
             plottitle = sprintf('LFP-LFP Sync spectrum Session: %s, Targets %s-%s (ref: %s), %s', sitepair_syncspctrm.session, sitepair_syncspctrm.targets{:}, ...
                 lfp_tfa_cfg.ref_hemisphere, site_conditions(cn).label);
             result_file = fullfile(sitepair_results_folder, ...
-                ['LFP-LFP_syncspctrm_' sitepair_syncspctrm.sites{1} '-' sitepair_syncspctrm.sites{2} '_condition' num2str(cn) '.png']); %site_conditions(cn).label
+                ['LFP-LFP_syncspctrm_' sitepair_syncspctrm.sites{1} '-' ...
+                sitepair_syncspctrm.sites{2} '_condition' num2str(cn) ]); %site_conditions(cn).label
             lfp_tfa_plot_hs_tuned_syncsp(sitepair_syncspctrm.condition(cn).hs_tuned_syncsp, ...
                 lfp_tfa_cfg, plottitle, result_file);
         end

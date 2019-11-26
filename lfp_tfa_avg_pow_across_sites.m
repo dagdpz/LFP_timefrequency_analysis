@@ -63,7 +63,7 @@ function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
         for cn = 1:length(lfp_tfa_cfg.conditions)
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
             sites_avg(t).condition(cn).label = lfp_tfa_cfg.conditions(cn).label;
-            sites_avg(t).condition(cn).avg_across_sessions = struct();
+            %sites_avg(t).condition(cn).avg_across_sessions = struct();
             % initialize number of sites for each handspace
             % label
             for ep = 1:size(lfp_pow.session(1).sites(1).condition(cn).hs_tuned_power, 1)
@@ -123,8 +123,10 @@ function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
                 for hs = 1:size(sites_avg(t).condition(cn).hs_tuned_power, 2)
                     if isfield(sites_avg(t).condition(cn).hs_tuned_power(ep,hs), 'psd')
                         sites_avg(t).condition(cn).hs_tuned_power(ep,hs).dimord = 'nsites_freq';                                
-                        sites_avg(t).condition(cn).hs_tuned_power(ep,hs).mean = ...
-                            (nanmean(sites_avg(t).condition(cn).hs_tuned_power(ep,hs).psd, 1));
+                        [sites_avg(t).condition(cn).hs_tuned_power(ep,hs).mean, ...
+                            sites_avg(t).condition(cn).hs_tuned_power(ep,hs).error] = ...
+                            (lfp_tfa_compute_statistics(...
+                            sites_avg(t).condition(cn).hs_tuned_power(ep,hs).psd, lfp_tfa_cfg.error_measure));
                     end
                 end
             end
@@ -137,7 +139,7 @@ function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
                         ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
                         lfp_tfa_cfg.conditions(cn).label];
                     result_file = fullfile(results_fldr, ...
-                                    ['LFP_Power_' lfp_tfa_cfg.compare.targets{t} lfp_tfa_cfg.conditions(cn).label '.png']);
+                                    sprintf('LFP_Power_%s_%s', lfp_tfa_cfg.compare.targets{t}, lfp_tfa_cfg.conditions(cn).label ));
                     lfp_tfa_plot_hs_tuned_psd_2(sites_avg(t).condition(cn).hs_tuned_power, ...
                                 lfp_tfa_cfg, plottitle, result_file);
                 end
