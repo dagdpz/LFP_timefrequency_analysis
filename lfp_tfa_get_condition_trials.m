@@ -45,48 +45,58 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
 
     cond_trials = ones(1, length(site_lfp.trials));
     % filter by type
-    if ~isnan(condition.type)
+    if isfield(condition, 'type') && ~isnan(condition.type) && ~isinf(condition.type) && ...
+            isfield(site_lfp.trials, 'type')
         cond_trials = cond_trials & ...
             ([site_lfp.trials.type] == condition.type);
     end
     % filter by effector
-    if ~isnan(condition.effector)
+    if isfield(condition, 'effector') && ~isnan(condition.effector) && ~isinf(condition.effector) && ...
+            isfield(site_lfp.trials, 'effector')
         cond_trials = cond_trials & ...
             ([site_lfp.trials.effector] == condition.effector);
     end
     % filter by choice
-    if ~isnan(condition.choice)
+    if isfield(condition, 'choice') && ~isnan(condition.choice) && ~isinf(condition.choice) && ...
+            isfield(site_lfp.trials, 'choice_trial')
         cond_trials = cond_trials & ...
             ([site_lfp.trials.choice_trial] == condition.choice);
     end
+
+    % filter by success
+    if isfield(condition, 'success') && ~isnan(condition.success) && ~isinf(condition.success) && ...
+            isfield(site_lfp.trials, 'success')
+        cond_trials = cond_trials & ...
+            ([site_lfp.trials.success] == condition.success);
+    end
     
-    % filter by perturbation
-    
-    % commented on 08.05.2019, to be tested
-%     preinj_perturb = 0;
-%     postinj_perturb = unique(perturbations(perturbations ~= 0));
+    % filter by perturbation    
     cond_trials_perturb = zeros(1, length(site_lfp.trials));
-    if ~isnan(condition.perturbation)
+    if isfield(condition, 'perturbation') && ~isnan(condition.perturbation) && ~isinf(condition.perturbation) && ...
+            isfield(site_lfp.trials, 'perturbation')
         perturbation_values = unique([site_lfp.trials.perturbation]);
-        if condition.perturbation == 1%post-injection
-            if strcmp(condition.perturbation_group, 'all')
-                perturbation_values = perturbation_values(perturbation_values ~= 0);
-            elseif strcmp(condition.perturbation_group, 'allbutfirst')
-                perturbation_values = perturbation_values(perturbation_values ~= 0);
-                perturbation_values = perturbation_values(2:end);
-            else
+        if ~isnan(perturbation_values)
+            if condition.perturbation == 1%post-injection
+                if strcmp(condition.perturbation_group, 'all')
+                    perturbation_values = perturbation_values(perturbation_values ~= 0);
+                elseif strcmp(condition.perturbation_group, 'allbutfirst')
+                    perturbation_values = perturbation_values(perturbation_values ~= 0);
+                    perturbation_values = perturbation_values(2:end);
+                else
+                    perturbation_values = condition.perturbation_group{1};
+                end
+            elseif condition.perturbation == 0 % pre-injection
                 perturbation_values = condition.perturbation_group{1};
             end
-        elseif condition.perturbation == 0 % pre-injection
-            perturbation_values = condition.perturbation_group{1};
+
+            for b = perturbation_values
+                cond_trials_perturb = cond_trials_perturb | ...
+                    ([site_lfp.trials.perturbation] == b);
+            end
+
+            cond_trials = cond_trials & cond_trials_perturb;
         end
-        
-        for b = perturbation_values
-            cond_trials_perturb = cond_trials_perturb | ...
-                ([site_lfp.trials.perturbation] == b);
-        end
-        
-        cond_trials = cond_trials & cond_trials_perturb;
             
     end
     
+end

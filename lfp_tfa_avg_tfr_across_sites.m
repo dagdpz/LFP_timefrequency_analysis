@@ -59,6 +59,12 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
         mkdir(results_fldr);
     end
     
+    % defaults
+    plot_significant = 0;
+    if isfield(lfp_tfa_cfg, 'plot_significant')
+        plot_significant = lfp_tfa_cfg.plot_significant;
+    end
+    
     % Average TFR across sites
     sites_avg = struct();
     for t = 1:length(lfp_tfa_cfg.compare.targets)
@@ -186,7 +192,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
                     result_file = fullfile(results_fldr, ...
                         ['LFP_DiffTFR_' lfp_tfa_cfg.compare.targets{t} ...
                         '_' 'diff_condition' num2str(dcn) ]);
-                    if lfp_tfa_cfg.plot_significant
+                    if plot_significant
                         plottitle = ['Target ', lfp_tfa_cfg.compare.targets{t}, ...
                             ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
                             sites_avg(t).difference(dcn).label ' significant'];
@@ -197,7 +203,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(lfp_tfr, lfp_tfa_cfg)
                     end
                         %sites_avg(t).difference(dcn).label '.png']);
                     lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_avg(t).difference(dcn).hs_tuned_tfs, ...
-                        lfp_tfa_cfg, plottitle, result_file, 'bluewhitered', lfp_tfa_cfg.plot_significant);
+                        lfp_tfa_cfg, plottitle, result_file, 'bluewhitered', plot_significant);
                 end
             end
         end

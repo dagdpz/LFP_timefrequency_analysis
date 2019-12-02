@@ -50,8 +50,18 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
 
     diff_tfr = [];
     
+    % defaults
+    fd_rate = 0.05;
+    fdr_method = 'pdep';
     if nargin < 3
-        stat_test = false;
+        stat_test = false;        
+    elseif nargin > 3
+        if isfield(lfp_tfa_cfg, 'fd_rate')
+            fd_rate = lfp_tfa_cfg.fd_rate;
+        end
+        if isfield(lfp_tfa_cfg, 'fd_rate')
+            fdr_method = lfp_tfa_cfg.fdr_method;
+        end        
     end
 
     if ~isempty([lfp_tfr.cfg_condition])
@@ -188,8 +198,8 @@ function [ diff_tfr ] = lfp_tfa_compute_difference_condition_tfr( lfp_tfr, diff_
                                         [~, p] = ttest(...
                                             diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.powspctrm);
                                         % multiple comparison correction
-                                        [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p, lfp_tfa_cfg.fd_rate,...
-                                            lfp_tfa_cfg.fdr_method, 'yes');
+                                        [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p, fd_rate,...
+                                            fdr_method, 'yes');
                                         diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.h = h;
                                         diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.crit_p = crit_p;
                                         diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.adj_ci_cvrg = adj_ci_cvrg;
