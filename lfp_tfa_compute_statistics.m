@@ -6,7 +6,8 @@ end
 
 avg = nanmean(lfp_tfa_data, 1);
 
-error = zeros(size(avg));
+error = zeros(2, size(avg, 2));
+
 if size(lfp_tfa_data, 1) > 1
 
     if strcmp(error_measure, 'stddev')

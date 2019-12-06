@@ -1,4 +1,4 @@
-function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg)
+function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg, varargin)
 %lfp_tfa_avg_evoked_LFP_across_sites  - Condition-based evoked LFP response
 % grand average across many site averages
 %
@@ -47,7 +47,11 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % results folder
-    results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sites', 'LFP_Evoked');
+    if nargin < 3
+        results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sites', 'LFP_Evoked');
+    else
+        results_fldr = varargin{1};
+    end
     if ~exist(results_fldr, 'dir')
         mkdir(results_fldr);
     end

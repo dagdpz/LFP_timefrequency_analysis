@@ -1,4 +1,4 @@
-function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
+function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg, varargin)
 %lfp_tfa_avg_pow_across_sites  - Condition-based LFP power spectrum
 %(Power vs. Frequency) grand average across many site averages from
 %multiple sessions
@@ -50,7 +50,11 @@ function sites_avg = lfp_tfa_avg_pow_across_sites(lfp_pow, lfp_tfa_cfg)
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % results folder
-    results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sites', 'LFP_Power');
+    if nargin < 3
+        results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sites', 'LFP_Power');
+    else
+        results_fldr = varargin{1};
+    end
     if ~exist(results_fldr, 'dir')
         mkdir(results_fldr);
     end
