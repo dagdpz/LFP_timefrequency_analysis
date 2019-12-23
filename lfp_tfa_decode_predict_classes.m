@@ -1,7 +1,34 @@
 function lfp_decode = lfp_tfa_decode_predict_classes( lfp_decode, lfp_tfa_cfg, analyses)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
-
+%lfp_tfa_decode_predict_classes - function to decode session-wise LFP data
+%   lfp_decode = lfp_tfa_decode_predict_classes( lfp_decode, lfp_tfa_cfg, analyses)
+%   INPUTS: 
+%       lfp_decode - struct containing session-wise LFP raw data and TFS,
+%       output of lfp_tfa_decode_get_conditions_lfp
+%       lfp_tfa_cfg - struct containing settings for lfp decoding, see
+%       settings/LFP_Decoding_Linus_8sessions/lfp_decoding_settings_Instr_control_IH_ISvsCS.m
+%       for example
+%       Required fields: 
+%           decode.n_cvfolds - number of folds for cross-validation
+%           decode.n_tbins_wnd - number of timebins to be considered in
+%           the moving window sample
+%           root_results_fldr - root folder to save resulting variables and
+%           figures
+%           decode.classes - struct containing information about the classes to decode
+%           decode.nsamples_tfs_tbin - number of samples to be
+%           considered for time binning the LFP TFS
+%           decode.nsamples_tfs_fbin - number of samples to be
+%           considered for frequency binning the LFP TFS
+%           decode.nsamples_lfp_tbin - number of samples to be
+%           considered for time binning the raw LFP
+%   OUTPUTS:
+%       lfp_decode - same as input struct 'lfp_decode', but with additional
+%       fields containing train and test accuracy (session-wise and average
+%       across sessions)
+%
+%   Required: lfp_tfa_decode_get_class_condition, cvpartition (Statistics
+%   and Machine Learning Toolbox), svmtrain and svmpredict (LIBSVM toolbox
+%   v3.24), lfp_tfa_decode_plot_accuracy
+ 
 close all;
 
 n_cvfolds = lfp_tfa_cfg.decode.n_cvfolds;
