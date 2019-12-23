@@ -18,6 +18,11 @@ colors = 'br';
 for a = 1:length(analyses)
     analysis = analyses{a};
     lfp_data = lfp_decode.(analysis);
+    % initialize struct to store average across sessions
+%     for ep = 1:size(lfp_data.session(1).trial, 1)
+%         lfp_data.sessions_avg.train_accuracy{ep} = [];
+%         lfp_data.sessions_avg.test_accuracy{ep} = [];
+%     end
     % session-wise decoding
     for i = 1:length(lfp_data.session)
         fprintf('Session %g\n', i);
@@ -122,12 +127,20 @@ for a = 1:length(analyses)
             lfp_data.session(i).train_accuracy{ep} = bin_train_accuracy;
             lfp_data.session(i).test_accuracy{ep} = bin_test_accuracy;
             lfp_data.session(i).timebins{ep} = trial_timebins;
+%             lfp_data.sessions_avg.train_accuracy{ep} = cat(2, ...
+%                 lfp_data.sessions_avg.train_accuracy{ep}, nanmean(bin_train_accuracy, 2));
+%             lfp_data.sessions_avg.test_accuracy{ep} = cat(2, ...
+%                 lfp_data.sessions_avg.test_accuracy{ep}, nanmean(bin_test_accuracy, 2));
+%             if i == 1
+%                 lfp_data.sessions_avg.timebins{ep} = trial_timebins;
+%             end
             
         end
 
-        figtitle = sprintf('Session %g - %s vs. %s', i, ...
+        figtitle = sprintf('Session %g - %s vs. %s (ntrials = %g, nfold = %g)', i, ...
             lfp_tfa_cfg.decode.classes(1).label, ...
-            lfp_tfa_cfg.decode.classes(2).label);
+            lfp_tfa_cfg.decode.classes(2).label, ...
+            length(test_labels), n_cvfolds);
         h = figure('name', figtitle);
         subplot(1, length(analyses), a);
         hold on;
@@ -184,6 +197,7 @@ for a = 1:length(analyses)
         end        
 
     end
+    
     % save back to main struct
     lfp_decode.(analysis) = lfp_data;
 
