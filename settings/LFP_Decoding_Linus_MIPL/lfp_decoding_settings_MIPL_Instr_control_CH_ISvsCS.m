@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Personal\Sarath\Results\LFP_Decoding_Results';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'LFP_decoding_MIPR_Instr_CH_IS_control_vs_inactivation';
+lfp_tfa_cfg.version = 'LFP_decoding_MIPL_Instr_Control_CH_ISvsCS';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -239,18 +239,18 @@ lfp_tfa_cfg.decode = struct();
 cl = 0;
 
 cl = cl + 1;
-lfp_tfa_cfg.decode.classes(cl).target = 'MIP_R';
+lfp_tfa_cfg.decode.classes(cl).target = 'MIP_L';
 lfp_tfa_cfg.decode.classes(cl).perturbation = 0;
 lfp_tfa_cfg.decode.classes(cl).choice_trial = 0;
 lfp_tfa_cfg.decode.classes(cl).hs_label = 'CH IS';
 lfp_tfa_cfg.decode.classes(cl).label = 'Instr control CHIS';
 
 cl = cl + 1;
-lfp_tfa_cfg.decode.classes(cl).target = 'MIP_R';
-lfp_tfa_cfg.decode.classes(cl).perturbation = 1;
+lfp_tfa_cfg.decode.classes(cl).target = 'MIP_L';
+lfp_tfa_cfg.decode.classes(cl).perturbation = 0;
 lfp_tfa_cfg.decode.classes(cl).choice_trial = 0;
-lfp_tfa_cfg.decode.classes(cl).hs_label = 'CH IS';
-lfp_tfa_cfg.decode.classes(cl).label = 'Instr inactivation CHIS';
+lfp_tfa_cfg.decode.classes(cl).hs_label = 'CH CS';
+lfp_tfa_cfg.decode.classes(cl).label = 'Instr control CHCS';
 
 % To add more classes to decode, increment cl by 1, and add a new element
 % into the struct array with the required fields. 
