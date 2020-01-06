@@ -6,13 +6,13 @@ lfp_tfa_cfg = [];
 %% Settings for data folders
 
 % absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'Y:\Personal\Sarath\Results\LFP_TFA_Results';
+lfp_tfa_cfg.results_folder = 'Y:\Personal\Sarath\Results\LFP_Decoding_Results';
 
 % versioning, a unique version for the settings file and analysis results
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'LFP_decoding_MIPR_Instr_Control_CHvsIH_IS';
+lfp_tfa_cfg.version = 'LFP_decoding_MIPR_Instr_Control_IHvsCH_CS';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -44,13 +44,13 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = true;
+lfp_tfa_cfg.read_decode_LFP = false;
 
 % folder where the results of analysed LFP site averages are stored
-lfp_tfa_cfg.analyse_lfp_folder = [];
-if ~lfp_tfa_cfg.compute_site_average
-    lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions\LFP Analysis';
+lfp_tfa_cfg.decode_lfp_file = [];
+if ~lfp_tfa_cfg.read_decode_LFP
+    lfp_tfa_cfg.decode_lfp_file = ...
+        'Y:\Personal\Sarath\Results\LFP_Decoding_Results\LFP_decoding_MIPR_Instr_Control_IH_ISvsCS\LFP Decoding\lfp_decode_data.mat';
 end
 
 % sorted neurons excel file, from which information about sessions and
@@ -165,7 +165,7 @@ lfp_tfa_cfg.session_info(8) = ...
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'evoked'}; %
+lfp_tfa_cfg.analyses = {'evoked', 'tfs'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -197,25 +197,6 @@ lfp_tfa_cfg.ref_hemisphere = 'R';
 % random seed for random number generator for reproducibility
 lfp_tfa_cfg.random_seed = rng;
 
-% define the time windows to analyse for LFP TFR and evoked LFP response
-% Must be a Nx4 cell array, N = number of windows to analyse
-% Each row corresponds to one state and contain following elements
-% 1. Identifier of state around which the window is referenced, 
-% see lfp_tfa_global_states, Example:  lfp_tfa_states.CUE_ON
-% 2. Name of the reference state (window) - string (used for labeling 
-% purposes in plots) eg: 'Cue'
-% 3. Start time offset - offset in seconds from reference state onset for 
-% the start of time window
-% start time = Reference state onset time + Start time offset
-% 4. End time offset - offset in seconds from ref. state onset for end of
-% time window
-% end time = Ref. state onset time + end time offset
-% 
-% Example row: 
-%   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
-lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
-                             'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};                    
-
 % define the epochs to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
 % Each row corresponds to one epoch and contain following elements
@@ -229,25 +210,108 @@ lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -0
 % Epoch end time = Ref. state onset time + end time offset
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0
-lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.FIX_HOL,     'FHol',   0.0, 1.0;...
-                              lfp_tfa_states.CUE_ON,      'Cue' ,  -0.5, 0.9; ...
+lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,      'Cue' ,  -0.5, 0.9; ...
                               lfp_tfa_states.REA_INI,     'Reach', -0.4, 0.5 };
-                          
-% color scheme to be used for plotting the power spectra and ppc spectra
-% curve for each epoch. This could either be a colormap or a Kx3 array,
-% where K is the number of epochs to be analysed i.e.
-% K=length(lfp_tfa_cfg.analyse_epochs). The three columns represent R, G,
-% and B values normalized to 1
-lfp_tfa_cfg.epoch_colors = flip(othercolor('Cat_12', length(lfp_tfa_cfg.analyse_epochs)));
-                          
-% the error measure to be plotted for evoked LFP response
-% Can be 'stddev', 'stderr' or 'bootci'
-% 'stddev' - plots one standard deviation around the mean
-% 'stderr' - plots one standard error around the mean
-% 'bootci' - plots 95% confidence interval around the mean by
-% bootstrapping, see bootci function
-lfp_tfa_cfg.error_measure = 'bootci'; 
 
+%% Settings for lfp decoding
+lfp_tfa_cfg.decode = struct();
+
+% classes to decode - a struct specifying the classes to be decoded. A
+% class could be a combination of recorded area (target),
+% control/inactivation, instructed/choice, reach hand and reach space (or
+% hand-space label). Each class to be decoded should be specified as one
+% element of the struct array and may contain the following fields:
+%   target: the area from where LFP is recorded - this could be a string
+%   representing the target area. 
+%   perturbation: whether to consider control or inactivation trials for
+%   this class. Set to 1 for inactivation and 0 for control. 
+%   choice_trial: whether to consider choice or instructed trials for
+%   this class. Set to 1 for choice and 0 for instructed. 
+%   reach_hand: which reach hand to be considered for this class. Could be
+%   'R' for right hand, 'L' for left hand and 'any' for any hand (i.e.,
+%   ignore hand)
+%   reach_space: which reach space to be considered for this class. Could be
+%   'R' for right space, 'L' for left space and 'any' for any space (i.e.,
+%   ignore space)
+%   hs_label: which hand-space label to be considered for this class. Could
+%   be 'IH IS'. 'IH CS', 'CH IS', 'CH CS' or 'any' ('any' to ignore
+%   hand-space label)
+cl = 0;
+
+cl = cl + 1;
+lfp_tfa_cfg.decode.classes(cl).target = 'MIP_R';
+lfp_tfa_cfg.decode.classes(cl).perturbation = 0;
+lfp_tfa_cfg.decode.classes(cl).choice_trial = 0;
+lfp_tfa_cfg.decode.classes(cl).hs_label = 'IH CS';
+lfp_tfa_cfg.decode.classes(cl).label = 'Instr control IHCS';
+
+cl = cl + 1;
+lfp_tfa_cfg.decode.classes(cl).target = 'MIP_R';
+lfp_tfa_cfg.decode.classes(cl).perturbation = 0;
+lfp_tfa_cfg.decode.classes(cl).choice_trial = 0;
+lfp_tfa_cfg.decode.classes(cl).hs_label = 'CH CS';
+lfp_tfa_cfg.decode.classes(cl).label = 'Instr control CHCS';
+
+% To add more classes to decode, increment cl by 1, and add a new element
+% into the struct array with the required fields. 
+% For example: 
+%     cl = cl + 1;
+%     lfp_tfa_cfg.decode.classes(cl).target = 'MIP_L';
+%     lfp_tfa_cfg.decode.classes(cl).perturbation = 0;
+%     lfp_tfa_cfg.decode.classes(cl).choice_trial = 0;
+%     lfp_tfa_cfg.decode.classes(cl).reach_space = 'R';
+%     lfp_tfa_cfg.decode.classes(cl).label = 'MIP_L Instr control RS';
+
+% whether to time bin the raw lfp. Set to true for binning the raw LFP in
+% time. 
+lfp_tfa_cfg.decode.timebin_lfp = true;
+% If lfp_tfa_cfg.decode.timebin_lfp is set to true, this requires the field
+% lfp_tfa_cfg.decode.nsamples_lfp_tbin which specifies how many timestamps
+% of raw LFP should be included in a bin. A bin will be created by taking
+% the average of all timepoints within a bin and will be assigned a
+% timestamp same as the middle timestamp of the bin. 
+lfp_tfa_cfg.decode.nsamples_lfp_tbin = [];
+if lfp_tfa_cfg.decode.timebin_lfp
+    lfp_tfa_cfg.decode.nsamples_lfp_tbin = 50;
+end
+
+% whether to time bin the lfp tfs. Set to true for binning the LFP TFS in
+% time. 
+lfp_tfa_cfg.decode.timebin_lfp_tfs = true;
+% If lfp_tfa_cfg.decode.timebin_lfp_tfs is set to true, this requires the field
+% lfp_tfa_cfg.decode.nsamples_tfs_tbin which specifies how many timestamps
+% of LFP TFS should be included in a bin. A bin will be created by taking
+% the average of all timepoints within a bin for each frequency and will be assigned a
+% timestamp same as the middle timestamp of the bin. 
+lfp_tfa_cfg.decode.nsamples_tfs_tbin = [];
+if lfp_tfa_cfg.decode.timebin_lfp_tfs
+    lfp_tfa_cfg.decode.nsamples_tfs_tbin = 1;
+end
+
+% whether to bin the lfp tfs in frequency domain. Set to true for binning the LFP TFS in
+% frequency domain. 
+lfp_tfa_cfg.decode.freqbin_lfp_tfs = true;
+% If lfp_tfa_cfg.decode.freqbin_lfp_tfs is set to true, this requires the field
+% lfp_tfa_cfg.decode.nsamples_tfs_fbin which specifies how many frequencies
+% of LFP TFS should be included in a bin. A bin will be created by taking
+% the average of LFP power of all frequencies within a bin at each time point and will be assigned a
+% frequency same as the middle frequency of the bin.
+lfp_tfa_cfg.decode.nsamples_tfs_fbin = [];
+if lfp_tfa_cfg.decode.freqbin_lfp_tfs
+    lfp_tfa_cfg.decode.nsamples_tfs_fbin = 1;
+    %lfp_tfa_cfg.decode.fbin_edges = [2, 4, 8, 12, 18, 32, 80, 120];
+end
+
+% how many folds of cross-validation should be performed. At each fold,
+% half of the trials are randomly selected as train and the other half as
+% test. Both test and train contain approximately same number of trails
+% from all the classes being decoded. 
+lfp_tfa_cfg.decode.n_cvfolds = 10;
+
+% number of timebins to be considered in the moving (sliding) window. Each
+% trail will be divided into moving windows of specified length (in time
+% bins) and each window forms a sample. 
+lfp_tfa_cfg.decode.n_tbins_wnd = 5;
 
 %% Settings for trial conditions
 
@@ -281,7 +345,7 @@ lfp_tfa_cfg.compare.effectors = [4];
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = 0; 
+lfp_tfa_cfg.compare.choice_trials = [0, 1]; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -334,67 +398,7 @@ lfp_tfa_cfg.compare.exclude_handspace = {};
 % lfp_tfa_cfg.compare.perturbation_groups(1) separately
 % lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
 % any perturbation value 
-lfp_tfa_cfg.compare.perturbations = 0; 
-
-% differences in conditions to be analysed
-% add new entries for further difference calculations
-% each entry should be a cell array of type 1xN cell where N should be even. 
-% The entries should be made as a string representing the condition 
-% (eg: 'perturbation', 'choice') followed by a cell array containing 
-% the two values of the given condition to be compared. 
-% Examples:
-% lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
-% This computes the difference between trials with perturbation = 1 (post-injection) and perturbation = 0 (pre-injection) when other conditions (eg. task type, choice) remains the same. 
-% lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
-% This computes the difference between choice = 1 and choice = 0 (instructed) trials when other conditions (eg. task type, perturbation) remains the same. 
-% lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 6]}}};
-% This computes the difference between given task types trials when other conditions (eg. task type, perturbation) remains the same. 
-% lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
-%    'choice', {0, 1}}};
-% Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
-
-lfp_tfa_cfg.diff_condition = {};
-%lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
-% lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
-% lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
-% lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
-%     'choice', {0, 1}}};
-
-lfp_tfa_cfg.decode = struct();
-lfp_tfa_cfg.decode.classes(1) = ...
-    struct('target', 'MIP_R', ...
-    'perturbation', 0, ...
-    'choice_trial', 0, ...
-    'reach_hand', 'L', ...
-    'label', 'Instr control LH');
-lfp_tfa_cfg.decode.classes(2) = ...
-    struct('target', 'MIP_R', ...
-    'perturbation', 0, ...
-    'choice_trial', 0, ...
-    'reach_hand', 'R', ...
-    'label', 'Instr control RH');
-
-lfp_tfa_cfg.decode.timebin_lfp = true;
-lfp_tfa_cfg.decode.nsamples_lfp_tbin = [];
-if lfp_tfa_cfg.decode.timebin_lfp
-    lfp_tfa_cfg.decode.nsamples_lfp_tbin = 50;
-end
-
-lfp_tfa_cfg.decode.timebin_lfp_tfs = true;
-lfp_tfa_cfg.decode.nsamples_tfs_tbin = [];
-if lfp_tfa_cfg.decode.timebin_lfp_tfs
-    lfp_tfa_cfg.decode.nsamples_tfs_tbin = 1;
-end
-
-lfp_tfa_cfg.decode.freqbin_lfp_tfs = true;
-if lfp_tfa_cfg.decode.freqbin_lfp_tfs
-    lfp_tfa_cfg.decode.nsamples_tfs_fbin = 6;
-    lfp_tfa_cfg.decode.fbin_edges = [2, 4, 8, 12, 18, 32, 80, 120];
-end
-
-lfp_tfa_cfg.decode.n_cvfolds = 10;
-
-lfp_tfa_cfg.decode.n_tbins_wnd = 5;
+lfp_tfa_cfg.compare.perturbations = [0, 1]; 
 
 % minimum number of trials per condition to be satisfied to consider a site
 % for averaging, if for a site, for any condition, the  number of valid 
@@ -523,13 +527,6 @@ lfp_tfa_cfg.tfr.t_ftimwin       = [];
 if strcmp(lfp_tfa_cfg.tfr.method, 'mtmconvol')
     lfp_tfa_cfg.tfr.tapsmofrq  = 5./cfg.foi; % 5 cycles per window. 
 end
-
-%% Settings for LFP-LFP phase synchronization measure
-% measure of LFP-LFP phase synchronization
-% can be only 'ppc' currently
-% 'ppc' calculates pairwise phase consistency
-% entry will be used as cfg.method for performing ft_connectivityanalysis
-lfp_tfa_cfg.sync.measure = 'ppc';
 
 %% Settings for detection of noisy trials
 % configuration for lfp noise rejection

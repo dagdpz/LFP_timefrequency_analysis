@@ -11,7 +11,7 @@ for f = 1:length(fields)
         continue;
     end
     if ~strcmp(field, 'label') && ~strcmp(field, 'perturbation') && ~strcmp(field, 'hs_label') ...
-            && ~strcmp(field, 'reach_hand') && ~strcmp(field, 'reach_space')
+            && ~strcmp(field, 'reach_hand') && ~strcmp(field, 'reach_space') && ~strcmp(field, 'choice_trial')
         % get trials based on each condition
         if isfield(conditions, field) && any(~isinf(class.(field)))
             class_condition_idx = class_condition_idx & ...
@@ -31,6 +31,12 @@ for f = 1:length(fields)
         if isfield(conditions, field) && any(~isinf(class.(field)))
             class_condition_idx = class_condition_idx & ...
                 strcmp({conditions.(field)}, class.(field));
+        end
+    elseif strcmp(field, 'choice_trial')
+        % get trials based on each condition
+        if isfield(conditions, 'choice') && any(~isinf(class.(field)))
+            class_condition_idx = class_condition_idx & ...
+                ismember([conditions.choice], class.(field));
         end
     end
 end

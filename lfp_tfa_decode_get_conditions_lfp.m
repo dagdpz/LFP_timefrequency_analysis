@@ -86,16 +86,23 @@ for i = 1:length(lfp_tfa_cfg.session_info)
                     % find the condition index, state index, and hand-space index
                     % for this class
                     condition_trials_idx{cnd_idx} = find(cond_trials);
-                    % save a struct representing the condition
-                    if cnd_idx > 1
-                        class_conditions(cnd_idx) = class_conditions(cnd_idx - 1);
-                    end
+%                     % save a struct representing the condition
+%                     if cnd_idx > 1
+%                         class_conditions(cnd_idx) = class_conditions(cnd_idx - 1);
+%                     end
                     class_conditions(cnd_idx).reach_hand = conditions(cnd).reach_hands{hs};
                     class_conditions(cnd_idx).reach_space = conditions(cnd).reach_spaces{hs};
                     class_conditions(cnd_idx).hs_label = conditions(cnd).hs_labels{hs};
                     class_conditions(cnd_idx).label = [conditions(cnd).label, ...
                         conditions(cnd).hs_labels{hs}];
                     class_conditions(cnd_idx).trials = condition_trials_idx{cnd_idx};
+                    class_conditions(cnd_idx).type = conditions(cnd).type;
+                    class_conditions(cnd_idx).effector = conditions(cnd).effector;
+                    class_conditions(cnd_idx).choice = conditions(cnd).choice;
+                    class_conditions(cnd_idx).perturbation = conditions(cnd).perturbation;
+                    class_conditions(cnd_idx).perturbation_group = ...
+                        conditions(cnd).perturbation_group;
+                    class_conditions(cnd_idx).success = conditions(cnd).success;
                 end                
             end
             % initialize trials data

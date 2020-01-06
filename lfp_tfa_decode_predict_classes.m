@@ -112,11 +112,14 @@ for a = 1:length(analyses)
             % get the valid timebins based on moving window
             if ~n_tbins_wnd
                 valid_timebins = 1:length(trial_timebins);
-            elseif mod(n_tbins_wnd, 2) %odd
-                valid_timebins = max(1, ceil(n_tbins_wnd/2)):length(trial_timebins) - floor(n_tbins_wnd/2);
-            elseif ~mod(n_tbins_wnd, 2) %even
-                valid_timebins = max(1, round(n_tbins_wnd/2)):length(trial_timebins) - round(n_tbins_wnd/2);
+            else
+                valid_timebins = n_tbins_wnd:length(trial_timebins);
             end
+%             if mod(n_tbins_wnd, 2) %odd
+%                 valid_timebins = max(1, ceil(n_tbins_wnd/2)):length(trial_timebins) - floor(n_tbins_wnd/2);
+%             elseif ~mod(n_tbins_wnd, 2) %even
+%                 valid_timebins = max(1, round(n_tbins_wnd/2)):length(trial_timebins) - round(n_tbins_wnd/2);
+%             end
 
             for b = valid_timebins
                 fprintf('Time bin %g\n', b);
@@ -126,17 +129,26 @@ for a = 1:length(analyses)
                     if isnan(lfp_data.session(i).class_idx(t))
                         continue;
                     end
-                    if mod(n_tbins_wnd, 2) %odd
-                        tbins_wnd = (b - floor(n_tbins_wnd/2)):(b + floor(n_tbins_wnd/2));
-                    else % even
-                        tbins_wnd = (b - floor(n_tbins_wnd/2) + 1):(b + floor(n_tbins_wnd/2));
+%                     if mod(n_tbins_wnd, 2) %odd
+%                         tbins_wnd = (b - floor(n_tbins_wnd/2)):(b + floor(n_tbins_wnd/2));
+%                     else % even
+%                         tbins_wnd = (b - floor(n_tbins_wnd/2) + 1):(b + floor(n_tbins_wnd/2));
+%                     end
+                    if ~n_tbins_wnd
+                        tbins_wnd = b;
+                    else
+                        tbins_wnd = (b - n_tbins_wnd + 1):(b);
                     end
                     % get data for all sites for time bin until now
-                    if strcmp(analysis, 'lfp_tfs')                    
-                        trial_data = reshape(class_trials{t}(:, :, tbins_wnd), 1, []); 
+                    if strcmp(analysis, 'lfp_tfs')
+                        %trial_data = class_trials{t}(:, :, tbins_wnd);
+                        trial_data = nanmean(class_trials{t}(:, :, tbins_wnd), 3);
+                        %trial_data = reshape(trial_data, 1, []); 
                     elseif strcmp(analysis, 'raw_lfp')
-                        trial_data = reshape(class_trials{t}(:, tbins_wnd), 1, []);
+                        %trial_data = class_trials{t}(:, :, tbins_wnd);
+                        trial_data = nanmean(class_trials{t}(:, :, tbins_wnd), 2);                        
                     end
+                    trial_data = reshape(trial_data, 1, []);
                     all_trials_concat = cat(1, all_trials_concat, trial_data);
                 end
 
