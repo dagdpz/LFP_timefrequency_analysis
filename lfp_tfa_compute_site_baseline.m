@@ -104,7 +104,7 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, l
                         trial = site_lfp.trials(t);
                         
                         % whether this trial should be considered for baseline calculation
-                        consider_trial = ~(trial.noisy) && trial.completed;
+                        consider_trial = ~(trial.noisy); % && trial.completed; MP debug
                         % based on task type
                         if ~isnan(k) && ~isinf(k)
                             consider_trial = consider_trial & sum(trial.type == k);
