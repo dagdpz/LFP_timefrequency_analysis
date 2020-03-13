@@ -213,7 +213,8 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
             session_avg(t).condition(cn).condition = site_conditions(cn);
             session_avg(t).condition(cn).label = site_conditions(cn).label;
             session_avg(t).condition(cn).session = sites_lfp(i).session;
-            session_avg(t).condition(cn).target = sites_lfp(i).target;
+%             session_avg(t).condition(cn).target = sites_lfp(i).target;
+            session_avg(t).condition(cn).target = targets{t};
             % initialize number of site pairs for each handspace
             % label
             for st = 1:size(sites_evoked(1).condition(cn).hs_tuned_evoked, 1)
@@ -302,7 +303,7 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
                 elseif site_conditions(cn).choice == 1
                     plottitle = [plottitle 'Choice trials'];
                 end
-                result_file = fullfile(results_folder_evoked, ['LFP_Evoked_' ...
+                result_file = fullfile(results_folder_evoked, ['LFP_Evoked_' session_avg(t).condition(cn).target ...
                     session_avg(t).condition(cn).session '_' site_conditions(cn).label]);
                 lfp_tfa_plot_evoked_lfp (session_avg(t).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
                     plottitle, result_file);
