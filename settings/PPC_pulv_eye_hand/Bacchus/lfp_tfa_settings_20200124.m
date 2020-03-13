@@ -24,7 +24,7 @@ lfp_tfa_cfg.version = 'dPul_MIP_Bac_20200124';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = true;
+lfp_tfa_cfg.process_LFP = false;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
@@ -107,7 +107,7 @@ lfp_tfa_cfg.session_info(1) = ...
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'tfs', 'evoked', 'pow'}; %
+lfp_tfa_cfg.analyses = {'evoked'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
