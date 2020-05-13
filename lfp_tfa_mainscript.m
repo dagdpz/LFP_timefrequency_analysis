@@ -8,7 +8,7 @@ clear;
 
 % file containing settings for LFP analysis
 % should have the same format as settings/lfp_tfa_settings_example.m
-settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\PPC_pulv_eye_hand\Linus\lfp_tfa_settings_control.m';
+settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\Simultaneous_dPul_PPC_recordings\Bacchus\lfp_tfa_settings_20200409.m';
 
 %% INITIALIZATION
 close all;
