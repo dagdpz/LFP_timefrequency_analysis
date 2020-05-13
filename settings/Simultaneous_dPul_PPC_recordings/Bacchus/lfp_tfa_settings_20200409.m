@@ -6,13 +6,13 @@ lfp_tfa_cfg = [];
 %% Settings for data folders
 
 % absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'Y:\Projects\PPC_pulv_eye_hand\LFP';
+lfp_tfa_cfg.results_folder = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP';
 
 % versioning, a unique version for the settings file and analysis results
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'dPul_MIP_Bac_20200124';
+lfp_tfa_cfg.version = 'dPul_LIP_Bac_20200409';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -24,7 +24,7 @@ lfp_tfa_cfg.version = 'dPul_MIP_Bac_20200124';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = false;
+lfp_tfa_cfg.process_LFP = true;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
@@ -55,12 +55,12 @@ end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
-lfp_tfa_cfg.info_filepath = 'Y:\Projects\PPC_pulv_eye_hand\ephys\dPul_MIP_Bac_20200124\Bac_sorted_neurons.xls';
+lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200409\Bac_sorted_neurons.xls';
 
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
 % used for analysis
-lfp_tfa_cfg.use_datasets = [2];
+lfp_tfa_cfg.use_datasets = [3];
 
 % info about sessions to be analysed
 % should be a 1 x N struct, N = number of sessions to analyse
