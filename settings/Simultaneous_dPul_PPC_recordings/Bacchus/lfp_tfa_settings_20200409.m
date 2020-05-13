@@ -77,8 +77,8 @@ lfp_tfa_cfg.use_datasets = [3];
 %       be combined)
 lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Bac', ...
-           'Date',          '20200124', ...
-           'Input',         'Y:\Projects\PPC_pulv_eye_hand\ephys\dPul_MIP_Bac_20200124\sites_Bacchus_20200124.mat', ...
+           'Date',          '20200409', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200409\sites_Bacchus_20200124.mat', ...
            'Preinj_blocks',  0, ...
            'Postinj_blocks', []);
 
@@ -107,7 +107,7 @@ lfp_tfa_cfg.session_info(1) = ...
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'evoked'}; %
+lfp_tfa_cfg.analyses = {'tfs','evoked','pow','sync'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -116,15 +116,15 @@ lfp_tfa_cfg.analyses = {'evoked'}; %
 % Those targets which are not in the analysed sessions will be ignored
 % Example:
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
-lfp_tfa_cfg.compare.targets = {'dPul_R','MIP_R'}; 
+lfp_tfa_cfg.compare.targets = {'dPul_R','LIP_R'}; 
 
 % target pairs to be included for LFP-LFP sychronization
 % should be a 1xN cell array of 1x2 cell array of strings which indicate
 % the target pairs between which the LFP-LFP phase synchronization should
 % be calculated - valid only if LFP-LFP phase sync should be calculated
 if any(strcmp(lfp_tfa_cfg.analyses, 'sync') | strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
-    lfp_tfa_cfg.compare.target_pairs = {{'MIP_R', 'MIP_R'}, {'MIP_R', 'MIP_L'}, ...
-        {'MIP_L', 'MIP_L'}}; 
+    lfp_tfa_cfg.compare.target_pairs = {{'LIP_R', 'LIP_R'}, {'dPul_R', 'LIP_R'}, ...
+        {'dPul_R', 'dPul_R'}}; 
 end
 
 % reference hemisphere for hand-space labelling
@@ -156,7 +156,8 @@ lfp_tfa_cfg.random_seed = rng;
 % Example row: 
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
 lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
-                             'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};                    
+    %                              'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};
+    'single', lfp_tfa_states.SAC_INI,    'Saccades',    -0.3,   0.5};
 
 % define the epochs to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
@@ -175,9 +176,11 @@ lfp_tfa_cfg.analyse_epochs = {lfp_tfa_states.CUE_ON,     'FHol',    -0.3 ,    0 
                               lfp_tfa_states.CUE_ON,     'Cue' ,    0.05 ,    0.2 ; ...
                               lfp_tfa_states.DEL_PER,    'EDel',    0.3 ,     0.6 ; ...
                               lfp_tfa_states.TAR_ACQ,    'Del',     -0.3 ,    0  ; ...
-                              lfp_tfa_states.REA_INI,    'PreR',    -0.3 ,    -0.05 ; ...
-                              lfp_tfa_states.REA_END,    'PeriR',   -0.2 ,    0.2 ; ...
-                              lfp_tfa_states.SUCCESS,    'THol',    -0.3 ,    0    };
+                               lfp_tfa_states.SAC_INI,   'PreS',     -0.2,    -0.05;...
+                               lfp_tfa_states.SAC_END,   'PeriS',     -0.1,    0.15;...
+ %                               lfp_tfa_states.REA_INI,    'PreR',    -0.3 ,    -0.05 ; ...
+%                               lfp_tfa_states.REA_END,    'PeriR',   -0.2 ,    0.2 ; ...
+                               lfp_tfa_states.SUCCESS,    'THol',    -0.3 ,    0    };
                           
 % color scheme to be used for plotting the power spectra and ppc spectra
 % curve for each epoch. This could either be a colormap or a Kx3 array,
@@ -217,7 +220,7 @@ lfp_tfa_cfg.compare.types = [4];
 % and effector = 6 separately
 % 2. lfp_tfa_cfg.compare.types = nan; Ignore effector (trials with any
 % effector value are combined)
-lfp_tfa_cfg.compare.effectors = [4];
+lfp_tfa_cfg.compare.effectors = [3];
 
 % which type of choice trials are to be included in the analysis
 % Examples:
