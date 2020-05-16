@@ -143,6 +143,14 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditi
                 if sum(cond_trials) < lfp_tfa_cfg.mintrials_percondition
                     sites_tfr(i).use_for_avg = 0;
                 end
+                
+                % Remove trials which do not have timing for both windows
+                % (e.g no saccades initiation detected
+                
+                for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
+                    
+                end
+                
                 % loop through states to analyse 
 
                 for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
