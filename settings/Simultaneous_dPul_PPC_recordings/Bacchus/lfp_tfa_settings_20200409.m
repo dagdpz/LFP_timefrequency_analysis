@@ -230,7 +230,7 @@ lfp_tfa_cfg.compare.effectors = [3];
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = 0; 
+lfp_tfa_cfg.compare.choice_trials = [0,1]; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
