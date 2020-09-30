@@ -208,8 +208,8 @@ function [session_tfs] = lfp_tfa_plot_site_average_tfr( states_lfp, site_conditi
                 
                 result_file = fullfile(site_results_folder, ...
                     ['LFP_TFR_' sites_tfr(i).site_ID '_' site_conditions(cn).label ]);
-                lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
-                    lfp_tfa_cfg, plottitle, result_file);
+%                 lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
+%                     lfp_tfa_cfg, plottitle, result_file);
             end
 
         end
