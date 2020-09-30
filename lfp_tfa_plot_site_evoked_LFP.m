@@ -186,8 +186,8 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
                 result_file = fullfile(site_results_folder, ...
                     ['LFP_Evoked_' sites_evoked(i).site_ID '_' site_conditions(cn).label ]);
 
-                lfp_tfa_plot_evoked_lfp (sites_evoked(i).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
-                    plottitle, result_file);
+%                 lfp_tfa_plot_evoked_lfp (sites_evoked(i).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
+%                     plottitle, result_file);
             end
 
         end
