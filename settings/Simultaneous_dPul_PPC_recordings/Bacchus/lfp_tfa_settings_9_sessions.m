@@ -362,12 +362,14 @@ lfp_tfa_cfg.compare.perturbations = [0];
 %    'choice', {0, 1}}};
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
-lfp_tfa_cfg.diff_condition = {{'choice', {0, 1}}};
+lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
+lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
+lfp_tfa_cfg.diff_condition(3) = {{'reach_spaces', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
-%     'choice', {0, 1}}};
+%     'choice', {0, 1}}};reach_hands
 
 % minimum number of trials per condition to be satisfied to consider a site
 % for averaging, if for a site, for any condition, the  number of valid 
@@ -438,7 +440,7 @@ lfp_tfa_cfg.tfr.method          = 'wavelet';
 % Example: 
 % 1. lfp_tfa_cfg.tfr.foi = logspace(log10(2), log10(120), 60); 60 logspaced
 % frequencies from 2Hz to 120 Hz
-lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
+lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(150), 60);
 
 % number of lfp samples to step for the sliding time window
 % Example:
@@ -625,7 +627,7 @@ lfp_tfa_cfg.baseline_method = 'zscore';
 % Example: lfp_tfa_cfg.compute_avg_across = 'sites'
 % Example: lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'};  compute
 % both averages across session averages and across site averages
-lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'}; 
+lfp_tfa_cfg.compute_avg_across = {'sessions','sites'}; 
 
 %% Settings for statistical test for significance of difference between TFR average across sites
 
