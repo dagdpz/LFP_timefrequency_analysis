@@ -24,7 +24,7 @@ lfp_tfa_cfg.version = 'dPul_LIP_Bac_9_sessions';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = true;
+lfp_tfa_cfg.process_LFP = false;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
@@ -44,18 +44,18 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = true;
+lfp_tfa_cfg.compute_site_average = false;
 
 % folder where the results of analysed LFP site averages are stored
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Projects\PPC_pulv_eye_hand\LFP\dPul_LIP_Bac_9_sessions\LFP Analysis';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_LIP_Bac_9_sessions\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
-lfp_tfa_cfg.info_filepath = 'C:\Users\mpachoud\Dropbox\DAG\phys\Bacchus_phys_dpz\Bac_sorted_neurons.xls';
+lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200624_RN\Bac_sorted_neurons.xls';
 
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
@@ -135,7 +135,7 @@ lfp_tfa_cfg.session_info(1) = ...
    
        lfp_tfa_cfg.session_info(9) = ...
     struct('Monkey',        'Bac', ...
-           'Date',          '20200619', ...
+           'Date',          '20200626', ...
            'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200626\sites_Bacchus_20200626.mat', ...
            'Preinj_blocks',  0, ...
            'Postinj_blocks', []);
@@ -167,7 +167,7 @@ lfp_tfa_cfg.session_info(1) = ...
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'tfs','sync'}; %
+lfp_tfa_cfg.analyses = {'tfs'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -440,7 +440,7 @@ lfp_tfa_cfg.tfr.method          = 'wavelet';
 % Example: 
 % 1. lfp_tfa_cfg.tfr.foi = logspace(log10(2), log10(120), 60); 60 logspaced
 % frequencies from 2Hz to 120 Hz
-lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(150), 60);
+lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
 
 % number of lfp samples to step for the sliding time window
 % Example:

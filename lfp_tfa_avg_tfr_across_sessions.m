@@ -174,8 +174,13 @@ function sessions_avg = lfp_tfa_avg_tfr_across_sessions(lfp_tfr, lfp_tfa_cfg)
         sessions_avg(t).difference = [];
         for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
             diff_condition = lfp_tfa_cfg.diff_condition{diff};
+              if lfp_tfa_cfg.plot_significant
+            sessions_avg(t).difference = [sessions_avg(t).difference, ...
+                lfp_tfa_compute_difference_condition_tfr(sessions_avg(t).condition, diff_condition,1)];
+            else
             sessions_avg(t).difference = [sessions_avg(t).difference, ...
                 lfp_tfa_compute_difference_condition_tfr(sessions_avg(t).condition, diff_condition)];
+              end
         end
         % plot Difference TFR
         for dcn = 1:length(sessions_avg(t).difference)
