@@ -142,15 +142,7 @@ for i = 1:length(states_lfp)
             % of trials for all conditions
             if sum(cond_trials) < lfp_tfa_cfg.mintrials_percondition
                 sites_tfr(i).use_for_avg = 0;
-            end
-            
-            % Remove trials which do not have timing for both windows
-            % (e.g no saccades initiation detected
-            
-            for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
-                
-            end
-            
+            end 
             % loop through states to analyse
             
             for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
@@ -221,7 +213,6 @@ for i = 1:length(states_lfp)
         sites_tfr(i).difference = [sites_tfr(i).difference, ...
             lfp_tfa_compute_difference_condition_tfr(sites_tfr(i).condition, diff_condition)];
     end
-end
 % Plot TFR difference
 for dcn = 1:length(sites_tfr(i).difference)
     if ~isempty(fieldnames(sites_tfr(i).difference(dcn).hs_tuned_tfs))
