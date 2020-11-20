@@ -190,8 +190,8 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
                 end
                 result_file = fullfile(site_results_folder, ...
                     ['LFP_Power_' states_lfp(i).site_ID '_' site_conditions(cn).label]);
-                lfp_tfa_plot_hs_tuned_psd_2(sites_pow(i).condition(cn).hs_tuned_power, ...
-                    lfp_tfa_cfg, plottitle, result_file);
+%                 lfp_tfa_plot_hs_tuned_psd_2(sites_pow(i).condition(cn).hs_tuned_power, ...
+%                     lfp_tfa_cfg, plottitle, result_file);
             end
 
         end

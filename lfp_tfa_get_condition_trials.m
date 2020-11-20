@@ -99,4 +99,15 @@ function cond_trials = lfp_tfa_get_condition_trials(site_lfp, condition)
             
     end
     
+    %remove trials for which one state timing is not defined (e.g saccade
+    %is not detected so onset is NA)
+    for tr = 1:length(site_lfp.trials)  
+        state_onset_values = [site_lfp.trials(tr).states.onset_t];
+    cond_trials_missing_timing(tr) = ~any(isnan(state_onset_values));
+    end
+    cond_trials = cond_trials & cond_trials_missing_timing;
+    
+    
+   
+    
 end

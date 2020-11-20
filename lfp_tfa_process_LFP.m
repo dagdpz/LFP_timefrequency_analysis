@@ -110,6 +110,7 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
         comp_trial = 0; % iterator for completed trials
         for t = 1:length(sites(i).trial)
             completed = sites(i).trial(t).completed;
+%             completed = sites(i).trial(t).success; % modified to take only successful trials instead of completed...
             if completed
                 type = sites(i).trial(t).type;
                 effector = sites(i).trial(t).effector;
