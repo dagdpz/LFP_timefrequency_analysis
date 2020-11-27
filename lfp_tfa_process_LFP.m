@@ -97,7 +97,11 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
         % get 'Set' entry from usable_sites_table
 %         site_lfp.dataset = usable_sites_table(...
 %             strcmp(usable_sites_table.Site_ID, sites(i).site_ID), :).Set(1);
-        site_lfp.session = sites(i).site_ID(1:12);
+        if length(sites(i).site_ID) > 12
+            site_lfp.session = sites(i).site_ID(1:12);
+        else
+            site_lfp.session = sites(i).site_ID;
+        end
         site_lfp.site_ID = sites(i).site_ID;
         site_lfp.target = sites(i).target;
         site_lfp.recorded_hemisphere = upper(sites(i).target(end));
