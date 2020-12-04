@@ -6,7 +6,7 @@ lfp_tfa_cfg = [];
 %% Settings for data folders
 
 % absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'C:\Users\PAmerio\Documents\TestLFP';
+lfp_tfa_cfg.results_folder = 'C:\Users\PAmerio\Documents\TestLFP\RvsLdefinition';
 
 % versioning, a unique version for the settings file and analysis results
 % the results produced using this settings file would be saved under 
@@ -30,7 +30,7 @@ lfp_tfa_cfg.process_LFP = true;
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'C:\Users\PAmerio\Documents\TestLFP\G003_cue_response\Processed LFP';
+        'C:\Users\PAmerio\Documents\TestLFP\RvsLdefinition\G003_cue_response\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -50,7 +50,7 @@ lfp_tfa_cfg.compute_site_average = true;
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'C:\Users\PAmerio\Documents\TestLFP\G003_cue_response\LFP Analysis';
+        'C:\Users\PAmerio\Documents\TestLFP\RvsLdefinition\G003_cue_response\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
@@ -121,7 +121,7 @@ lfp_tfa_cfg.analyses = {'tfs'}; %
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
 lfp_tfa_cfg.compare.targets = {'G003'}; 
 
-% target pairs to be included for LFP-LFP sychronization
+% target pairs to be included for LFP-LFP sychronization                   Not used at the moment 
 % should be a 1xN cell array of 1x2 cell array of strings which indicate
 % the target pairs between which the LFP-LFP phase synchronization should
 % be calculated - valid only if LFP-LFP phase sync should be calculated
@@ -137,7 +137,7 @@ end
 % lesional labeling
 % set ref_hemisphere to recorded hemishere for ipsi lateral and contra
 % lateral labeling
-lfp_tfa_cfg.ref_hemisphere = 'L'; 
+lfp_tfa_cfg.ref_hemisphere = 'R'; 
 
 % random seed for random number generator for reproducibility
 lfp_tfa_cfg.random_seed = rng;
@@ -162,7 +162,7 @@ lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -1
     %                              'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};
     %'single', lfp_tfa_states.SAC_INI,    'Saccades',    -0.3,   0.5};
 
-% define the epochs to analyse for LFP power spectrum
+% define the epochs to analyse for LFP power spectrum                     
 % Must be a Nx4 cell array, N = number of epochs to analyse
 % Each row corresponds to one epoch and contain following elements
 % 1. Identifier of state to which the epoch is referred, see lfp_tfa_global_states, Example:  lfp_tfa_states.CUE_ON
@@ -207,7 +207,7 @@ lfp_tfa_cfg.error_measure = 'bootci';
 % and type = 2 separately
 % 2. lfp_tfa_cfg.compare.types = nan; Ignore trial type (trials with any
 % type value are combined)
-lfp_tfa_cfg.compare.types = [1 2 3 4 5 6];
+lfp_tfa_cfg.compare.types = nan;
 
 % effectors to be included in the analysis
 % should be a vector of integers specifying the effectors
@@ -228,7 +228,7 @@ lfp_tfa_cfg.compare.effectors = nan;
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = nan; 
+lfp_tfa_cfg.compare.choice_trials = [0, 1]; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -281,7 +281,7 @@ lfp_tfa_cfg.compare.exclude_handspace = {};
 % lfp_tfa_cfg.compare.perturbation_groups(1) separately
 % lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
 % any perturbation value 
-lfp_tfa_cfg.compare.perturbations = nan; 
+lfp_tfa_cfg.compare.perturbations = 0; 
 
 % differences in conditions to be analysed
 % add new entries for further difference calculations
@@ -300,11 +300,11 @@ lfp_tfa_cfg.compare.perturbations = nan;
 %    'choice', {0, 1}}};
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
-lfp_tfa_cfg.diff_condition(1) = {{'type', {1, 2}}};
+%lfp_tfa_cfg.diff_condition(1) = {{'type', {1, 2}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'reach_spaces', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'perturbation', {0, 1}}};
-% lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
+lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
 %     'choice', {0, 1}}};reach_hands

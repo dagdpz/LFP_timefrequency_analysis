@@ -120,6 +120,7 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
                 effector = sites(i).trial(t).effector;
                 run = sites(i).trial(t).run;
                 block = sites(i).trial(t).block;
+                target_selected = sites(i).trial(t).target_selected;
                 % for future use
                 % check if the block is usable
 %                 if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
@@ -136,9 +137,9 @@ function session_info = lfp_tfa_process_LFP( session_info, lfp_tfa_cfg )
                 fix_pos = sites(i).trial(t).fix_pos;
                       
                 % reach space         
-                if sign(real(tar_pos) - real(fix_pos)) == -1
+                if target_selected == 1
                     reach_space = 'L'; 
-                elseif sign(real(tar_pos) - real(fix_pos)) == 1
+                elseif target_selected == 2
                     reach_space = 'R';
                 else
                     reach_space = 'N';
