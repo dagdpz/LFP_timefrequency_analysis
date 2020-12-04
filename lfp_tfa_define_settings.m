@@ -33,7 +33,8 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
 
     % add external functions to path
     addpath(genpath(fullfile(pwd, 'external')));
-
+    addpath('C:\Users\PAmerio\Documents\GitHub\export_fig','-begin');
+    
     % define state IDs
     lfp_tfa_global_define_states;    
 
