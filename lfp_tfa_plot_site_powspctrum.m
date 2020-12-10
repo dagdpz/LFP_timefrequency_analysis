@@ -180,9 +180,11 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
                     ', Target = ' sites_pow(i).target ' (ref_' lfp_tfa_cfg.ref_hemisphere '), ' ...
                 'Perturb ' num2str(site_conditions(cn).perturbation_group{1}) ', '];
                 if site_conditions(cn).choice == 0
-                    plottitle = [plottitle 'Instructed trials'];
-                else
-                    plottitle = [plottitle 'Choice trials'];
+                    plottitle = [plottitle 'Unilateral Instructed trials'];
+                elseif site_conditions(cn).choice == 1
+                    plottitle = [plottitle 'Bilateral Instructed trials'];
+                elseif site_conditions(cn).choice == 2
+                    plottitle = [plottitle 'Bilateral Choice trials'];
                 end
                 site_results_folder = fullfile(results_folder_psd, 'sites', sites_pow(i).site_ID);
                 if ~exist(site_results_folder, 'dir')
@@ -299,9 +301,11 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
                     ', Target = ' session_avg(t).condition(cn).target '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
                     'Perturb ' num2str(site_conditions(cn).perturbation_group{1}) ', '];
                 if site_conditions(cn).choice == 0
-                    plottitle = [plottitle 'Instructed trials'];
-                else
-                    plottitle = [plottitle 'Choice trials'];
+                    plottitle = [plottitle 'Unilateral Instructed trials'];
+                elseif site_conditions(cn).choice == 1
+                    plottitle = [plottitle 'Bilateral Instructed trials'];
+                elseif site_conditions(cn).choice == 2
+                    plottitle = [plottitle 'Bilateral Choice trials'];
                 end
                 results_file = fullfile(results_folder_psd, ...
                     ['LFP_Power_' session_avg(t).condition(cn).session '_' site_conditions(cn).label]);

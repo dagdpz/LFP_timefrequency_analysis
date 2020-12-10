@@ -6,7 +6,7 @@ lfp_tfa_cfg = [];
 %% Settings for data folders
 
 % absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'C:\Users\PAmerio\Documents\TestLFP\RvsLdefinition';
+lfp_tfa_cfg.results_folder = 'C:\Users\PAmerio\Documents\TestLFP\Difference _comp_test';
 
 % versioning, a unique version for the settings file and analysis results
 % the results produced using this settings file would be saved under 
@@ -24,13 +24,13 @@ lfp_tfa_cfg.version = 'G003_cue_response';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = true;
+lfp_tfa_cfg.process_LFP = false;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'C:\Users\PAmerio\Documents\TestLFP\RvsLdefinition\G003_cue_response\Processed LFP';
+        'C:\Users\PAmerio\Documents\TestLFP\ChoiceDefinition\G003_cue_response\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -50,7 +50,7 @@ lfp_tfa_cfg.compute_site_average = true;
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'C:\Users\PAmerio\Documents\TestLFP\RvsLdefinition\G003_cue_response\LFP Analysis';
+        'C:\Users\PAmerio\Documents\TestLFP\Difference _comp_test';
 end
 
 % sorted neurons excel file, from which information about sessions and
@@ -80,7 +80,7 @@ end
        lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'G003', ...
            'Date',          '20201123', ...
-           'Input',         'C:\Users\PAmerio\Documents\TestLFP\G003_datapreproc_full_valid_reref_clean_conv.mat', ...
+           'Input',         'C:\Users\PAmerio\Documents\TestLFP\ChoiceDefinition\G003_datapreproc_full_valid_reref_clean_conv.mat', ...
            'Preinj_blocks',  0, ...
            'Postinj_blocks', []);
       
@@ -228,7 +228,7 @@ lfp_tfa_cfg.compare.effectors = nan;
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = [0, 1]; 
+lfp_tfa_cfg.compare.choice_trials = [0 1 2]; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -302,9 +302,10 @@ lfp_tfa_cfg.compare.perturbations = 0;
 
 %lfp_tfa_cfg.diff_condition(1) = {{'type', {1, 2}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
-% lfp_tfa_cfg.diff_condition(3) = {{'reach_spaces', {'L', 'R'}}};
+lfp_tfa_cfg.diff_condition(1) = {{'reach_spaces', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'perturbation', {0, 1}}};
-lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
+% lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
+%lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 2}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
 %     'choice', {0, 1}}};reach_hands

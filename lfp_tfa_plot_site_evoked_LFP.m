@@ -179,9 +179,11 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
                     sites_evoked(i).target '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
                     site_conditions(cn).label '), '];
                 if site_conditions(cn).choice == 0
-                    plottitle = [plottitle 'Instructed trials'];
+                    plottitle = [plottitle 'Unilateral Instructed trials'];
                 elseif site_conditions(cn).choice == 1
-                    plottitle = [plottitle 'Choice trials'];
+                    plottitle = [plottitle 'Bilateral Instructed trials'];
+                elseif site_conditions(cn).choice == 2
+                    plottitle = [plottitle 'Bilateral Choice trials'];
                 end
                 result_file = fullfile(site_results_folder, ...
                     ['LFP_Evoked_' sites_evoked(i).site_ID '_' site_conditions(cn).label ]);
@@ -299,9 +301,11 @@ function [ session_evoked ] = lfp_tfa_plot_site_evoked_LFP( sites_lfp, site_cond
                     session_avg(t).condition(cn).target ' (ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
                     site_conditions(cn).label ', '];
                 if site_conditions(cn).choice == 0
-                    plottitle = [plottitle 'Instructed trials'];
+                    plottitle = [plottitle 'Unilateral Instructed trials'];
                 elseif site_conditions(cn).choice == 1
-                    plottitle = [plottitle 'Choice trials'];
+                    plottitle = [plottitle 'Bilateral Instructed trials'];
+                elseif site_conditions(cn).choice == 2
+                    plottitle = [plottitle 'Bilateral Choice trials'];
                 end
                 result_file = fullfile(results_folder_evoked, ['LFP_Evoked_' session_avg(t).condition(cn).target ...
                     session_avg(t).condition(cn).session '_' site_conditions(cn).label]);

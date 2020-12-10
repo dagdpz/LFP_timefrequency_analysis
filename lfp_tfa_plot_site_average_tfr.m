@@ -193,9 +193,11 @@ for i = 1:length(states_lfp)
                 ', Target ' sites_tfr(i).target '(ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
                 site_conditions(cn).label];
             if site_conditions(cn).choice == 0
-                plottitle = [plottitle 'Instructed trials'];
+                plottitle = [plottitle 'Unilateral Instructed trials'];
             elseif site_conditions(cn).choice == 1
-                plottitle = [plottitle 'Choice trials'];
+                plottitle = [plottitle 'Bilateral Instructed trials'];
+            elseif site_conditions(cn).choice == 2
+                plottitle = [plottitle 'Bilateral Choice trials'];
             end
             
             result_file = fullfile(site_results_folder, ...
@@ -363,9 +365,11 @@ for t = 1:length(targets)
                     'Session ', session_avg(t).condition(cn).session, ...
                     ' ', site_conditions(cn).label];
                 if site_conditions(cn).choice == 0
-                    plottitle = [plottitle 'Instructed trials'];
+                    plottitle = [plottitle 'Unilateral Instructed trials'];
                 elseif site_conditions(cn).choice == 1
-                    plottitle = [plottitle 'Choice trials'];
+                    plottitle = [plottitle 'Bilateral Instructed trials'];
+                elseif site_conditions(cn).choice == 2
+                    plottitle = [plottitle 'Bilateral Choice trials'];
                 end
                 result_file = fullfile(results_folder_tfr, ...
                     ['LFP_TFR_' session_avg(t).target '_'...

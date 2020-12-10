@@ -81,7 +81,7 @@ for i = 1:length(diff_condition)/2
             continue;
         end
     elseif strcmp(compare.field, 'choice')
-        if sum([compare.values{:}] == unique([conditions.choice])) < 2
+        if sum(arrayfun(@(x) sum(x == unique([conditions.choice])), [compare.values{:}])) < 2
             continue;
         end
     elseif strcmp(compare.field, 'type_eff')

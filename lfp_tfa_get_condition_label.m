@@ -96,12 +96,15 @@ if isfield(cfg_condition, 'choice')
     if isnan(cfg_condition.choice) || isinf(cfg_condition.choice)
         ch = '';
         chs = '';
+    elseif cfg_condition.choice == 2
+        ch='Bilateral Choice';
+        chs='BC';
     elseif cfg_condition.choice == 1
-        ch='Choice';
-        chs='Choi';
+        ch='Bilateral Instructed';
+        chs='BI';
     elseif cfg_condition.choice == 0
-        ch='Instructed';
-        chs='Instr';
+        ch='Unilateral Instructed';
+        chs='UI';
     elseif strcmp(cfg_condition.choice, 'diff1')
         ch='(Instructed - Choice)';
         chs = '(Instr - Choi)';      
