@@ -319,10 +319,14 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 %    'choice', {0, 1}}};
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
-lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
-% lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
-% lfp_tfa_cfg.diff_condition(3) = {{'reach_spaces', {'L', 'R'}}};
- lfp_tfa_cfg.diff_condition(2) = {{'perturbation', {0, 1}}};
+ lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
+%  lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
+  lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
+  lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}}};
+ lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
+    'choice', {0, 1}}};
+lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
+    'reach_spaces', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
@@ -589,7 +593,7 @@ lfp_tfa_cfg.compute_avg_across = {'sessions','sites'};
 %% Settings for statistical test for significance of difference between TFR average across sites
 
 %Multiple comparison correction method to be used: FDR or Bonferroni
-lfp_tfa_cfg.correction_method = 'Bonferroni';
+lfp_tfa_cfg.correction_method = 'FDR';
 
 % Desired false discovery rate for multiple comparison
 % correction for statistical significance tests
@@ -610,7 +614,7 @@ lfp_tfa_cfg.fdr_method = 'pdep';
 
 % Set to true (1) for plotting only the significant difference
 % between site averages, false (0) otherwise
-lfp_tfa_cfg.plot_significant = 1;
+lfp_tfa_cfg.plot_significant = 0;
 
 %% settings for saving figures
 
