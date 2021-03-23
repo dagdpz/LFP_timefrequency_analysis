@@ -1,4 +1,4 @@
-function combined_tfs = lfp_tfa_get_combined_tfs( site_lfp, cond_trials, state, lfp_tfa_cfg )
+function combined_tfs = lfp_tfa_get_combined_tfs( site_lfp, cond_trials, state, lfp_tfa_cfg, perturbation )
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -129,13 +129,20 @@ if ~isempty(combined_tfs.powspctrm)
 
     % baseline normalization
     cfg_baseline.method = lfp_tfa_cfg.baseline_method;
+    if  lfp_tfa_cfg.baseline_perturbation == -1
+        baseline_cnd_idx = [site_lfp.baseline.perturbation] == ...
+        perturbation & [site_lfp.baseline.choice] == ...
+        lfp_tfa_cfg.baseline_use_choice_trial;
+    else
     baseline_cnd_idx = [site_lfp.baseline.perturbation] == ...
         lfp_tfa_cfg.baseline_perturbation & [site_lfp.baseline.choice] == ...
         lfp_tfa_cfg.baseline_use_choice_trial;
+    end
     cfg_baseline.mean = site_lfp.baseline(baseline_cnd_idx).pow_mean;
     cfg_baseline.std = site_lfp.baseline(baseline_cnd_idx).pow_std;
-    combined_tfs.powspctrm_normmean = lfp_tfa_baseline_normalization(...
-        combined_tfs.powspctrm_rawmean, cfg_baseline); 
+    state_tfs.powspctrm = lfp_tfa_baseline_normalization(...
+        state_tfs.powspctrm, cfg_baseline); 
+    state_tfs.baseline = cfg_baseline;
     
 end
 

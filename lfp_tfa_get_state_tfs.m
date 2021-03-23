@@ -1,4 +1,4 @@
-function state_tfs = lfp_tfa_get_state_tfs(site_lfp, cond_trials, state, lfp_tfa_cfg)
+function state_tfs = lfp_tfa_get_state_tfs(site_lfp, cond_trials, state, lfp_tfa_cfg, perturbation)
 %lfp_tfa_get_state_tfs - Function to get the LFP power spectrogram average 
 %across trials in a time window of interest around a givem state (event)
 %
@@ -119,9 +119,15 @@ if ~isempty(state_tfs.powspctrm)
 
     % baseline normalization
     cfg_baseline.method = lfp_tfa_cfg.baseline_method;
+    if  lfp_tfa_cfg.baseline_perturbation == -1
+        baseline_cnd_idx = [site_lfp.baseline.perturbation] == ...
+        perturbation & [site_lfp.baseline.choice] == ...
+        lfp_tfa_cfg.baseline_use_choice_trial;
+    else
     baseline_cnd_idx = [site_lfp.baseline.perturbation] == ...
         lfp_tfa_cfg.baseline_perturbation & [site_lfp.baseline.choice] == ...
         lfp_tfa_cfg.baseline_use_choice_trial;
+    end
     cfg_baseline.mean = site_lfp.baseline(baseline_cnd_idx).pow_mean;
     cfg_baseline.std = site_lfp.baseline(baseline_cnd_idx).pow_std;
     state_tfs.powspctrm = lfp_tfa_baseline_normalization(...

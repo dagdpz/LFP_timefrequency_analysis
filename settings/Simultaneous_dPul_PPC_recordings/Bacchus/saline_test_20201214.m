@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'dPul_control_LIP_Bac_20201209';
+lfp_tfa_cfg.version = '20201214_saline_test';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -24,13 +24,13 @@ lfp_tfa_cfg.version = 'dPul_control_LIP_Bac_20201209';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = true;
+lfp_tfa_cfg.process_LFP = false;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Bac_20201209\Processed LFP';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\20201214_saline_test\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -50,17 +50,17 @@ lfp_tfa_cfg.compute_site_average = true;
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Bac_20201209\LFP Analysis';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\20201214_saline_test\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
-lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201119\Bac_sorted_neurons.xls';
+lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\20201214_saline_test\Bac_sorted_neurons.xls';
 
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
 % used for analysis
-lfp_tfa_cfg.use_datasets = [11];
+lfp_tfa_cfg.use_datasets = [-1];
 
 % info about sessions to be analysed
 % should be a 1 x N struct, N = number of sessions to analyse
@@ -79,9 +79,9 @@ lfp_tfa_cfg.use_datasets = [11];
        
        lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Bac', ...
-           'Date',          '20201209', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Bac_20201209\sites_Bacchus_20201209.mat', ...
-           'Preinj_blocks',  2, ...
+           'Date',          '20201214', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\20201214_saline_test\sites_Bacchus_20201214.mat', ...
+           'Preinj_blocks',  0, ...
            'Postinj_blocks', 3);
        
       
@@ -120,7 +120,7 @@ lfp_tfa_cfg.analyses = {'tfs'}; %
 % Those targets which are not in the analysed sessions will be ignored
 % Example:
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
-lfp_tfa_cfg.compare.targets = {'LIP_R','LIP_R'}; 
+lfp_tfa_cfg.compare.targets = {'LIP_R'}; 
 
 % target pairs to be included for LFP-LFP sychronization
 % should be a 1xN cell array of 1x2 cell array of strings which indicate
@@ -161,7 +161,7 @@ lfp_tfa_cfg.random_seed = rng;
 %   lfp_tfa_states.CUE_ON,     'Cue',    -1.0 ,    0.5
 lfp_tfa_cfg.analyse_states = {'single', lfp_tfa_states.CUE_ON,    'Cue',      -0.5,   0.9;...
     %                              'single', lfp_tfa_states.REA_INI,    'Reach',    -0.3,   0.5};
-    'single', lfp_tfa_states.SAC_INI,    'Saccades',    -0.3,   0.5};
+    'single', lfp_tfa_states.TAR_ACQ,    'Saccades',    -0.3,   0.5};
 
 % define the epochs to analyse for LFP power spectrum
 % Must be a Nx4 cell array, N = number of epochs to analyse
@@ -234,7 +234,7 @@ lfp_tfa_cfg.compare.effectors = [0];
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = [0,1]; 
+lfp_tfa_cfg.compare.choice_trials = [0]; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -308,7 +308,7 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 
 % lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
- %lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
+%  lfp_tfa_cfg.diff_condition(3) = {{'reach_spaces', {'L', 'R'}}};
  lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};

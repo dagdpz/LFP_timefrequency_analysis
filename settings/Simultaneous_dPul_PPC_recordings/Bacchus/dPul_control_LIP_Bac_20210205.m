@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'dPul_control_LIP_Bac_20201209';
+lfp_tfa_cfg.version = 'dPul_control_LIP_Bac_20210205';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -30,7 +30,7 @@ lfp_tfa_cfg.process_LFP = true;
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Bac_20201209\Processed LFP';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Bac_20210205\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -50,12 +50,12 @@ lfp_tfa_cfg.compute_site_average = true;
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Bac_20201209\LFP Analysis';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Bac_20210205\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
-lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201119\Bac_sorted_neurons.xls';
+lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Bac_20210205\Bac_sorted_neurons.xls';
 
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
@@ -79,10 +79,10 @@ lfp_tfa_cfg.use_datasets = [11];
        
        lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Bac', ...
-           'Date',          '20201209', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Bac_20201209\sites_Bacchus_20201209.mat', ...
-           'Preinj_blocks',  2, ...
-           'Postinj_blocks', 3);
+           'Date',          '20210205', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Bac_20210205\sites_Bacchus_20210205.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 2);
        
       
        

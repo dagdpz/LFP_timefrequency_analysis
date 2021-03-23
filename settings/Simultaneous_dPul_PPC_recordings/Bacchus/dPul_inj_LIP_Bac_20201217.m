@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'dPul_control_LIP_Bac_20201209';
+lfp_tfa_cfg.version = 'dPul_inj_LIP_Bac_20201217';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -24,13 +24,13 @@ lfp_tfa_cfg.version = 'dPul_control_LIP_Bac_20201209';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = true;
+lfp_tfa_cfg.process_LFP = false;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Bac_20201209\Processed LFP';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Bac_20201217\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -50,7 +50,7 @@ lfp_tfa_cfg.compute_site_average = true;
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Bac_20201209\LFP Analysis';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Bac_20201217\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
@@ -60,7 +60,7 @@ lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
 % used for analysis
-lfp_tfa_cfg.use_datasets = [11];
+lfp_tfa_cfg.use_datasets = [10];
 
 % info about sessions to be analysed
 % should be a 1 x N struct, N = number of sessions to analyse
@@ -79,10 +79,10 @@ lfp_tfa_cfg.use_datasets = [11];
        
        lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Bac', ...
-           'Date',          '20201209', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Bac_20201209\sites_Bacchus_20201209.mat', ...
-           'Preinj_blocks',  2, ...
-           'Postinj_blocks', 3);
+           'Date',          '20201217', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201217\sites_Bacchus_20201217.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 2);
        
       
        
@@ -306,10 +306,12 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 %    'choice', {0, 1}}};
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
-% lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
+lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
- %lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
- lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+% lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
+ lfp_tfa_cfg.diff_condition(2) = {{'perturbation', {0, 1}}};
+ % lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
+  % 'reach_spaces', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
