@@ -212,8 +212,11 @@ for i = 1:length(states_lfp)
     % difference between conditions
     for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
         diff_condition = lfp_tfa_cfg.diff_condition{diff};
+%         sites_tfr(i).difference = [sites_tfr(i).difference, ...
+%             lfp_tfa_compute_difference_condition_tfr(sites_tfr(i).condition, diff_condition)];
+        % Modified by PA - statistical testing ----------------------------
         sites_tfr(i).difference = [sites_tfr(i).difference, ...
-            lfp_tfa_compute_difference_condition_tfr(sites_tfr(i).condition, diff_condition)];
+            lfp_tfa_compute_difference_condition_tfr(sites_tfr(i).condition, diff_condition, 1, lfp_tfa_cfg)];
     end
 % Plot TFR difference
 for dcn = 1:length(sites_tfr(i).difference)

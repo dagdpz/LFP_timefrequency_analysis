@@ -6,13 +6,13 @@ lfp_tfa_cfg = [];
 %% Settings for data folders
 
 % absolute path to the folder where the results of analysis should be stored
-lfp_tfa_cfg.results_folder = 'C:\Users\PAmerio\Documents\TestLFP\Difference _comp_test';
+lfp_tfa_cfg.results_folder = 'C:\Users\PAmerio\Documents\TestLFP';
 
 % versioning, a unique version for the settings file and analysis results
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'G003_cue_response';
+lfp_tfa_cfg.version = 'G011_march_test_2';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -30,7 +30,7 @@ lfp_tfa_cfg.process_LFP = false;
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'C:\Users\PAmerio\Documents\TestLFP\ChoiceDefinition\G003_cue_response\Processed LFP';
+        'C:\Users\pamerio\Documents\TestLFP\G011_march_test\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -78,9 +78,9 @@ end
 
        
        lfp_tfa_cfg.session_info(1) = ...
-    struct('Monkey',        'G003', ...
-           'Date',          '20201123', ...
-           'Input',         'C:\Users\PAmerio\Documents\TestLFP\ChoiceDefinition\G003_datapreproc_full_valid_reref_clean_conv.mat', ...
+    struct('Monkey',        'G011', ...
+           'Date',          '20210325', ...
+           'Input',         'C:\Users\PAmerio\Documents\TestLFP\G011_datapreproc_valid_reref_clean_conv.mat', ...
            'Preinj_blocks',  0, ...
            'Postinj_blocks', []);
       
@@ -119,7 +119,7 @@ lfp_tfa_cfg.analyses = {'tfs'}; %
 % Those targets which are not in the analysed sessions will be ignored
 % Example:
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
-lfp_tfa_cfg.compare.targets = {'G003'}; 
+lfp_tfa_cfg.compare.targets = {'G011'}; 
 
 % target pairs to be included for LFP-LFP sychronization                   Not used at the moment 
 % should be a 1xN cell array of 1x2 cell array of strings which indicate
@@ -137,7 +137,7 @@ end
 % lesional labeling
 % set ref_hemisphere to recorded hemishere for ipsi lateral and contra
 % lateral labeling
-lfp_tfa_cfg.ref_hemisphere = 'R'; 
+lfp_tfa_cfg.ref_hemisphere = 'L'; 
 
 % random seed for random number generator for reproducibility
 lfp_tfa_cfg.random_seed = rng;
@@ -207,7 +207,7 @@ lfp_tfa_cfg.error_measure = 'bootci';
 % and type = 2 separately
 % 2. lfp_tfa_cfg.compare.types = nan; Ignore trial type (trials with any
 % type value are combined)
-lfp_tfa_cfg.compare.types = nan;
+lfp_tfa_cfg.compare.types = 3;
 
 % effectors to be included in the analysis
 % should be a vector of integers specifying the effectors
@@ -218,7 +218,7 @@ lfp_tfa_cfg.compare.types = nan;
 % and effector = 6 separately
 % 2. lfp_tfa_cfg.compare.types = nan; Ignore effector (trials with any
 % effector value are combined)
-lfp_tfa_cfg.compare.effectors = nan;
+lfp_tfa_cfg.compare.effectors = 0;
 
 % which type of choice trials are to be included in the analysis
 % Examples:
@@ -228,7 +228,7 @@ lfp_tfa_cfg.compare.effectors = nan;
 % instructed trials separately
 % 3. lfp_tfa_cfg.compare.choice_trials = nan; % ignore choice (both choice
 % and instructed trials are combined)
-lfp_tfa_cfg.compare.choice_trials = [0 1 2]; 
+lfp_tfa_cfg.compare.choice_trials = [0 2]; 
 
 % reach hands to be included for analysis
 % should be nan or a cell array that contain only values 'R', 'L'
@@ -254,7 +254,7 @@ lfp_tfa_cfg.compare.reach_hands = {'any'};
 % which acquired target is on left and on right separately
 % 4. lfp_tfa_cfg.compare.reach_hands = {'any'}; ignore space label (trial with
 % any acquired target position is combined)
-lfp_tfa_cfg.compare.reach_spaces = {'L','R'}; 
+lfp_tfa_cfg.compare.reach_spaces = {'any'}; 
 
 % hand space combinations to be excluded from analysis
 % should be a cell array with each element containing the hand and space
@@ -302,9 +302,9 @@ lfp_tfa_cfg.compare.perturbations = 0;
 
 %lfp_tfa_cfg.diff_condition(1) = {{'type', {1, 2}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
-lfp_tfa_cfg.diff_condition(1) = {{'reach_spaces', {'L', 'R'}}};
+% lfp_tfa_cfg.diff_condition(1) = {{'reach_spaces', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'perturbation', {0, 1}}};
-% lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
+lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 2}}};
 %lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 2}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
@@ -379,7 +379,7 @@ lfp_tfa_cfg.tfr.method          = 'wavelet';
 % Example: 
 % 1. lfp_tfa_cfg.tfr.foi = logspace(log10(2), log10(120), 60); 60 logspaced
 % frequencies from 2Hz to 120 Hz
-lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
+lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(190), 70);
 
 % number of lfp samples to step for the sliding time window
 % Example:
@@ -481,7 +481,7 @@ lfp_tfa_cfg.noise.plottrials = 0;
 % onset as the reference state for baseline period
 % 2. lfp_tfa_cfg.baseline_ref_state = ''; consider the whole trial period
 % for baseline
-lfp_tfa_cfg.baseline_ref_state = ''; 
+lfp_tfa_cfg.baseline_ref_state = lfp_tfa_states.CUE_ON; 
 
 % period of interest relative to onset of baseline_ref_state for baseline power calculation, 
 % Examples: 
@@ -495,7 +495,7 @@ lfp_tfa_cfg.baseline_ref_state = '';
 if isempty(lfp_tfa_cfg.baseline_ref_state)
 	lfp_tfa_cfg.baseline_ref_period = 'trial';
 else
-	lfp_tfa_cfg.baseline_ref_period = []; % SET LIMITS OF baseline_ref_period here
+	lfp_tfa_cfg.baseline_ref_period = [-0.5 -0.05]; % SET LIMITS OF baseline_ref_period here
 end
 
 % which perturbation blocks to be considered for baseline power calculation
@@ -542,7 +542,7 @@ end
 % P_norm(t,f) = (P(t, f)) / (mu_P(f))
 % Example:
 % lfp_tfa_cfg.baseline_method = 'relchange';
-lfp_tfa_cfg.baseline_method = 'zscore';
+lfp_tfa_cfg.baseline_method = 'relchange';
 
 % flag to indicate if LFP TFR average should be computed - for future use
 % Set to 0 if LFP TFR average should not be computed, else set to 1
@@ -571,7 +571,7 @@ lfp_tfa_cfg.compute_avg_across = {'sessions','sites'};
 %% Settings for statistical test for significance of difference between TFR average across sites
 
 %Multiple comparison correction method to be used: FDR or Bonferroni
-lfp_tfa_cfg.correction_method = 'Bonferroni';
+lfp_tfa_cfg.correction_method = 'FDR';
 
 % Desired false discovery rate for multiple comparison
 % correction for statistical significance tests

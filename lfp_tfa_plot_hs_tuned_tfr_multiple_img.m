@@ -130,6 +130,7 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
                               
                 
                 state_lfp_powspctrm = nanmean(avg_tfr(st, hs).freq.powspctrm, 1);
+                
                 if plot_significant && ...
                         isfield(avg_tfr(st, hs).freq, 'stat_test') && ...
                         ~isempty(avg_tfr(st, hs).freq.stat_test.h)
@@ -144,13 +145,13 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
                     squeeze(state_lfp_powspctrm) , imscale);
                 
                 % horizontal lines to separate frequency bands
-                fbandstart = [2, 4, 8, 12, 18, 32, 80];
+                fbandstart = [4, 8, 13, 30, 60];
                 fbandstart_idx = zeros(size(fbandstart));
                 for f = fbandstart
                     f_idx = find(abs(avg_tfr(st, hs).freq.freq - f) == ...
                         min(abs(avg_tfr(st, hs).freq.freq - f)), 1, 'first');
                     line([state_info(st).start_s state_info(st).finish_s], ...
-                        [f_idx f_idx], 'color', 'k', 'linestyle', '--');
+                        [f_idx f_idx], 'color', 'k');
                     fbandstart_idx(fbandstart == f) = f_idx;
                 end
 
@@ -170,23 +171,23 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
             set(gca,'TickDir','out')
             % log y axis ticks
             %set(gca, 'ytick', ([1:8:numel(concat_states_tfs.freq)]));
-            set(gca, 'ytick', (fbandstart_idx));
-            set(gca, 'yticklabel', fbandstart);
+            set(gca, 'ytick', [1 fbandstart_idx f]);
+            set(gca, 'yticklabel', [2 fbandstart 190]);
                 %round(concat_states_tfs.freq([1:8:numel(concat_states_tfs.freq)])));
             % add 0.5 at end since the time value is the center of the bin
             % add 0 at beginning to make x-axis visible
             set(gca, 'ylim', [0 numel(avg_tfr(st, hs).freq.freq) + 0.5]);
             % mark state onsets
-            set(gca,'xtick',state_samples)
+            set(gca,'xtick',sort([state_samples 10.7583 25.0967 45.5801]))
             for so = state_onsets
-                line([so so], ylim, 'color', 'k'); 
-                if isfield(avg_tfr(state_onsets == so, hs), 'state_name') && ...
-                        ~isempty(avg_tfr(state_onsets == so, hs).state_name)
-                    state_name = avg_tfr(state_onsets == so, hs).state_name;
-                    text(so+1, 10, state_name, 'fontsize', 8);
-                end
+                line([so so], ylim, 'color', 'k', 'linestyle', '--'); 
+%                 if isfield(avg_tfr(state_onsets == so, hs), 'state_name') && ...
+%                         ~isempty(avg_tfr(state_onsets == so, hs).state_name)
+%                     state_name = avg_tfr(state_onsets == so, hs).state_name;
+%                     text(so+1, 10, state_name, 'fontsize', 8);
+%                 end
             end
-            set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 8)
+            set(gca,'xticklabels', sort([round(concat_states_tfs.state_time(state_samples), 1) -0.5 0.2 1.2]), 'fontsize', 8)
             set(gca, 'xticklabelrotation', 45)
             % add 0.5 since the time value is the center of the bin
             % add 0 at the beginning to make the y-axis visible
@@ -203,7 +204,10 @@ function lfp_tfa_plot_hs_tuned_tfr_multiple_img( avg_tfr, lfp_tfa_cfg, plottitle
                 subplottitle = [subplottitle ' (ntrials = ' num2str(avg_tfr(1, hs).ntrials) ')'];            
             end
             title(subplottitle);
-            %line([0 0], ylim, 'color', 'k');
+            % PA modification -- time-periods
+            line([10.7583 10.7583], ylim, 'color', 'k', 'linestyle', '--');
+            line([25.0967 25.0967], ylim, 'color', 'k', 'linestyle', '--');
+            line([45.5801 45.5801], ylim, 'color', 'k', 'linestyle', '--');
             
         end
     end
