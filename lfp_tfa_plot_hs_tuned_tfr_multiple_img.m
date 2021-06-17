@@ -95,7 +95,11 @@ for hs = 1:size(avg_tfr, 2)
         
         state_info = struct();
         for st = 1:size(avg_tfr, 1)
-            
+            %% LS 2021
+            if isempty(avg_tfr(st, hs).freq)
+                %%
+                continue;
+            end
             % state timing information
             % state onset sample number
             state_info(st).onset_s = find(...
@@ -158,6 +162,7 @@ for hs = 1:size(avg_tfr, 2)
         end
         concat_states_tfs.time = 1:1:size(concat_states_tfs.powspctrm, 3);
         state_onsets = find(concat_states_tfs.state_time == 0);
+        % states_valid=find(~cellfun(@isempty,{avg_tfr(:, hs).state})); %% LS 2021
         state_samples = sort([state_info.start_s, state_info.onset_s, ...
             state_info.finish_s]);
         
@@ -186,6 +191,18 @@ for hs = 1:size(avg_tfr, 2)
                 text(so+1, 10, state_name, 'fontsize', 8);
             end
         end
+        
+        %         for si = 1:numel(state_onsets)  %%LS very temporary solution here to have a lable even if we dont have any values for the window...
+        %             so=state_onsets(si);
+        %
+        %             line([so so], ylim, 'color', 'k');
+        %             if isfield(avg_tfr(state_onsets == so, hs), 'state_name') && ...
+        %                     ~isempty(avg_tfr(states_valid(si), hs).state_name)
+        %                 state_name = avg_tfr(states_valid(si), hs).state_name;
+        %                 text(so+1, 10, state_name, 'fontsize', 8);
+        %             end
+        %         end
+        
         set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 8)
         set(gca, 'xticklabelrotation', 45)
         % add 0.5 since the time value is the center of the bin

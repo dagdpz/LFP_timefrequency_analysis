@@ -133,6 +133,15 @@ function [ session_pow ] = lfp_tfa_plot_site_powspctrum( states_lfp, site_condit
                         
                         % get timing information of epoch
                         states          = states_lfp(i).trials(t).states;
+                        if ~ismember(epoch_refstate,[states(:).id])
+                            %% LS 2021: replace missing state alignment with NaNs
+                            
+                            epoch_tfs.psd = [epoch_tfs.psd, ...
+                                NaN(1,length(lfp_tfa_cfg.tfr.foi),floor((epoch_reftend-epoch_reftstart)/lfp_tfa_cfg.tfr.timestep*states_lfp(i).trials(t).fsample))];
+                            epoch_tfs.psd_f = states_lfp(i).trials(t).tfs.freq;
+                            continue;
+                        end
+                        
                         state_onset_t   = states([states(:).id] == ...
                             epoch_refstate).onset_t;
                         epoch_start_t   = states([states(:).id] == ...

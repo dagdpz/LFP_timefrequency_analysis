@@ -63,6 +63,16 @@ state_tfs.state_name = state_name;
 for t = find(cond_trials)
     % get the state information for this trial
     states          = site_lfp.trials(t).states;
+    if ~ismember(state_id,[states(:).id])
+        %% LS 2021: replace missing state alignment with NaNs
+        
+        state_tfs.powspctrm = [state_tfs.powspctrm, ...
+            NaN(1,length(lfp_tfa_cfg.tfr.foi),floor((state_ref_tend-state_ref_tstart)/lfp_tfa_cfg.tfr.timestep*site_lfp.trials(t).fsample))];
+        state_tfs.time=NaN(1,floor((state_ref_tend-state_ref_tstart)/lfp_tfa_cfg.tfr.timestep*site_lfp.trials(t).fsample));
+        state_tfs.freq = site_lfp.trials(t).tfs.freq;
+        state_tfs.cfg = site_lfp.trials(t).tfs.cfg;
+        continue;
+    else
     state_onset_t   = states([states(:).id] == ...
         state_id).onset_t;
     state_start_t   = states([states(:).id] == ...
@@ -94,6 +104,7 @@ for t = find(cond_trials)
     % freq bins
     state_tfs.freq = site_lfp.trials(t).tfs.freq; 
     state_tfs.cfg = site_lfp.trials(t).tfs.cfg;
+    end
 
 end
 
