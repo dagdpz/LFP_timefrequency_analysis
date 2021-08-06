@@ -108,7 +108,6 @@ for i = 1:length(sites)
     
     %% LS 2021: convert to ipsi/contra instead of fixed reference hemisphere
     %% remove non-completed trials later !
-    keys.contra_ipsi_relative_to='target';
     sitetrials=[sites(i).trial];
     positions=[sitetrials.tar_pos]-[sitetrials.fix_pos];
     hemifields=num2cell(sign(real(positions)));
@@ -119,33 +118,19 @@ for i = 1:length(sites)
     [sitetrials.fixation]=deal(fixations{:});
     [sites(i).trial]=sitetrials;
     
-    sites(i)=ph_LR_to_CI(keys,sites(i));
+    sites(i)=ph_LR_to_CI(lfp_tfa_cfg,sites(i));  %% convert... 
     
     %% now loop through each trial for this site
-    t = 0; % iterator for completed trials
     for t = 1:length(sites(i).trial)
-        completed = sites(i).trial(t).completed;
-        success = sites(i).trial(t).success;
-        % %             completed = sites(i).trial(t).success; % modified to take only successful trials instead of completed...
-        %             if completed
-        type = sites(i).trial(t).type;
-        effector = sites(i).trial(t).effector;
-        run = sites(i).trial(t).run;
-        block = sites(i).trial(t).block;
+        
         % for future use
         % check if the block is usable
         %                 if isempty(usable_sites_table(strcmp(usable_sites_table.Site_ID, ...
         %                         sites(i).site_ID) && usable_sites_table.Block == block))
         %                     continue;
         %                 end
-        choice_trial = sites(i).trial(t).choice;
-        reach_hand = sites(i).trial(t).reach_hand; % 1 = left, 2 = right
-        perturbation = sites(i).trial(t).perturbation; % 0 = control
-        if isnan(perturbation)
-            perturbation = 0;
-        end
-        %                 tar_pos = sites(i).trial(t).tar_pos;
-        %                 fix_pos = sites(i).trial(t).fix_pos;
+       
+        %% convert hand and space information into string labels (for some reason)
         hf=sites(i).trial(t).hemifield;
         
         % reach space
@@ -155,45 +140,25 @@ for i = 1:length(sites)
             reach_space = 'C';
         else
             reach_space = 'N';
-        end
+        end      
         
+        rh = sites(i).trial(t).reach_hand; % 1 = left, 2 = right
         % reach hand
-        if reach_hand == 1
+        if rh == 1
             reach_hand = 'I';
-        elseif reach_hand == 2
+        elseif rh == 2
             reach_hand = 'C';
         else
             reach_hand = 'N';  % no hand labeling
         end
+        hs_label=[reach_hand 'H ' reach_space 'S'];        
         
-        hs_label=[reach_hand 'H ' reach_space 'S'];
+        site_lfp.trials(t).reach_hand  = reach_hand;
+        site_lfp.trials(t).reach_space = reach_space;
+        site_lfp.trials(t).hndspc_lbl  = hs_label;
+              
         
-        %                 % assign hand-space for the trial
-        %                 if strcmp(site_lfp.ref_hemisphere, reach_space)
-        %                      if strcmp(site_lfp.ref_hemisphere, reach_hand)
-        %                         hs_label = 'IH IS';
-        %                     else
-        %                         hs_label = 'CH IS';
-        %                     end
-        %                 else
-        %                     if strcmp(site_lfp.ref_hemisphere, reach_hand)
-        %                         hs_label = 'IH CS';
-        %                     else
-        %                         hs_label = 'CH CS';
-        %                     end
-        %                 end
-        
-        % check if this kind of labeling is required
-        %                 if reach_hand == 'R' && reach_space == 'R'
-        %                     hs_label = 'RH RS';
-        %                 elseif reach_hand == 'R' && reach_space == 'L'
-        %                     hs_label = 'RH LS';
-        %                 elseif reach_hand == 'L' && reach_space == 'R'
-        %                     hs_label = 'LH RS';
-        %                 elseif reach_hand == 'L' && reach_space == 'L'
-        %                     hs_label = 'LH LS';
-        %                 end
-        
+        %% retrieve LFP data
         
         start_time = (sites(i).trial(t).TDT_LFPx_tStart); % trial start time
         fs = sites(i).trial(t).TDT_LFPx_SR; % sample rate
@@ -201,24 +166,28 @@ for i = 1:length(sites)
         ts = (1/fs); % sample time
         nsamples = numel(LFP);
         end_time = start_time + (ts*(nsamples-1));
-        timestamps = linspace(start_time, end_time, nsamples);
+        timestamps = linspace(start_time, end_time, nsamples);        
+        
+        site_lfp.trials(t).lfp_data    = LFP;
+        site_lfp.trials(t).time        = timestamps;
+        site_lfp.trials(t).fsample     = fs;
+        site_lfp.trials(t).tsample     = ts;
         
         % save retrieved data into struct
-        site_lfp.trials(t).completed = completed;
-        site_lfp.trials(t).success = success;
-        site_lfp.trials(t).type = type;
-        site_lfp.trials(t).effector = effector;
-        site_lfp.trials(t).run = run;
-        site_lfp.trials(t).block = block;
-        site_lfp.trials(t).choice_trial = choice_trial;
-        site_lfp.trials(t).lfp_data = LFP;
-        site_lfp.trials(t).time = timestamps;
-        site_lfp.trials(t).fsample  = fs;
-        site_lfp.trials(t).tsample = ts;
-        site_lfp.trials(t).reach_hand  = reach_hand;
-        site_lfp.trials(t).reach_space  = reach_space;
-        site_lfp.trials(t).hndspc_lbl  = hs_label;
+                
+        perturbation = sites(i).trial(t).perturbation; % 0 = control
+        if isnan(perturbation)
+            perturbation = 0;
+        end        
         site_lfp.trials(t).perturbation  = perturbation;
+        site_lfp.trials(t).completed    = sites(i).trial(t).completed;
+        site_lfp.trials(t).success      = sites(i).trial(t).success;
+        site_lfp.trials(t).type         = sites(i).trial(t).type;
+        site_lfp.trials(t).effector     = sites(i).trial(t).effector;
+        site_lfp.trials(t).run          = sites(i).trial(t).run;
+        site_lfp.trials(t).block        = sites(i).trial(t).block;
+        site_lfp.trials(t).choice_trial = sites(i).trial(t).choice;
+                
         % flag to mark noisy trials, default False, filled in by
         % lfp_tfa_reject_noisy_lfp.m
         site_lfp.trials(t).noisy = 0;
@@ -240,7 +209,6 @@ for i = 1:length(sites)
             site_lfp.trials(t).states(s).onset_t  = state_onset;
             site_lfp.trials(t).states(s).onset_s  = state_onset_sample;
         end
-        %end
         
         trial_start_t = site_lfp.trials(t).states(...
             [site_lfp.trials(t).states.id] == ...
@@ -252,9 +220,6 @@ for i = 1:length(sites)
             lfp_tfa_cfg.trialinfo.ref_tend;
         site_lfp.trials(t).trialperiod = [trial_start_t, ...
             trial_end_t];
-        
-        
-        % end
     end
     
     %%% Noise rejection - should this be included within processing check this? %%%

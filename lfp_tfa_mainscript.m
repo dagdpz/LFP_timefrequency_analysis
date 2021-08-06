@@ -9,7 +9,8 @@ clear;
 % file containing settings for LFP analysis
 % should have the same format as settings/lfp_tfa_settings_example.m
 %   settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\PPC_pulv_eye_hand\Linus\Linus_dPul_LIP_inactivation_combined.m';
-   settings_filepath = 'C:\Users\lschneider\GitHub\Settings\LFP_time_frequency_analysis\Pulv_eye_hand\Interleaved\lfp_tfa_settings.m';
+   %settings_filepath = 'C:\Users\lschneider\GitHub\Settings\LFP_time_frequency_analysis\Pulv_eye_hand\Interleaved\lfp_tfa_settings.m';
+   settings_filepath = 'C:\Users\lschneider\GitHub\Settings\LFP_time_frequency_analysis\Pulv_oculomotor\paper\lfp_tfa_settings.m';
 
 %% INITIALIZATION
 close all;
@@ -259,11 +260,11 @@ end
 
 %% Average across sessions
 %% do monkey separation or combination here!?
-lfp_tfa_cfg.monkeys={'Lin','Fla'};
+
 for m=1:numel(lfp_tfa_cfg.monkeys)
     if isempty(lfp_tfa_cfg.monkeys{m}) %combined
         lfp_tfa_cfg.monkey='';
-        m_idx=trues(size(sessions_info));
+        m_idx=true(size(sessions_info));
     else
         lfp_tfa_cfg.monkey=[lfp_tfa_cfg.monkeys{m} '_'];
         m_idx=ismember({sessions_info.Monkey},lfp_tfa_cfg.monkeys{m});

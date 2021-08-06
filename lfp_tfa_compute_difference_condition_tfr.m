@@ -325,7 +325,7 @@ for i = 1:length(diff_condition)/2
                     for st = 1:size(lfp_tfr(d).hs_tuned_tfs, 1) %st is windows here
                         %calculate difference between same hands,
                         %opposite space condition
-                        if ismember(lfp_tfr(d).cfg_condition.effector,[0 2 3 4 6])
+                        if ismember(lfp_tfr(d).cfg_condition.effector,[1 2 3 4 6])
                             
                             ntimebins_CH = min([size(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm, 3)...
                                 size(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm, 3)]);

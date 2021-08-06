@@ -78,7 +78,7 @@ for t = 1:length(trials_lfp)
     onset_timestamp = state_evoked_lfp.lfp_time(...
         abs(state_evoked_lfp.lfp_time) == min(abs(state_evoked_lfp.lfp_time)));
     state_evoked_lfp.lfp_time = state_evoked_lfp.lfp_time - ...
-        onset_timestamp;
+        onset_timestamp(1); %% LS2021 funny error here: +/- the exact same number when running pulv_oculomotor
 
 end
 

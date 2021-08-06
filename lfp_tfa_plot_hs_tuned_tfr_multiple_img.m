@@ -73,6 +73,7 @@ noffset = 100;
 nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
 nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
 
+states_valid=[];
 % loop through handspace
 for hs = 1:size(avg_tfr, 2)
     % check if no trials exist for this condition and HS
@@ -95,11 +96,6 @@ for hs = 1:size(avg_tfr, 2)
         
         state_info = struct();
         for st = 1:size(avg_tfr, 1)
-            %% LS 2021
-            if isempty(avg_tfr(st, hs).freq)
-                %%
-                continue;
-            end
             % state timing information
             % state onset sample number
             state_info(st).onset_s = find(...
@@ -132,11 +128,17 @@ for hs = 1:size(avg_tfr, 2)
             concat_states_tfs.state_time = [concat_states_tfs.state_time, ...
                 avg_tfr(st, hs).freq.time, nan(1, 100/25)];
             
+            %% LS 2021
+            if ~all(isnan(avg_tfr(st, hs).freq.time))
+                states_valid=[states_valid st];
+            end
+            avg_tfr(st, hs).freq.powspctrm(isnan(avg_tfr(st, hs).freq.powspctrm))=0;
             
             state_lfp_powspctrm = nanmean(avg_tfr(st, hs).freq.powspctrm, 1);
             if plot_significant && ...
                     isfield(avg_tfr(st, hs).freq, 'stat_test') && ...
                     ~isempty(avg_tfr(st, hs).freq.stat_test.h)
+                avg_tfr(st, hs).freq.stat_test.h(isnan(avg_tfr(st, hs).freq.stat_test.h))=0;
                 state_lfp_powspctrm = state_lfp_powspctrm .* ...
                     avg_tfr(st, hs).freq.stat_test.h;
             end
@@ -156,13 +158,12 @@ for hs = 1:size(avg_tfr, 2)
                 line([state_info(st).start_s state_info(st).finish_s], ...
                     [f_idx f_idx], 'color', 'k', 'linestyle', '--');
                 fbandstart_idx(fbandstart == f) = f_idx;
-            end
-            
-            
+            end            
         end
         concat_states_tfs.time = 1:1:size(concat_states_tfs.powspctrm, 3);
         state_onsets = find(concat_states_tfs.state_time == 0);
-        % states_valid=find(~cellfun(@isempty,{avg_tfr(:, hs).state})); %% LS 2021
+        % states_valid=find(~cellfun(@isempty,{avg_tfr(:, hs).freq})); %% LS 2021
+        states_names={avg_tfr(states_valid, hs).state_name}; %% LS 2021
         state_samples = sort([state_info.start_s, state_info.onset_s, ...
             state_info.finish_s]);
         
@@ -178,32 +179,22 @@ for hs = 1:size(avg_tfr, 2)
         set(gca, 'ytick', (fbandstart_idx));
         set(gca, 'yticklabel', fbandstart);
         %round(concat_states_tfs.freq([1:8:numel(concat_states_tfs.freq)])));
-        % add 0.5 at end since the time value is the center of the bin
-        % add 0 at beginning to make x-axis visible
-        set(gca, 'ylim', [0 numel(avg_tfr(st, hs).freq.freq) + 0.5]);
-        % mark state onsets
-        set(gca,'xtick',state_samples)
         for so = state_onsets
             line([so so], ylim, 'color', 'k');
             if isfield(avg_tfr(state_onsets == so, hs), 'state_name') && ...
-                    ~isempty(avg_tfr(state_onsets == so, hs).state_name)
-                state_name = avg_tfr(state_onsets == so, hs).state_name;
+                    ~isempty(states_names(state_onsets == so))
+                state_name = states_names{state_onsets == so};
                 text(so+1, 10, state_name, 'fontsize', 8);
             end
         end
         
-        %         for si = 1:numel(state_onsets)  %%LS very temporary solution here to have a lable even if we dont have any values for the window...
-        %             so=state_onsets(si);
-        %
-        %             line([so so], ylim, 'color', 'k');
-        %             if isfield(avg_tfr(state_onsets == so, hs), 'state_name') && ...
-        %                     ~isempty(avg_tfr(states_valid(si), hs).state_name)
-        %                 state_name = avg_tfr(states_valid(si), hs).state_name;
-        %                 text(so+1, 10, state_name, 'fontsize', 8);
-        %             end
-        %         end
-        
-        set(gca,'xticklabels', round(concat_states_tfs.state_time(state_samples), 1), 'fontsize', 8)
+        % add 0.5 at end since the time value is the center of the bin
+        % add 0 at beginning to make x-axis visible
+        set(gca, 'ylim', [0 numel(avg_tfr(st, hs).freq.freq) + 0.5]);
+        % mark state onsets
+        state_ticks=round(concat_states_tfs.state_time(state_samples), 1);
+        set(gca,'xtick',state_samples(~isnan(state_ticks)))
+        set(gca,'xticklabels', state_ticks(~isnan(state_ticks)), 'fontsize', 8)
         set(gca, 'xticklabelrotation', 45)
         % add 0.5 since the time value is the center of the bin
         % add 0 at the beginning to make the y-axis visible
@@ -220,7 +211,6 @@ for hs = 1:size(avg_tfr, 2)
             subplottitle = [subplottitle ' (ntrials = ' num2str(avg_tfr(1, hs).ntrials) ')'];
         end
         title(subplottitle);
-        %line([0 0], ylim, 'color', 'k');
         
         %change aspect ration if only 2 conditions
         if size(avg_tfr, 2) < 3
@@ -241,14 +231,8 @@ if nargin > 4
     cm = colormap(varargin{1});
     colorbar;
 end
-% white separation between two state windows - commented since there is
-% a new method for separating windows - test and remove
-%cm(1,:,:) = [1,1,1];
 colormap(cm);
 
-
-
-%export_fig(h, results_file);
 fig_formats = {'png'}; %default
 if isfield(lfp_tfa_cfg, 'save_fig_format') && ~isempty(lfp_tfa_cfg.save_fig_format)
     fig_formats = lfp_tfa_cfg.save_fig_format;

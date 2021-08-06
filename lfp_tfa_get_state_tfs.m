@@ -81,13 +81,6 @@ for t = find(cond_trials)
         state_id).onset_t + state_ref_tend;
     % sampling frequency
     fs = site_lfp.trials(t).fsample;
-%     %remove this trial is the state time info is not defined (e.g saccades
-%     %not detected)
-%     if isnan(state_start_t) || isnan(state_end_t)
-%         cond_trials(t) = 0;
-%         continue
-%     end
-
     % crop the tfs for this state
     state_tfs.powspctrm = [state_tfs.powspctrm, ...
         site_lfp.trials(t).tfs.powspctrm(1, :, ...
