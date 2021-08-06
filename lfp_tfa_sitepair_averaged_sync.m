@@ -244,8 +244,8 @@ function [sitepair_sync] = lfp_tfa_sitepair_averaged_sync( sitepair_crosspow, si
                     lfp_tfa_cfg.ref_hemisphere, site_conditions(cn).label);
                 result_file = fullfile(sitepair_results_folder, ...
                     ['LFP-LFP_Sync_' sitepair_sync.sites{1} '-' sitepair_sync.sites{2} '_condition' num2str(cn) ]); %site_conditions(cn).label
-                lfp_tfa_plot_hs_tuned_sync(sitepair_sync.condition(cn).hs_tuned_sync, ...
-                    lfp_tfa_cfg, plottitle, result_file, 'imscale', [0, 1]);
+%                 lfp_tfa_plot_hs_tuned_sync(sitepair_sync.condition(cn).hs_tuned_sync, ...
+%                     lfp_tfa_cfg, plottitle, result_file, 'imscale', [0, 1]);
             end
 
         end

@@ -46,6 +46,9 @@ end
 % lfp_tfa_cfg.session_info, remains the same
 lfp_tfa_cfg.compute_site_average = false;
 
+%wheter to plot site_wise averages
+lfp_tfa_cfg.plot_site_average = false;
+
 % folder where the results of analysed LFP site averages are stored
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average

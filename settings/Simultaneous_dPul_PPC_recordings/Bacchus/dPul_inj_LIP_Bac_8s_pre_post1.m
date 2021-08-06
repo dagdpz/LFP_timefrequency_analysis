@@ -44,7 +44,7 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = false;
+lfp_tfa_cfg.compute_site_average = true;
 
 %wheter to plot site_wise averages
 lfp_tfa_cfg.plot_site_average = false;
@@ -106,7 +106,7 @@ lfp_tfa_cfg.use_datasets = [10];
             'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201203\sites_Bacchus_20201203.mat', ...
             'Preinj_blocks',  0, ...
             'Postinj_blocks', 2);
-       
+%        
         lfp_tfa_cfg.session_info(5) = ...
     struct('Monkey',        'Bac', ...
            'Date',          '20201217', ...
@@ -536,7 +536,7 @@ lfp_tfa_cfg.noise.plottrials = 0;
 % onset as the reference state for baseline period
 % 2. lfp_tfa_cfg.baseline_ref_state = ''; consider the whole trial period
 % for baseline
-lfp_tfa_cfg.baseline_ref_state = ''; 
+lfp_tfa_cfg.baseline_ref_state = lfp_tfa_states.CUE_ON; 
 
 % period of interest relative to onset of baseline_ref_state for baseline power calculation, 
 % Examples: 
@@ -550,7 +550,7 @@ lfp_tfa_cfg.baseline_ref_state = '';
 if isempty(lfp_tfa_cfg.baseline_ref_state)
 	lfp_tfa_cfg.baseline_ref_period = 'trial';
 else
-	lfp_tfa_cfg.baseline_ref_period = []; % SET LIMITS OF baseline_ref_period here
+	lfp_tfa_cfg.baseline_ref_period = [-0.5 0]; % SET LIMITS OF baseline_ref_period here
 end
 
 % which perturbation blocks to be considered for baseline power calculation
@@ -564,14 +564,15 @@ end
 % 0 (pre-injection) and 2 (post-injection), but is not recommended
 % 3. lfp_tfa_cfg.baseline_perturbation = [2, 3]; combines perturbation blocks
 % 2 and 3
-% if -1, baseline is calculated separetly for each perturbation group
 
-% if length(lfp_tfa_cfg.compare.perturbations) == 1
-%     lfp_tfa_cfg.baseline_perturbation = lfp_tfa_cfg.compare.perturbations;
-% else
-%     lfp_tfa_cfg.baseline_perturbation = 0; % set the perturbation block(s) to be used for computing baseline
-% end
-lfp_tfa_cfg.baseline_perturbation = -1;
+
+if length(lfp_tfa_cfg.compare.perturbations) == 1
+    lfp_tfa_cfg.baseline_perturbation = lfp_tfa_cfg.compare.perturbations;
+else
+    lfp_tfa_cfg.baseline_perturbation = 0; % set the perturbation block(s) to be used for computing baseline
+end
+% if -1, baseline is calculated separetly for each perturbation group
+ lfp_tfa_cfg.baseline_perturbation = -1;
 
 % whether to consider choice (1) or instructed trials (0) in baseline power
 % calculation 
@@ -598,9 +599,10 @@ end
 % P_norm(t,f) = (P(t, f) - mu_P(f))
 % 'division' - relative increase in power w.r.t. the baseline
 % P_norm(t,f) = (P(t, f)) / (mu_P(f))
+
 % Example:
 % lfp_tfa_cfg.baseline_method = 'relchange';
-lfp_tfa_cfg.baseline_method = 'zscore';
+lfp_tfa_cfg.baseline_method = 'relchange';
 
 % flag to indicate if LFP TFR average should be computed - for future use
 % Set to 0 if LFP TFR average should not be computed, else set to 1

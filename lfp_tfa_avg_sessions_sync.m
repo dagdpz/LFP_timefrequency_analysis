@@ -215,7 +215,7 @@ function [results_fldr, sessions_avg] = lfp_tfa_avg_sessions_sync(sessions_info,
                         sprintf('%s-%s_%s', lfp_tfa_cfg.compare.target_pairs{t}{:}, ...
                         sessions_avg(t).condition(cn).label));
                     lfp_tfa_plot_hs_tuned_sync(sessions_avg(t).condition(cn).hs_tuned_sync, ...
-                        lfp_tfa_cfg, plottitle, result_file, 'imscale', [0, 1]);
+                        lfp_tfa_cfg, plottitle, result_file, 'imscale', [0, 0.3]);
                 end
             end        
         end
