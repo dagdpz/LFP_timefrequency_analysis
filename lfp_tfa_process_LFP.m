@@ -228,9 +228,14 @@ for i = 1:length(sites)
     %% Time frequency spectrogram calculation
     site_lfp = lfp_tfa_compute_site_tfr( site_lfp, lfp_tfa_cfg );
     
-    % exclude non-completed!
+    % exclude non-completed and non-desired condistions! LS 2021
     completed=[site_lfp.trials.completed]==1;
-    [site_lfp.trials]=site_lfp.trials(completed);
+    to_keep=completed & ismember([site_lfp.trials.choice_trial],lfp_tfa_cfg.compare.choice_trials) & ismember([site_lfp.trials.effector],lfp_tfa_cfg.compare.effectors) & ismember([site_lfp.trials.type],lfp_tfa_cfg.compare.types);
+    if ~any(to_keep)
+        continue;
+    end
+    
+    [site_lfp.trials]=site_lfp.trials(to_keep);
     
     % Noise rejection
     site_lfp = lfp_tfa_reject_noisy_lfp_trials( site_lfp, lfp_tfa_cfg.noise );

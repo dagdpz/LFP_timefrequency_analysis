@@ -383,8 +383,8 @@ for i = 1:length(diff_condition)/2
                                 size(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm, 3)]);
                             
                             if isfield(lfp_tfr(d).hs_tuned_tfs, 'ntrials')
-                                diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.powspctrm = nanmean(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm(:,:,1:ntimebins_space))...
-                                    - nanmean(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm(:,:,1:ntimebins_space));
+                                diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.powspctrm = nanmean(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm(:,:,1:ntimebins_space),1)...
+                                    - nanmean(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm(:,:,1:ntimebins_space),1);
                                 
                                 
                             else
