@@ -44,7 +44,7 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = true;
+lfp_tfa_cfg.compute_site_average = false;
 
 %wheter to plot site_wise averages
 lfp_tfa_cfg.plot_site_average = false;
@@ -159,7 +159,7 @@ lfp_tfa_cfg.use_datasets = [10];
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'tfs'}; %
+lfp_tfa_cfg.analyses = {'evoked'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -354,10 +354,10 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 %    'choice', {0, 1}}};
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
-lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
+% lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
- lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
- lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}}};
+%  lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
+ lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
  % lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
   % 'reach_spaces', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
@@ -572,7 +572,7 @@ else
     lfp_tfa_cfg.baseline_perturbation = 0; % set the perturbation block(s) to be used for computing baseline
 end
 % if -1, baseline is calculated separetly for each perturbation group
- lfp_tfa_cfg.baseline_perturbation = -1;
+%  lfp_tfa_cfg.baseline_perturbation = -1;
 
 % whether to consider choice (1) or instructed trials (0) in baseline power
 % calculation 
@@ -652,7 +652,7 @@ lfp_tfa_cfg.fdr_method = 'pdep';
 
 % Set to true (1) for plotting only the significant difference
 % between site averages, false (0) otherwise
-lfp_tfa_cfg.plot_significant = 0;
+lfp_tfa_cfg.plot_significant = 1;
 
 %% settings for saving figures
 
