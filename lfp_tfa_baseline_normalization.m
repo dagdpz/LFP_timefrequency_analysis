@@ -45,6 +45,7 @@ function [ lfp_tfr_normalized ] = lfp_tfa_baseline_normalization( raw_tfs, cfg_b
         lfp_tfr_normalized = (raw_tfs - repmat(base_mean, ...
             [size(raw_tfs, 1) 1 size(raw_tfs, 3)])) ./ repmat(base_std, ...
             [size(raw_tfs, 1) 1 size(raw_tfs, 3)]);
+        
     end
 
 end

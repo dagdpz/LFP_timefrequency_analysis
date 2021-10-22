@@ -142,19 +142,19 @@ for i = 1:length(states_lfp)
             % of trials for all conditions
             if sum(cond_trials) < lfp_tfa_cfg.mintrials_percondition
                 sites_tfr(i).use_for_avg = 0;
-            end 
+            end
             % loop through states to analyse
             
             for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
                 
                 if strcmp(lfp_tfa_cfg.analyse_states{st, 1}, 'combined')
                     state_tfs = lfp_tfa_get_combined_tfs(states_lfp(i), ...
-                        cond_trials, lfp_tfa_cfg.analyse_states(st, :), lfp_tfa_cfg);
+                        cond_trials, lfp_tfa_cfg.analyse_states(st, :), lfp_tfa_cfg, site_conditions(cn).perturbation);
                 end
                 
                 if strcmp(lfp_tfa_cfg.analyse_states{st, 1}, 'single')
                     state_tfs = lfp_tfa_get_state_tfs(states_lfp(i), ...
-                        cond_trials, lfp_tfa_cfg.analyse_states(st, :), lfp_tfa_cfg);
+                        cond_trials, lfp_tfa_cfg.analyse_states(st, :), lfp_tfa_cfg, site_conditions(cn).perturbation);
                 end
                 
                 if ~isempty(state_tfs.powspctrm)
@@ -198,10 +198,12 @@ for i = 1:length(states_lfp)
                 plottitle = [plottitle 'Choice trials'];
             end
             
-            result_file = fullfile(site_results_folder, ...
-                ['LFP_TFR_' sites_tfr(i).site_ID '_' site_conditions(cn).label ]);
-            %                 lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
-            %                     lfp_tfa_cfg, plottitle, result_file);
+            if lfp_tfa_cfg.plot_site_average
+                result_file = fullfile(site_results_folder, ...
+                    ['LFP_TFR_' sites_tfr(i).site_ID '_' site_conditions(cn).label ]);
+                lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).condition(cn).hs_tuned_tfs, ...
+                    lfp_tfa_cfg, plottitle, result_file);
+            end
         end
         
     end
@@ -213,37 +215,38 @@ for i = 1:length(states_lfp)
         sites_tfr(i).difference = [sites_tfr(i).difference, ...
             lfp_tfa_compute_difference_condition_tfr(sites_tfr(i).condition, diff_condition)];
     end
-% Plot TFR difference
-for dcn = 1:length(sites_tfr(i).difference)
-    if ~isempty(fieldnames(sites_tfr(i).difference(dcn).hs_tuned_tfs))
-        plottitle = [' Target ' ...
-            sites_tfr(i).target, ' (ref_', lfp_tfa_cfg.ref_hemisphere, ...
-            '), Site ', sites_tfr(i).site_ID ...
-            sites_tfr(i).difference(dcn).label ];
-        %                     if sites_tfr(i).difference(dcn).cfg_condition.choice == 0
-        %                         plottitle = [plottitle ', Instructed trials'];
-        %                     else
-        %                         plottitle = [plottitle ', Choice trials'];
-        %                     end
-        
-        result_file = fullfile(site_results_folder, ...
-            ['LFP_DiffTFR_' sites_tfr(i).site_ID '_' ...
-            'diff_condition' num2str(dcn) ]);%sites_tfr(i).difference(dcn).label '.png']);
-        lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).difference(dcn).hs_tuned_tfs, ...
-            lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
+    % Plot TFR difference
+    for dcn = 1:length(sites_tfr(i).difference)
+        if ~isempty(fieldnames(sites_tfr(i).difference(dcn).hs_tuned_tfs))
+            plottitle = [' Target ' ...
+                sites_tfr(i).target, ' (ref_', lfp_tfa_cfg.ref_hemisphere, ...
+                '), Site ', sites_tfr(i).site_ID ...
+                sites_tfr(i).difference(dcn).label ];
+            %                     if sites_tfr(i).difference(dcn).cfg_condition.choice == 0
+            %                         plottitle = [plottitle ', Instructed trials'];
+            %                     else
+            %                         plottitle = [plottitle ', Choice trials'];
+            %                     end
+            if lfp_tfa_cfg.plot_site_average
+                result_file = fullfile(site_results_folder, ...
+                    ['LFP_DiffTFR_' sites_tfr(i).site_ID '_' ...
+                    'diff_condition' num2str(dcn) ]);%sites_tfr(i).difference(dcn).label '.png']);
+                lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_tfr(i).difference(dcn).hs_tuned_tfs, ...
+                    lfp_tfa_cfg, plottitle, result_file, 'bluewhitered');
+            end
+        end
     end
-end
-%end
-
-% save mat file for each site
-site_tfr = sites_tfr(i);
-save(fullfile(site_results_folder, ...
-    ['LFP_TFR_' site_tfr.site_ID '.mat']), 'site_tfr');
-% save into a mother struct
-session_tfs.sites(i) = site_tfr;
-
-close all;
-
+    %end
+    
+    % save mat file for each site
+    site_tfr = sites_tfr(i);
+    save(fullfile(site_results_folder, ...
+        ['LFP_TFR_' site_tfr.site_ID '.mat']), 'site_tfr');
+    % save into a mother struct
+    session_tfs.sites(i) = site_tfr;
+    
+    close all;
+    
 end
 
 

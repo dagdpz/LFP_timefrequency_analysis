@@ -245,7 +245,7 @@ for i = 1:length(diff_condition)/2
             
         elseif strcmp(compare.field, 'reach_hands') || strcmp(compare.field, 'reach_spaces') % need to average same hand or same space for each lfp_tfr(d), then do the difference between the 2 averages
             
-             
+            
             for d = 1:length(lfp_tfr)
                 diff_tfr.difference(d) = lfp_tfr(d);
                 if strcmp(compare.field, 'reach_hands')
@@ -268,7 +268,7 @@ for i = 1:length(diff_condition)/2
                                 - nanmean(lfp_tfr(d).hs_tuned_tfs(st,3).freq.powspctrm(:,:,1:ntimebins_CS));
                             diff_tfr.difference(d).hs_tuned_tfs(st, 2).freq.powspctrm = nanmean(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm(:,:,1:ntimebins_IS))...
                                 - nanmean(lfp_tfr(d).hs_tuned_tfs(st,4).freq.powspctrm(:,:,1:ntimebins_IS));
-
+                            
                             
                         else
                             
@@ -325,55 +325,106 @@ for i = 1:length(diff_condition)/2
                     for st = 1:size(lfp_tfr(d).hs_tuned_tfs, 1) %st is windows here
                         %calculate difference between same hands,
                         %opposite space condition
-                        ntimebins_CH = min([size(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm, 3)...
-                            size(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm, 3)]);
-                        ntimebins_IH = min([size(lfp_tfr(d).hs_tuned_tfs(st,3).freq.powspctrm, 3)...
-                            size(lfp_tfr(d).hs_tuned_tfs(st,4).freq.powspctrm, 3)]);
-                        
-                        
-                        if isfield(lfp_tfr(d).hs_tuned_tfs, 'ntrials')
-                            diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.powspctrm = nanmean(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm(:,:,1:ntimebins_CH))...
-                                - nanmean(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm(:,:,1:ntimebins_CH));
-                            diff_tfr.difference(d).hs_tuned_tfs(st, 2).freq.powspctrm = nanmean(lfp_tfr(d).hs_tuned_tfs(st,3).freq.powspctrm(:,:,1: ntimebins_IH))...
-                                - nanmean(lfp_tfr(d).hs_tuned_tfs(st,4).freq.powspctrm(:,:,1: ntimebins_IH));
+                        if lfp_tfr(d).cfg_condition.effector == 3 || lfp_tfr(d).cfg_condition.effector == 4
                             
-                        else
-                            diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.powspctrm = lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm(:,:,1:ntimebins_CH)...
-                                - lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm(:,:,1:ntimebins_CH);
-                            diff_tfr.difference(d).hs_tuned_tfs(st, 2).freq.powspctrm = lfp_tfr(d).hs_tuned_tfs(st,3).freq.powspctrm(:,:,1: ntimebins_IH)...
-                                - lfp_tfr(d).hs_tuned_tfs(st,4).freq.powspctrm(:,:,1: ntimebins_IH);
-                        end
-                        %change hand space label
-                        diff_tfr.difference(d).hs_tuned_tfs(st, 1).hs_label = {'CHCS - CHIS'};
-                        diff_tfr.difference(d).hs_tuned_tfs(st, 2).hs_label = {'IHCS - IHIS'};
-                        %empty other hand space condition since not needed
-                        %here
-                        diff_tfr.difference(d).hs_tuned_tfs(st,3).freq.powspctrm = [];
-                        diff_tfr.difference(d).hs_tuned_tfs(st,3).freq.time = [];
-                        diff_tfr.difference(d).hs_tuned_tfs(st,3).freq.freq = [];
-                        diff_tfr.difference(d).hs_tuned_tfs(st,4).freq.powspctrm = [];
-                        diff_tfr.difference(d).hs_tuned_tfs(st,4).freq.time = [];
-                        diff_tfr.difference(d).hs_tuned_tfs(st,4).freq.freq = [];
-                        
-                        
-                        if stat_test == true
-                            for hs = 1:2
-                                % paired ttest
-                                [~, p] = ttest(...
-                                    diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.powspctrm);
-                                % multiple comparison correction
-                                if strcmp(lfp_tfa_cfg.correction_method,'FDR');
-                                    [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p, fd_rate,...
-                                        fdr_method, 'yes');
-                                    diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.h = h;
-                                    diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.crit_p = crit_p;
-                                    diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.adj_ci_cvrg = adj_ci_cvrg;
-                                    diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.adj_p = adj_p;
-                                elseif strcmp(lfp_tfa_cfg.correction_method,'Bonferroni');
-                                    corrected_p_val_sig = 0.05/size(lfp_tfr(d).hs_tuned_tfs(st,hs).freq.powspctrm,1);
-                                    diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.h = p < corrected_p_val_sig;
+                            ntimebins_CH = min([size(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm, 3)...
+                                size(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm, 3)]);
+                            ntimebins_IH = min([size(lfp_tfr(d).hs_tuned_tfs(st,3).freq.powspctrm, 3)...
+                                size(lfp_tfr(d).hs_tuned_tfs(st,4).freq.powspctrm, 3)]);
+                            
+                            
+                            if isfield(lfp_tfr(d).hs_tuned_tfs, 'ntrials')
+                                diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.powspctrm = nanmean(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm(:,:,1:ntimebins_CH))...
+                                    - nanmean(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm(:,:,1:ntimebins_CH));
+                                diff_tfr.difference(d).hs_tuned_tfs(st, 2).freq.powspctrm = nanmean(lfp_tfr(d).hs_tuned_tfs(st,3).freq.powspctrm(:,:,1: ntimebins_IH))...
+                                    - nanmean(lfp_tfr(d).hs_tuned_tfs(st,4).freq.powspctrm(:,:,1: ntimebins_IH));
+                                
+                            else
+                                diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.powspctrm = lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm(:,:,1:ntimebins_CH)...
+                                    - lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm(:,:,1:ntimebins_CH);
+                                diff_tfr.difference(d).hs_tuned_tfs(st, 2).freq.powspctrm = lfp_tfr(d).hs_tuned_tfs(st,3).freq.powspctrm(:,:,1: ntimebins_IH)...
+                                    - lfp_tfr(d).hs_tuned_tfs(st,4).freq.powspctrm(:,:,1: ntimebins_IH);
+                            end
+                            %change hand space label
+                            diff_tfr.difference(d).hs_tuned_tfs(st, 1).hs_label = {'CHCS - CHIS'};
+                            diff_tfr.difference(d).hs_tuned_tfs(st, 2).hs_label = {'IHCS - IHIS'};
+                            %empty other hand space condition since not needed
+                            %here
+                            diff_tfr.difference(d).hs_tuned_tfs(st,3).freq.powspctrm = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,3).freq.time = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,3).freq.freq = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,4).freq.powspctrm = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,4).freq.time = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,4).freq.freq = [];
+                            
+                            
+                            if stat_test == true
+                                for hs = 1:2
+                                    % paired ttest
+                                    [~, p] = ttest(...
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.powspctrm);
+                                    % multiple comparison correction
+                                    if strcmp(lfp_tfa_cfg.correction_method,'FDR');
+                                        [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p, fd_rate,...
+                                            fdr_method, 'yes');
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.h = h;
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.crit_p = crit_p;
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.adj_ci_cvrg = adj_ci_cvrg;
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.adj_p = adj_p;
+                                    elseif strcmp(lfp_tfa_cfg.correction_method,'Bonferroni');
+                                        corrected_p_val_sig = 0.05/size(lfp_tfr(d).hs_tuned_tfs(st,hs).freq.powspctrm,1);
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.h = p < corrected_p_val_sig;
+                                    end
+                                    
                                 end
                             end
+                        elseif lfp_tfr(d).cfg_condition.effector == 0
+                            ntimebins_space = min([size(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm, 3)...
+                                size(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm, 3)]);
+                            
+                            if isfield(lfp_tfr(d).hs_tuned_tfs, 'ntrials')
+                                diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.powspctrm = nanmean(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm(:,:,1:ntimebins_space))...
+                                    - nanmean(lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm(:,:,1:ntimebins_space));
+                                
+                                
+                            else
+                                diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.powspctrm = lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm(:,:,1:ntimebins_space)...
+                                    - lfp_tfr(d).hs_tuned_tfs(st,2).freq.powspctrm(:,:,1:ntimebins_space);
+                               
+                            end
+                             %change hand space label
+                            diff_tfr.difference(d).hs_tuned_tfs(st, 1).hs_label = {'anyH_CS - anyH_IS'};
+                                   %empty other hand space condition since not needed
+                            %here
+                            diff_tfr.difference(d).hs_tuned_tfs(st,2).freq.powspctrm = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,2).freq.time = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,2).freq.freq = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,2).freq.powspctrm = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,2).freq.time = [];
+                            diff_tfr.difference(d).hs_tuned_tfs(st,2).freq.freq = []; 
+                            
+                               if stat_test == true
+                                
+                                    % paired ttest
+                                    [~, p] = ttest(...
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.powspctrm);
+                                    % multiple comparison correction
+                                    if strcmp(lfp_tfa_cfg.correction_method,'FDR');
+                                        [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p, fd_rate,...
+                                            fdr_method, 'yes');
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.stat_test.h = h;
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.stat_test.crit_p = crit_p;
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.stat_test.adj_ci_cvrg = adj_ci_cvrg;
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.stat_test.adj_p = adj_p;
+                                    elseif strcmp(lfp_tfa_cfg.correction_method,'Bonferroni');
+                                        corrected_p_val_sig = 0.05/size(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm,1);
+                                        diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.stat_test.h = p < corrected_p_val_sig;
+                                    end
+                                    
+                                
+                            end
+                                    
+                            
                         end
                     end
                     

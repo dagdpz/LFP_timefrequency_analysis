@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'dPul_inj_LIP_Bac_20201112';
+lfp_tfa_cfg.version = 'dPul_inj_LIP_Bac_20201119';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -24,13 +24,13 @@ lfp_tfa_cfg.version = 'dPul_inj_LIP_Bac_20201112';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = true;
+lfp_tfa_cfg.process_LFP = false;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Bac_20201112\Processed LFP';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Bac_20201119\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -50,12 +50,12 @@ lfp_tfa_cfg.compute_site_average = true;
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Bac_20201112\LFP Analysis';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Bac_20201119\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
-lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201112\Bac_sorted_neurons.xls';
+lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201119\Bac_sorted_neurons.xls';
 
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
@@ -79,8 +79,8 @@ lfp_tfa_cfg.use_datasets = [10];
        
        lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Bac', ...
-           'Date',          '20201112', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201112\sites_Bacchus_20201112.mat', ...
+           'Date',          '20201119', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201119\sites_Bacchus_20201119.mat', ...
            'Preinj_blocks',  0, ...
            'Postinj_blocks', 3);
        
@@ -111,7 +111,7 @@ lfp_tfa_cfg.use_datasets = [10];
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'tfs'}; %
+lfp_tfa_cfg.analyses = {'pow','evoked'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -120,7 +120,7 @@ lfp_tfa_cfg.analyses = {'tfs'}; %
 % Those targets which are not in the analysed sessions will be ignored
 % Example:
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
-lfp_tfa_cfg.compare.targets = {'LIP_R'}; 
+lfp_tfa_cfg.compare.targets = {'LIP_R','LIP_R'}; 
 
 % target pairs to be included for LFP-LFP sychronization
 % should be a 1xN cell array of 1x2 cell array of strings which indicate

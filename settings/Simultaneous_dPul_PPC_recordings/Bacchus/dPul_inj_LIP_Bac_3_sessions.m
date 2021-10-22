@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'dPul_LIP_Bac_7_sessions_TCM';
+lfp_tfa_cfg.version = 'dPul_inj_LIP_Bac_3_sessions';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -30,7 +30,7 @@ lfp_tfa_cfg.process_LFP = false;
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_LIP_Bac_7_sessions_TCM\Processed LFP';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Bac_3_sessions\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -46,23 +46,21 @@ end
 % lfp_tfa_cfg.session_info, remains the same
 lfp_tfa_cfg.compute_site_average = false;
 
-lfp_tfa_cfg.plot_site_average = false;
-
 % folder where the results of analysed LFP site averages are stored
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Projects\PPC_pulv_eye_hand\LFP\dPul_LIP_Bac_7_sessions_TCM\LFP Analysis';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Bac_3_sessions\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
-lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_7_sessions_TCM\Bac_sorted_neurons.xls';
+lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201119\Bac_sorted_neurons.xls';
 
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
 % used for analysis
-lfp_tfa_cfg.use_datasets = [3];
+lfp_tfa_cfg.use_datasets = [10];
 
 % info about sessions to be analysed
 % should be a 1 x N struct, N = number of sessions to analyse
@@ -77,56 +75,30 @@ lfp_tfa_cfg.use_datasets = [3];
 %       specified, all post-injection blocks will be combined; if
 %       'allbutfirst', all blocks from the second post-injection block will
 %       be combined)
-lfp_tfa_cfg.session_info(1) = ...
+
+       lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Bac', ...
-           'Date',          '20200325', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200325\sites_Bacchus_20200325.mat', ...
+           'Date',          '20201119', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201119\sites_Bacchus_20201119.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', []);
-       
-       
+           'Postinj_blocks', 3);
        
        lfp_tfa_cfg.session_info(2) = ...
     struct('Monkey',        'Bac', ...
-           'Date',          '20200409', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200409\sites_Bacchus_20200409.mat', ...
+           'Date',          '20201126', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201126\sites_Bacchus_20201126.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', []);
- 
+           'Postinj_blocks', 3);
+       
        lfp_tfa_cfg.session_info(3) = ...
     struct('Monkey',        'Bac', ...
-           'Date',          '20200423', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200423\sites_Bacchus_20200423.mat', ...
+           'Date',          '20201203', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Bac_20201203\sites_Bacchus_20201203.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', []);
+           'Postinj_blocks', 3);
        
-        lfp_tfa_cfg.session_info(4) = ...
-    struct('Monkey',        'Bac', ...
-           'Date',          '20200513', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200513\sites_Bacchus_20200513.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', []);
+      
        
-        lfp_tfa_cfg.session_info(5) = ...
-    struct('Monkey',        'Bac', ...
-           'Date',          '20200522', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200522\sites_Bacchus_20200522.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', []);
-       
-         lfp_tfa_cfg.session_info(6) = ...
-    struct('Monkey',        'Bac', ...
-           'Date',          '20200530', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200530\sites_Bacchus_20200530.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', []);
-       
-       lfp_tfa_cfg.session_info(7) = ...
-    struct('Monkey',        'Bac', ...
-           'Date',          '20200619', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_LIP_Bac_20200619\sites_Bacchus_20200619.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', []);
        
        
 % To add a new session to analyse, increment the counter by 1 and add a new
@@ -152,7 +124,7 @@ lfp_tfa_cfg.session_info(1) = ...
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'sync'}; %
+lfp_tfa_cfg.analyses = {'tfs'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -161,7 +133,7 @@ lfp_tfa_cfg.analyses = {'sync'}; %
 % Those targets which are not in the analysed sessions will be ignored
 % Example:
 % 1. lfp_tfa_cfg.compare.targets = {'MIPa_R', 'MIPa_L', 'dPul_R', 'dPul_L'}; 
-lfp_tfa_cfg.compare.targets = {'dPul_R','LIP_R'}; 
+lfp_tfa_cfg.compare.targets = {'LIP_R','LIP_L'}; 
 
 % target pairs to be included for LFP-LFP sychronization
 % should be a 1xN cell array of 1x2 cell array of strings which indicate
@@ -265,7 +237,7 @@ lfp_tfa_cfg.compare.types = [4];
 % and effector = 6 separately
 % 2. lfp_tfa_cfg.compare.types = nan; Ignore effector (trials with any
 % effector value are combined)
-lfp_tfa_cfg.compare.effectors = [3];
+lfp_tfa_cfg.compare.effectors = [0];
 
 % which type of choice trials are to be included in the analysis
 % Examples:
@@ -288,7 +260,7 @@ lfp_tfa_cfg.compare.choice_trials = [0,1];
 % which reach hand is left and right separately
 % 4. lfp_tfa_cfg.compare.reach_hands = {'any'}; ignore hand label (trial with
 % any hand label is combined)
-lfp_tfa_cfg.compare.reach_hands = {'L', 'R'};
+lfp_tfa_cfg.compare.reach_hands = {'any'};
 
 % reach space to be included for analysis
 % should be a cell array that contain only values 'R', 'L', or 'any'
@@ -328,7 +300,7 @@ lfp_tfa_cfg.compare.exclude_handspace = {};
 % lfp_tfa_cfg.compare.perturbation_groups(1) separately
 % lfp_tfa_cfg.compare.perturbations = nan; combine the trials with
 % any perturbation value 
-lfp_tfa_cfg.compare.perturbations = [0]; 
+lfp_tfa_cfg.compare.perturbations = [0 1]; 
 
 % differences in conditions to be analysed
 % add new entries for further difference calculations
@@ -347,12 +319,18 @@ lfp_tfa_cfg.compare.perturbations = [0];
 %    'choice', {0, 1}}};
 % Compute difference between difference between post and pre-injection trials of choice trials and that of instructed trials     
 
-lfp_tfa_cfg.diff_condition = {};
-% lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+ lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
+%  lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
+  lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
+  lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}}};
+ lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
+    'choice', {0, 1}}};
+lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
+    'reach_spaces', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
-%     'choice', {0, 1}}};
+%     'choice', {0, 1}}};reach_hands
 
 % minimum number of trials per condition to be satisfied to consider a site
 % for averaging, if for a site, for any condition, the  number of valid 
@@ -610,9 +588,12 @@ lfp_tfa_cfg.baseline_method = 'zscore';
 % Example: lfp_tfa_cfg.compute_avg_across = 'sites'
 % Example: lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'};  compute
 % both averages across session averages and across site averages
-lfp_tfa_cfg.compute_avg_across = {'sessions', 'sites'}; 
+lfp_tfa_cfg.compute_avg_across = {'sessions','sites'}; 
 
 %% Settings for statistical test for significance of difference between TFR average across sites
+
+%Multiple comparison correction method to be used: FDR or Bonferroni
+lfp_tfa_cfg.correction_method = 'FDR';
 
 % Desired false discovery rate for multiple comparison
 % correction for statistical significance tests
@@ -633,7 +614,7 @@ lfp_tfa_cfg.fdr_method = 'pdep';
 
 % Set to true (1) for plotting only the significant difference
 % between site averages, false (0) otherwise
-lfp_tfa_cfg.plot_significant = 1;
+lfp_tfa_cfg.plot_significant = 0;
 
 %% settings for saving figures
 
