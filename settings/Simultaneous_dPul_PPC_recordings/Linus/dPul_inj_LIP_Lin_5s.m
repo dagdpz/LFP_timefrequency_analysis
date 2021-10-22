@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'dPul_control_LIP_Lin_2s_TCM';
+lfp_tfa_cfg.version = 'dPul_inj_LIP_Lin_5s';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -30,7 +30,7 @@ lfp_tfa_cfg.process_LFP = false;
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Lin_2s_TCM\Processed LFP';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Lin_4s_TCM\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -54,12 +54,12 @@ lfp_tfa_cfg.plot_site_average = false;
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Lin_2s_TCM\LFP Analysis';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Lin_5s\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
-lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Lin_20210602\Lin_sorted_neurons.xls';
+lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210901\Lin_sorted_neurons.xls';
 
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
@@ -79,21 +79,42 @@ lfp_tfa_cfg.use_datasets = [70];
 %       specified, all post-injection blocks will be combined; if
 %       'allbutfirst', all blocks from the second post-injection block will
 %       be combined)
-
-        lfp_tfa_cfg.session_info(1) = ...
+    lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Lin', ...
-           'Date',          '20210602', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Lin_20210602\sites_Linus_20210602.mat', ...
-           'Preinj_blocks',  10, ...
-           'Postinj_blocks', 12);
+           'Date',          '20210520', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210520\sites_Linus_20210520.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 3);
        
-       lfp_tfa_cfg.session_info(2) = ...
+        lfp_tfa_cfg.session_info(2) = ...
     struct('Monkey',        'Lin', ...
-           'Date',          '20210623', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Lin_20210623\sites_Linus_20210623.mat', ...
-           'Preinj_blocks',  10, ...
-           'Postinj_blocks', 12);
-   
+           'Date',          '20210610', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210610\sites_Linus_20210610.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 3);
+       
+          lfp_tfa_cfg.session_info(3) = ...
+    struct('Monkey',        'Lin', ...
+           'Date',          '20210616', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210616\sites_Linus_20210616.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 3);
+       
+       lfp_tfa_cfg.session_info(4) = ...
+    struct('Monkey',        'Lin', ...
+           'Date',          '20210709', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210709\sites_Linus_20210709.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 2);
+       
+        lfp_tfa_cfg.session_info(5) = ...
+    struct('Monkey',        'Lin', ...
+           'Date',          '20210901', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210901\sites_Linus_20210901.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 3);
+       
+        
        
       
        
@@ -321,6 +342,10 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
  %lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
  lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+ lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
+  lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
+     'reach_hands', {'L', 'R'}}};
+
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
@@ -497,7 +522,7 @@ lfp_tfa_cfg.noise.plottrials = 0;
 % onset as the reference state for baseline period
 % 2. lfp_tfa_cfg.baseline_ref_state = ''; consider the whole trial period
 % for baseline
-lfp_tfa_cfg.baseline_ref_state = lfp_tfa_states.CUE_ON;; 
+lfp_tfa_cfg.baseline_ref_state = lfp_tfa_states.CUE_ON; 
 
 % period of interest relative to onset of baseline_ref_state for baseline power calculation, 
 % Examples: 
@@ -511,7 +536,7 @@ lfp_tfa_cfg.baseline_ref_state = lfp_tfa_states.CUE_ON;;
 if isempty(lfp_tfa_cfg.baseline_ref_state)
 	lfp_tfa_cfg.baseline_ref_period = 'trial';
 else
-	lfp_tfa_cfg.baseline_ref_period = [-0.5 0]; % SET LIMITS OF baseline_ref_period here
+	lfp_tfa_cfg.baseline_ref_period = [-0.5 -0.05]; % SET LIMITS OF baseline_ref_period here
 end
 
 % which perturbation blocks to be considered for baseline power calculation
@@ -608,7 +633,7 @@ lfp_tfa_cfg.fdr_method = 'pdep';
 
 % Set to true (1) for plotting only the significant difference
 % between site averages, false (0) otherwise
-lfp_tfa_cfg.plot_significant = 0;
+lfp_tfa_cfg.plot_significant = 1;
 
 %% settings for saving figures
 

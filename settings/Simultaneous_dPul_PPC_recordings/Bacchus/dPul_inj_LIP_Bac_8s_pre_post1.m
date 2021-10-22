@@ -159,7 +159,7 @@ lfp_tfa_cfg.use_datasets = [10];
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'evoked'}; %
+lfp_tfa_cfg.analyses = {'tfs'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -356,8 +356,11 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 
 % lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
-%  lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
+ 
  lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+  lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
+  lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
+   'choice', {0, 1}}};
  % lfp_tfa_cfg.diff_condition(4) = {{'perturbation', {0, 1}, ...
   % 'reach_spaces', {'L', 'R'}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};

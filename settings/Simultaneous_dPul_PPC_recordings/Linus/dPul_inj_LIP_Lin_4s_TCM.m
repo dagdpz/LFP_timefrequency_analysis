@@ -24,7 +24,7 @@ lfp_tfa_cfg.version = 'dPul_inj_LIP_Lin_4s_TCM';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = true;
+lfp_tfa_cfg.process_LFP = false;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
@@ -44,7 +44,7 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = true;
+lfp_tfa_cfg.compute_site_average = false;
 
 %wheter to plot site_wise averages
 lfp_tfa_cfg.plot_site_average = false;
@@ -106,6 +106,13 @@ lfp_tfa_cfg.use_datasets = [70];
            'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210709\sites_Linus_20210709.mat', ...
            'Preinj_blocks',  0, ...
            'Postinj_blocks', 2);
+       
+        lfp_tfa_cfg.session_info(5) = ...
+    struct('Monkey',        'Lin', ...
+           'Date',          '20210901', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210901\sites_Linus_20210901.mat', ...
+           'Preinj_blocks',  0, ...
+           'Postinj_blocks', 3);
        
         
        

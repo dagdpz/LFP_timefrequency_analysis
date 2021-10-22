@@ -44,7 +44,7 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = true;
+lfp_tfa_cfg.compute_site_average = false;
 
 %wheter to plot site_wise averages
 lfp_tfa_cfg.plot_site_average = false;
@@ -361,12 +361,12 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 
 % lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
- %lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
- lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
- lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
+ lfp_tfa_cfg.diff_condition(1) = {{'reach_spaces', {'L', 'R'}}};
+%  lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+%  lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
- lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
-     'choice', {0, 1}}};
+%  lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
+%      'choice', {0, 1}}};
 
 % minimum number of trials per condition to be satisfied to consider a site
 % for averaging, if for a site, for any condition, the  number of valid 

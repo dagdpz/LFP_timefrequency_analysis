@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'dPul_control_LIP_Lin_2s_TCM';
+lfp_tfa_cfg.version = 'dPul_control_LIP_Lin_3s';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -30,7 +30,7 @@ lfp_tfa_cfg.process_LFP = false;
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Lin_2s_TCM\Processed LFP';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Lin_3s\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -54,12 +54,12 @@ lfp_tfa_cfg.plot_site_average = false;
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Lin_2s_TCM\LFP Analysis';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_control_LIP_Lin_3s\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
-lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Lin_20210602\Lin_sorted_neurons.xls';
+lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210901\Lin_sorted_neurons.xls';
 
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
@@ -93,7 +93,13 @@ lfp_tfa_cfg.use_datasets = [70];
            'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Lin_20210623\sites_Linus_20210623.mat', ...
            'Preinj_blocks',  10, ...
            'Postinj_blocks', 12);
-   
+       
+        lfp_tfa_cfg.session_info(3) = ...
+    struct('Monkey',        'Lin', ...
+           'Date',          '20210729', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_control_LIP_Lin_20210729\sites_Linus_20210729.mat', ...
+           'Preinj_blocks',  10, ...
+           'Postinj_blocks', 12);
        
       
        
@@ -319,8 +325,8 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 
 % lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
- %lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
- lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
+ lfp_tfa_cfg.diff_condition(1) = {{'reach_spaces', {'L', 'R'}}};
+%  lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
@@ -511,7 +517,7 @@ lfp_tfa_cfg.baseline_ref_state = lfp_tfa_states.CUE_ON;;
 if isempty(lfp_tfa_cfg.baseline_ref_state)
 	lfp_tfa_cfg.baseline_ref_period = 'trial';
 else
-	lfp_tfa_cfg.baseline_ref_period = [-0.5 0]; % SET LIMITS OF baseline_ref_period here
+	lfp_tfa_cfg.baseline_ref_period = [-0.5 -0.05]; % SET LIMITS OF baseline_ref_period here
 end
 
 % which perturbation blocks to be considered for baseline power calculation
@@ -608,7 +614,7 @@ lfp_tfa_cfg.fdr_method = 'pdep';
 
 % Set to true (1) for plotting only the significant difference
 % between site averages, false (0) otherwise
-lfp_tfa_cfg.plot_significant = 0;
+lfp_tfa_cfg.plot_significant = 1;
 
 %% settings for saving figures
 
