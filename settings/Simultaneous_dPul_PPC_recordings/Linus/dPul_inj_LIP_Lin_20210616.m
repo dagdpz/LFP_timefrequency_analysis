@@ -115,7 +115,7 @@ lfp_tfa_cfg.use_datasets = [70];
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'evoked'}; %
+lfp_tfa_cfg.analyses = {'band'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -389,6 +389,14 @@ lfp_tfa_cfg.tfr.method          = 'wavelet';
 % 1. lfp_tfa_cfg.tfr.foi = logspace(log10(2), log10(120), 60); 60 logspaced
 % frequencies from 2Hz to 120 Hz
 lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
+
+
+% define frequencies to average for the band_average analysis ([a b], every
+% frequencies between a and b averaged together for that band
+lfp_tfa_cfg.band.gamma = [32 120];
+lfp_tfa_cfg.band.beta  = [12 32];
+lfp_tfa_cfg.band.alpha = [8 12];
+lfp_tfa_cfg.band.theta = [4 8];
 
 % number of lfp samples to step for the sliding time window
 % Example:

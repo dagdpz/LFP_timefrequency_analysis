@@ -9,7 +9,7 @@ clear;
 % file containing settings for LFP analysis
 % should have the same format as settings/lfp_tfa_settings_example.m
 %   settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\PPC_pulv_eye_hand\Linus\Linus_dPul_LIP_inactivation_combined.m';
- settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\Simultaneous_dPul_PPC_recordings\Linus\dPul_inj_LIP_Lin_20211006.m';
+ settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\Simultaneous_dPul_PPC_recordings\Linus\dPul_inj_LIP_Lin_10s.m';
 
 %% INITIALIZATION
 close all;
@@ -35,6 +35,8 @@ lfp_tfr = struct();
 lfp_evoked = struct();
 % struct to store average LFP power spectrum for different conditions
 lfp_pow = struct();
+% struct to store average LFP band for different conditions
+lfp_band = struct();
 
 
 %% LFP processing
@@ -132,6 +134,22 @@ for i = 1:length(sessions_info)
             load(fullfile(sessions_info(i).lfp_tfs_results_fldr, ...
                 lfp_tfr_files(1).name), 'session_tfs');
             lfp_tfr.session(i) = session_tfs;
+        end
+    end
+    
+   if any(strcmp(lfp_tfa_cfg.analyses, 'band'))
+        % check if site-wise average needs to be computed
+        if lfp_tfa_cfg.compute_site_average
+            lfp_band.session(i) = ...
+                lfp_tfa_plot_site_band_average( session_proc_lfp, ...
+                conditions, lfp_tfa_cfg );
+        else
+            % load pre-computed results if available
+            lfp_band_files = dir(fullfile(...
+                sessions_info(i).lfp_band_results_fldr, 'LFP_band*.mat'));
+            load(fullfile(sessions_info(i).lfp_band_results_fldr, ...
+                lfp_band_files(1).name), 'session_band');
+            lfp_band.session(i) = session_band;
         end
     end
     if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))
@@ -273,6 +291,12 @@ if length(sessions_info) > 1
             lfp_evoked.sessions_avg = ...
                 lfp_tfa_avg_evoked_LFP_across_sessions(lfp_evoked, lfp_tfa_cfg);
         end
+        % LFP band average
+          if any(strcmp(lfp_tfa_cfg.analyses, 'band'))
+            lfp_band.sessions_avg = ...
+                lfp_tfa_avg_band_across_sessions(lfp_band, lfp_tfa_cfg);
+        end
+      
         % LFP spectral power
         if any(strcmp(lfp_tfa_cfg.analyses, 'pow'))
             lfp_pow.sessions_avg = ...
@@ -299,6 +323,11 @@ if length(sessions_info) > 1
         if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))
             lfp_evoked.sites_avg = ...
                 lfp_tfa_avg_evoked_LFP_across_sites(lfp_evoked, lfp_tfa_cfg);
+        end
+        % LFP band average
+          if any(strcmp(lfp_tfa_cfg.analyses, 'band'))
+            lfp_band.sessions_avg = ...
+                lfp_tfa_avg_band_across_sites(lfp_band, lfp_tfa_cfg);
         end
         % LFP power spectrum
         if any(strcmp(lfp_tfa_cfg.analyses, 'pow'))
