@@ -129,7 +129,7 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, l
                         if consider_trial 
                             baseline_pow{t} = trial.tfs.powspctrm(1, :, trial.tfs.time >= ref_period(1) & trial.tfs.time <= ref_period(2));
                         else
-                            baseline_pow{t} = NaN(size(trial.tfs.powspctrm,2),sum(trial.tfs.time >= ref_period(1) & trial.tfs.time <= ref_period(2));
+                            baseline_pow{t} = NaN(1,size(trial.tfs.powspctrm,2),sum(trial.tfs.time >= ref_period(1) & trial.tfs.time <= ref_period(2)));
                         end
                     end
                     % calculate baseline power mean and std
