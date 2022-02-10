@@ -81,7 +81,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(Sessions, lfp_tfa_cfg, varargi
             % initialize number of site pairs for each handspace
             % label
             for st = 1:size(lfp_tfa_cfg.analyse_states, 1)
-                for hs = 1:size(lfp_tfa_cfg.conditions(1).hs_labels, 2)
+                for hs = 1:size(lfp_tfa_cfg.conditions(cn).hs_labels, 2)
                     sites_avg(t).condition(cn).hs_tuned_tfs(st, hs).nsites = 0;
                     sites_avg(t).condition(cn).hs_tuned_tfs(st, hs).freq.powspctrm = [];
                 end
