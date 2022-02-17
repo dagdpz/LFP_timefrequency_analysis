@@ -22,7 +22,10 @@ if size(lfp_tfa_data, 1) > 1
 
         fn_mean = @(x) nanmean(x, 1);
         %rng(random_seed);
+        %% LS 2021
+        if ~all(all(isnan(lfp_tfa_data)))
         error = bootci(1000, fn_mean, lfp_tfa_data);
+        end
     end
 end
     
