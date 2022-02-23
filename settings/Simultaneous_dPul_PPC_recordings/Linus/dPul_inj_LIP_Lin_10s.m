@@ -374,12 +374,12 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 
 % lfp_tfa_cfg.diff_condition(1) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
- lfp_tfa_cfg.diff_condition(1) = {{'reach_spaces', {'L', 'R'}}};
- lfp_tfa_cfg.diff_condition(2) = {{'perturbation', {0, 1}}};
- lfp_tfa_cfg.diff_condition(3) = {{'choice', {0, 1}}};
+% lfp_tfa_cfg.diff_condition(1) = {{'reach_spaces', {'L', 'R'}}};
+%  lfp_tfa_cfg.diff_condition(2) = {{'perturbation', {0, 1}}};
+%  lfp_tfa_cfg.diff_condition(3) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
-% lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
-%     'choice', {0, 1}}};reach_hands
+  lfp_tfa_cfg.diff_condition(1) = {{'reach_hands', {'L', 'R'}, ...
+     'perturbation', {0, 1}}};
 
 % minimum number of trials per condition to be satisfied to consider a site
 % for averaging, if for a site, for any condition, the  number of valid 
