@@ -49,8 +49,15 @@ state_evoked_lfp.state_id = state_id;
 state_evoked_lfp.state_name = state_name;
 
 for t = 1:length(trials_lfp)
-
     states          = trials_lfp(t).states;
+    if ~ismember(state_id,[states(:).id])
+        %% LS 2021: replace missing state alignment with NaNs
+        
+        state_evoked_lfp.lfp = [state_evoked_lfp.lfp, ...
+            NaN(1,length(trials_lfp(t).tfs.freq),floor((state_reftend-state_reftstart)/(trials_lfp(t).time(2)-trials_lfp(t).time(1))))];
+        state_evoked_lfp.lfp_time=NaN(1,floor((state_reftend-state_reftstart)/(trials_lfp(t).time(2)-trials_lfp(t).time(1))));       
+        continue;
+    end
     state_onset_t   = states([states(:).id] == ...
         state_id).onset_t;
     state_start_t   = states([states(:).id] == ...
@@ -71,7 +78,7 @@ for t = 1:length(trials_lfp)
     onset_timestamp = state_evoked_lfp.lfp_time(...
         abs(state_evoked_lfp.lfp_time) == min(abs(state_evoked_lfp.lfp_time)));
     state_evoked_lfp.lfp_time = state_evoked_lfp.lfp_time - ...
-        onset_timestamp;
+        onset_timestamp(1); %% LS2021 funny error here: +/- the exact same number when running pulv_oculomotor
 
 end
 
