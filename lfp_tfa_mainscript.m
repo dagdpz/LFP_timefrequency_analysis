@@ -9,7 +9,7 @@ clear;
 % file containing settings for LFP analysis
 % should have the same format as settings/lfp_tfa_settings_example.m
 %   settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\PPC_pulv_eye_hand\Linus\Linus_dPul_LIP_inactivation_combined.m';
- settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\Simultaneous_dPul_PPC_recordings\Linus\dPul_inj_LIP_Lin_10s.m';
+ settings_filepath = '/home/mathieu/Documents/GitHub/LFP_timefrequency_analysis/settings/Simultaneous_dPul_PPC_recordings/Linus/dPul_inj_LIP_Lin_10s_linux.m';
 
 %% INITIALIZATION
 close all;
