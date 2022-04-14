@@ -1,4 +1,4 @@
-function sessions_avg = lfp_tfa_avg_tfr_across_sessions(Sessions, lfp_tfa_cfg)
+function sessions_avg = lfp_tfa_avg_tfr_across_sessions(Sessions, lfp_tfa_cfg,varargin)
 %lfp_tfa_avg_tfr_across_sessions  - Condition-based LFP time frequency
 %response average across many session averages (A session average is
 %the LFP TFR average across site averages recorded in a session. A site
@@ -51,17 +51,21 @@ function sessions_avg = lfp_tfa_avg_tfr_across_sessions(Sessions, lfp_tfa_cfg)
 % ...
 %%%%%%%%%%%%%%%%%%%%%%%%%[DAG mfile header version 1]%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% results folder
-results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sessions', 'LFP_TFR');
+% results folder % results folder
+    if nargin < 3
+results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sessions');
+    else
+        results_fldr = varargin{1};
+    end
 if ~exist(results_fldr, 'dir')
     mkdir(results_fldr);
 end
 
-% Average TFR across sessions
-sessions_avg = struct();
 % conditions to compare
+sessions_avg = struct(); % why was this inside the loop?
 lfp_tfa_cfg.conditions = lfp_tfa_compare_conditions(lfp_tfa_cfg);
 for t = 1:length(lfp_tfa_cfg.compare.targets)
+% Average TFR across sessions
     sessions_avg(t).target = lfp_tfa_cfg.compare.targets{t};
     for cn = 1:length(lfp_tfa_cfg.conditions)
         fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
@@ -162,7 +166,7 @@ for t = 1:length(lfp_tfa_cfg.compare.targets)
                     ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
                     sessions_avg(t).condition(cn).label];
                 result_file = fullfile(results_fldr, ...
-                    [lfp_tfa_cfg.monkey 'LFP_TFR_' lfp_tfa_cfg.compare.targets{t}, '_', ...
+                    [lfp_tfa_cfg.monkey '_LFP_TFR_' lfp_tfa_cfg.compare.targets{t}, '_', ...
                     sessions_avg(t).condition(cn).label]);
                 lfp_tfa_plot_hs_tuned_tfr_multiple_img(sessions_avg(t).condition(cn).hs_tuned_tfs, ...
                     lfp_tfa_cfg, plottitle, result_file);
@@ -222,5 +226,5 @@ for t = 1:length(lfp_tfa_cfg.compare.targets)
 end
 
 % save session average tfs
-save(fullfile(results_fldr, [lfp_tfa_cfg.monkey  'LFP_TFR_sessions_avg.mat']), 'sessions_avg');
+save(fullfile(results_fldr, [lfp_tfa_cfg.monkey  '_LFP_TFR_sessions_avg.mat']), 'sessions_avg');
 end

@@ -121,17 +121,20 @@ function [ site_lfp ] = lfp_tfa_compute_site_baseline( site_lfp, session_info, l
                         if ~isnan(c) && ~isinf(c)
                             consider_trial = consider_trial & sum(trial.choice_trial == c);
                         end
+                        if strcmp(lfp_tfa_cfg.baseline_ref_state, '') && strcmp(lfp_tfa_cfg.baseline_ref_period , 'trial')
+                            ref_period = trial.trialperiod;
+                        elseif ~strcmp(lfp_tfa_cfg.baseline_ref_state, '')
+                            ref = lfp_tfa_cfg.baseline_ref_state;
+                            ref_onset = trial.states([trial.states.id] == ref) .onset_t;
+                            ref_period = ref_onset + lfp_tfa_cfg.baseline_ref_period;
+                        end
+
+
                         if consider_trial 
-                            if strcmp(lfp_tfa_cfg.baseline_ref_state, '') && strcmp(lfp_tfa_cfg.baseline_ref_period , 'trial')
-                                baseline_pow{t} = trial.tfs.powspctrm(1, :, ...
-                                    trial.tfs.time >= trial.trialperiod(1) & trial.tfs.time <= trial.trialperiod(2));
-                            elseif ~strcmp(lfp_tfa_cfg.baseline_ref_state, '')
-                                ref = lfp_tfa_cfg.baseline_ref_state;
-                                ref_onset = trial.states([trial.states.id] == ref) .onset_t;
-                                ref_period = ref_onset + lfp_tfa_cfg.baseline_ref_period;
-                                baseline_pow{t} = trial.tfs.powspctrm(1, :, trial.tfs.time >= ...
-                                    ref_period(1) & trial.tfs.time <= ref_period(2));
-                            end
+                            baseline_pow{t} = trial.tfs.powspctrm(1, :, trial.tfs.time >= ...
+                                ref_period(1) & trial.tfs.time <= ref_period(2));
+                        else %% make NaNs of same size LS 20220318
+                            baseline_pow{t} = NaN(1,size(trial.tfs.powspctrm,2),1);
                         end
                     end
                     % calculate baseline power mean and std

@@ -55,7 +55,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(Sessions, lfp_tfa_cfg, varargi
 
     % results folder
     if nargin < 3
-        results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sites', 'LFP_TFR');
+        results_fldr = fullfile(lfp_tfa_cfg.root_results_fldr, 'Avg_across_sites');
     else
         results_fldr = varargin{1};
     end
@@ -70,8 +70,8 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(Sessions, lfp_tfa_cfg, varargi
     end
     
     % Average TFR across sites
-    sites_avg = struct();
     for t = 1:length(lfp_tfa_cfg.compare.targets)
+    sites_avg = struct();
         sites_avg(t).target = lfp_tfa_cfg.compare.targets{t};
         for cn = 1:length(lfp_tfa_cfg.conditions)
             fprintf('Condition %s\n', lfp_tfa_cfg.conditions(cn).label);
@@ -170,7 +170,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(Sessions, lfp_tfa_cfg, varargi
                         ' (ref_', lfp_tfa_cfg.ref_hemisphere, ') ', ...
                         sites_avg(t).condition(cn).label];
                     result_file = fullfile(results_fldr, ...
-                        [lfp_tfa_cfg.monkey 'LFP_TFR_' lfp_tfa_cfg.compare.targets{t} ...
+                        [lfp_tfa_cfg.monkey '_LFP_TFR_' lfp_tfa_cfg.compare.targets{t} ...
                         '_' sites_avg(t).condition(cn).label ]);
                     lfp_tfa_plot_hs_tuned_tfr_multiple_img(sites_avg(t).condition(cn).hs_tuned_tfs, ...
                         lfp_tfa_cfg, plottitle, result_file);
@@ -222,6 +222,6 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(Sessions, lfp_tfa_cfg, varargi
     end
     
     % save session average tfs
-    save(fullfile(results_fldr, [lfp_tfa_cfg.monkey 'LFP_TFR_sites_avg.mat']), 'sites_avg');
+    save(fullfile(results_fldr, [lfp_tfa_cfg.monkey '_LFP_TFR_sites_avg.mat']), 'sites_avg');
     
 end
