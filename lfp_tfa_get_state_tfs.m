@@ -93,7 +93,7 @@ for t = find(cond_trials)
     % put onset timestamp to zero
     onset_timestamp = state_tfs.time(...
         abs(state_tfs.time) == min(abs(state_tfs.time)));
-    state_tfs.time = state_tfs.time - onset_timestamp;
+    state_tfs.time = state_tfs.time - onset_timestamp(1); % added (1) IK 20210819
     % freq bins
     state_tfs.freq = site_lfp.trials(t).tfs.freq; 
     state_tfs.cfg = site_lfp.trials(t).tfs.cfg;
