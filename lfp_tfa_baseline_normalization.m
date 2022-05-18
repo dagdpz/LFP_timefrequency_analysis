@@ -28,23 +28,18 @@ function [ lfp_tfr_normalized ] = lfp_tfa_baseline_normalization( raw_tfs, cfg_b
 % See also lfp_tfa_get_state_tfs, lfp_tfa_plot_site_average_tfr, lfp_tfa_process_LFP
 
     base_mean = cfg_baseline.mean;
+    base=repmat(base_mean, [size(raw_tfs, 1) 1 size(raw_tfs, 3)]);
     if strcmp(cfg_baseline.method , 'zscore')
        base_std =  cfg_baseline.std;
     end
     if strcmp(cfg_baseline.method , 'subtraction')
-        lfp_tfr_normalized = raw_tfs - repmat(base_mean, ...
-            [size(raw_tfs, 1) 1 size(raw_tfs, 3)]);
+        lfp_tfr_normalized = raw_tfs - base;
     elseif strcmp(cfg_baseline.method , 'division')
-        lfp_tfr_normalized = raw_tfs ./ repmat(base_mean, ...
-            [size(raw_tfs, 1) 1 size(raw_tfs, 3)]);
+        lfp_tfr_normalized = raw_tfs ./ base;
     elseif strcmp(cfg_baseline.method , 'relchange')
-        lfp_tfr_normalized = (raw_tfs - repmat(base_mean, ...
-            [size(raw_tfs, 1) 1 size(raw_tfs, 3)])) ./ repmat(base_mean, ...
-            [size(raw_tfs, 1) 1 size(raw_tfs, 3)]);
+        lfp_tfr_normalized = (raw_tfs - base) ./ base;
     elseif strcmp(cfg_baseline.method , 'zscore')
-        lfp_tfr_normalized = (raw_tfs - repmat(base_mean, ...
-            [size(raw_tfs, 1) 1 size(raw_tfs, 3)])) ./ repmat(base_std, ...
-            [size(raw_tfs, 1) 1 size(raw_tfs, 3)]);
+        lfp_tfr_normalized = (raw_tfs - base) ./ repmat(base_std, [size(raw_tfs, 1) 1 size(raw_tfs, 3)]);
         
     end
 
