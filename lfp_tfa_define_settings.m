@@ -100,6 +100,8 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
             filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_Evoked_LFP' ];
         lfp_tfa_cfg.session_info(i).lfp_pow_results_fldr = [lfp_tfa_cfg.analyse_lfp_folder ...
             filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_LFP_Power' ];
+         lfp_tfa_cfg.session_info(i).lfp_band_results_fldr = [lfp_tfa_cfg.analyse_lfp_folder ...
+            filesep lfp_tfa_cfg.session_info(i).session filesep 'Condition_based_band_average' ];
     end
 
     % save settings struct

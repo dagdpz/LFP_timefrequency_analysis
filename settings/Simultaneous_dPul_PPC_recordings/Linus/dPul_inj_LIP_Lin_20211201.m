@@ -12,7 +12,7 @@ lfp_tfa_cfg.results_folder = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP';
 % the results produced using this settings file would be saved under 
 % the folder [lfp_tfa_cfg.results_folder, '\' lfp_tfa_cfg.version]
 % eg: 'Y:\Personal\Sarath\Results\LFP_TFA_Results\Linus_inactivation_8sessions'
-lfp_tfa_cfg.version = 'dPul_inj_LIP_Lin_5s';
+lfp_tfa_cfg.version = 'dPul_inj_LIP_Lin_20211201';
 
 % whether to calculate the LFP time frequency spectrograms and noise trial
 % detection
@@ -24,13 +24,13 @@ lfp_tfa_cfg.version = 'dPul_inj_LIP_Lin_5s';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = false;
+lfp_tfa_cfg.process_LFP = true;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
 if ~lfp_tfa_cfg.process_LFP
     lfp_tfa_cfg.proc_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Lin_4s_TCM\Processed LFP';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Lin_20211201\Processed LFP';
 end
 
 % whether to calculate the site-wise averages
@@ -44,7 +44,7 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = false;
+lfp_tfa_cfg.compute_site_average = true;
 
 %wheter to plot site_wise averages
 lfp_tfa_cfg.plot_site_average = false;
@@ -54,12 +54,12 @@ lfp_tfa_cfg.plot_site_average = false;
 lfp_tfa_cfg.analyse_lfp_folder = [];
 if ~lfp_tfa_cfg.compute_site_average
     lfp_tfa_cfg.analyse_lfp_folder = ...
-        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Lin_5s\LFP Analysis';
+        'Y:\Projects\Simultaneous_dPul_PPC_recordings\LFP\dPul_inj_LIP_Lin_20211201\LFP Analysis';
 end
 
 % sorted neurons excel file, from which information about sessions and
 % individual sites can be obtained
-lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210901\Lin_sorted_neurons.xls';
+lfp_tfa_cfg.info_filepath = 'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20211201\Lin_sorted_neurons.xls';
 
 % dataset to be used for analysis, see entry 'Set' in the sorted neurons excel file
 % only those sessions belonging to 'Set' = lfp_tfa_cfg.use_datasets will be
@@ -79,42 +79,14 @@ lfp_tfa_cfg.use_datasets = [70];
 %       specified, all post-injection blocks will be combined; if
 %       'allbutfirst', all blocks from the second post-injection block will
 %       be combined)
-    lfp_tfa_cfg.session_info(1) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20210520', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210520\sites_Linus_20210520.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 3);
+
        
-        lfp_tfa_cfg.session_info(2) = ...
+       lfp_tfa_cfg.session_info(1) = ...
     struct('Monkey',        'Lin', ...
-           'Date',          '20210610', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210610\sites_Linus_20210610.mat', ...
+           'Date',          '20211201', ...
+           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20211201\sites_Linus_20211201.mat', ...
            'Preinj_blocks',  0, ...
-           'Postinj_blocks', 3);
-       
-          lfp_tfa_cfg.session_info(3) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20210616', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210616\sites_Linus_20210616.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 3);
-       
-       lfp_tfa_cfg.session_info(4) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20210709', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210709\sites_Linus_20210709.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 2);
-       
-        lfp_tfa_cfg.session_info(5) = ...
-    struct('Monkey',        'Lin', ...
-           'Date',          '20210901', ...
-           'Input',         'Y:\Projects\Simultaneous_dPul_PPC_recordings\ephys\dPul_inj_LIP_Lin_20210901\sites_Linus_20210901.mat', ...
-           'Preinj_blocks',  0, ...
-           'Postinj_blocks', 3);
-       
-        
+           'Postinj_blocks', [2 3]);
        
       
        
@@ -143,7 +115,7 @@ lfp_tfa_cfg.use_datasets = [70];
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'band'}; %
+lfp_tfa_cfg.analyses = {'tfs'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
@@ -170,7 +142,7 @@ end
 % lesional labeling
 % set ref_hemisphere to recorded hemishere for ipsi lateral and contra
 % lateral labeling
-lfp_tfa_cfg.ref_hemisphere = 'R'; 
+lfp_tfa_cfg.ref_hemisphere = 'L'; 
 
 % random seed for random number generator for reproducibility
 lfp_tfa_cfg.random_seed = rng;
@@ -342,10 +314,6 @@ lfp_tfa_cfg.compare.perturbations = [0 1];
 % lfp_tfa_cfg.diff_condition(2) = {{'reach_hands', {'L', 'R'}}};
  %lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
  lfp_tfa_cfg.diff_condition(1) = {{'perturbation', {0, 1}}};
- lfp_tfa_cfg.diff_condition(2) = {{'reach_spaces', {'L', 'R'}}};
-  lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
-     'reach_hands', {'L', 'R'}}};
-
 % lfp_tfa_cfg.diff_condition(2) = {{'choice', {0, 1}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'type_eff', {[4 4], [4 4]}}};
 % lfp_tfa_cfg.diff_condition(3) = {{'perturbation', {0, 1}, ...
@@ -421,13 +389,6 @@ lfp_tfa_cfg.tfr.method          = 'wavelet';
 % 1. lfp_tfa_cfg.tfr.foi = logspace(log10(2), log10(120), 60); 60 logspaced
 % frequencies from 2Hz to 120 Hz
 lfp_tfa_cfg.tfr.foi             = logspace(log10(2), log10(120), 60);
-
-% define frequencies to average for the band_average analysis ([a b], every
-% frequencies between a and b averaged together for that band
-lfp_tfa_cfg.band.gamma = [32 120];
-lfp_tfa_cfg.band.beta  = [12 32];
-lfp_tfa_cfg.band.alpha = [8 12];
-lfp_tfa_cfg.band.theta = [4 8];
 
 % number of lfp samples to step for the sliding time window
 % Example:
@@ -543,7 +504,7 @@ lfp_tfa_cfg.baseline_ref_state = lfp_tfa_states.CUE_ON;
 if isempty(lfp_tfa_cfg.baseline_ref_state)
 	lfp_tfa_cfg.baseline_ref_period = 'trial';
 else
-	lfp_tfa_cfg.baseline_ref_period = [-0.5 -0.05]; % SET LIMITS OF baseline_ref_period here
+	lfp_tfa_cfg.baseline_ref_period = [-0.5 0]; % SET LIMITS OF baseline_ref_period here
 end
 
 % which perturbation blocks to be considered for baseline power calculation
