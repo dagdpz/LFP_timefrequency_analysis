@@ -44,10 +44,10 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = false;
+lfp_tfa_cfg.compute_site_average = true;
 
 %wheter to plot site_wise averages
-lfp_tfa_cfg.plot_site_average = false;
+lfp_tfa_cfg.plot_site_average = true;
 
 % folder where the results of analysed LFP site averages are stored
 lfp_tfa_cfg.analyse_lfp_folder = [];
