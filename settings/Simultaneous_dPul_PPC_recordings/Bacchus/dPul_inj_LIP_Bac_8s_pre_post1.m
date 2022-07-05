@@ -159,7 +159,7 @@ lfp_tfa_cfg.use_datasets = [10];
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'tfs'}; %
+lfp_tfa_cfg.analyses = {'sync'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
