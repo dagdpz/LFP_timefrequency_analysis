@@ -21,7 +21,7 @@ function condition_label = lfp_tfa_get_condition_label(cfg_condition, label_leng
 %
 % REQUIRES:	
 %
-% See also settings/lfp_tfa_settings_example, lfp_tfa_read_info_file, 
+% See also settings/lfp_tfa_settings_example, 
 % lfp_tfa_compare_conditions, lfp_tfa_mainscript
 %
 % Author(s):	S.Nair, DAG, DPZ
