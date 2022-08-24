@@ -2,7 +2,7 @@
 
 % initialize configuration structure
 lfp_tfa_cfg = [];
-   
+ lfp_tfa_cfg.monkeys = {'Bac'};  
 %% Settings for data folders
 
 % absolute path to the folder where the results of analysis should be stored
@@ -44,10 +44,10 @@ end
 % should be computed, set this variable to true. 
 % Caution: Set this variable to false only if all settings other than 
 % lfp_tfa_cfg.session_info, remains the same
-lfp_tfa_cfg.compute_site_average = true;
+lfp_tfa_cfg.compute_site_average = false;
 
 %wheter to plot site_wise averages
-lfp_tfa_cfg.plot_site_average = true;
+lfp_tfa_cfg.plot_site_average = false;
 
 % folder where the results of analysed LFP site averages are stored
 lfp_tfa_cfg.analyse_lfp_folder = [];
@@ -159,7 +159,7 @@ lfp_tfa_cfg.use_datasets = [10];
 %                   time windows
 %       'sync'      - LFP-LFP phase synchronization spectrum for given 
 %                   conditions and epochs
-lfp_tfa_cfg.analyses = {'sync'}; %
+lfp_tfa_cfg.analyses = {'tfs'}; %
 
 % targets to be included in the analysis
 % should be a cell array of strings which indicate the target names
