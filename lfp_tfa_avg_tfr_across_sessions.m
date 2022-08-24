@@ -80,7 +80,8 @@ for t = 1:length(lfp_tfa_cfg.compare.targets)
         for i = 1:length(Sessions)
             for k = 1:length(Sessions(i).session_avg)
                 %% LS 2021: question is !? combine hemispheres BEFORE per session averaging??
-                if ismember(lfp_tfa_cfg.compare.targets{t}, Sessions(i).session_avg(k).target)
+%                 if ismember(lfp_tfa_cfg.compare.targets{t}, Sessions(i).session_avg(k).target)
+                   if strcmp(lfp_tfa_cfg.compare.targets{t}, Sessions(i).session_avg(k).target) 
                 %if strcmp(Sessions(i).session_avg(k).target, lfp_tfa_cfg.compare.targets{t})
                     if ~isempty(Sessions(i).session_avg(k).condition(cn).hs_tuned_tfs) && ...
                             isfield(Sessions(i).session_avg(k).condition(cn).hs_tuned_tfs, 'freq')

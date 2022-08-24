@@ -119,7 +119,7 @@ for i = 1:length(sites)
     [sites(i).trial]=sitetrials;
     
     sites(i)=ph_LR_to_CI(lfp_tfa_cfg,sites(i));  %% convert... 
-    
+    site_lfp.target = sites(i).target;
     %% now loop through each trial for this site
     for t = 1:length(sites(i).trial)
         
@@ -135,9 +135,9 @@ for i = 1:length(sites)
         
         % reach space
         if hf == -1
-            reach_space = 'I';
-        elseif hf == 1
             reach_space = 'C';
+        elseif hf == 1
+            reach_space = 'I';
         else
             reach_space = 'N';
         end      
@@ -145,9 +145,9 @@ for i = 1:length(sites)
         rh = sites(i).trial(t).reach_hand; % 1 = left, 2 = right
         % reach hand
         if rh == 1
-            reach_hand = 'I';
-        elseif rh == 2
             reach_hand = 'C';
+        elseif rh == 2
+            reach_hand = 'I';
         else
             reach_hand = 'N';  % no hand labeling
         end

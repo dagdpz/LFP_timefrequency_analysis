@@ -172,7 +172,7 @@ for hs = 1:size(avg_tfr, 2)
         %subplot(nhandlabels, nspacelabels, hs)
         %imagesc(concat_states_tfs.time, [1:numel(concat_states_tfs.freq)], squeeze(concat_states_tfs.powspctrm), [-1 1]);
         axis xy, cb = colorbar;
-        set(get(cb,'title'),'string', cbtitle, 'fontsize',8);
+        set(get(cb,'title'),'string', cbtitle, 'fontsize',14);
         set(gca,'TickDir','out')
         % log y axis ticks
         %set(gca, 'ytick', ([1:8:numel(concat_states_tfs.freq)]));
@@ -184,7 +184,7 @@ for hs = 1:size(avg_tfr, 2)
             if isfield(avg_tfr(state_onsets == so, hs), 'state_name') && ...
                     ~isempty(states_names(state_onsets == so))
                 state_name = states_names{state_onsets == so};
-                text(so+1, 10, state_name, 'fontsize', 8);
+                text(so+1, 10, state_name, 'fontsize', 12);
             end
         end
         
@@ -194,7 +194,7 @@ for hs = 1:size(avg_tfr, 2)
         % mark state onsets
         state_ticks=round(concat_states_tfs.state_time(state_samples), 1);
         set(gca,'xtick',state_samples(~isnan(state_ticks)))
-        set(gca,'xticklabels', state_ticks(~isnan(state_ticks)), 'fontsize', 8)
+        set(gca,'xticklabels', state_ticks(~isnan(state_ticks)), 'fontsize', 16)
         set(gca, 'xticklabelrotation', 45)
         % add 0.5 since the time value is the center of the bin
         % add 0 at the beginning to make the y-axis visible

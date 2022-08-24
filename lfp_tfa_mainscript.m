@@ -6,11 +6,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clear;
 
-% file containing settings for LFP analysis
+% file containing settings for LFP anal
 % should have the same format as settings/lfp_tfa_settings_example.m
 %   settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\PPC_pulv_eye_hand\Linus\Linus_dPul_LIP_inactivation_combined.m';
    %settings_filepath = 'C:\Users\lschneider\GitHub\Settings\LFP_time_frequency_analysis\Pulv_eye_hand\Interleaved\lfp_tfa_settings.m';
-   settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\Settings\LFP\Simultaneous_dPul_PPC_recordings\Linus\dPul_inj_LIP_Lin_10s_LS.m';
+   settings_filepath =  '~/Documents/GitHub/LFP_timefrequency_analysis/settings/Simultaneous_dPul_PPC_recordings/Linus/dPul_inj_LIP_Lin_10s_linux.m';
 
 %% INITIALIZATION
 close all;
@@ -260,7 +260,6 @@ end
 
 %% Average across sessions
 %% do monkey separation or combination here!?
-
 for m=1:numel(lfp_tfa_cfg.monkeys)
     if isempty(lfp_tfa_cfg.monkeys{m}) %combined
         lfp_tfa_cfg.monkey='';
@@ -276,8 +275,13 @@ for m=1:numel(lfp_tfa_cfg.monkeys)
             % LFP power
             % LFP TFR
             if any(strcmp(lfp_tfa_cfg.analyses, 'tfs'))
-                lfp_tfr.sessions_avg(m) = ...
+               if ~isfield(lfp_tfr, 'sessions_avg')
+                lfp_tfr.sessions_avg = ...
                     lfp_tfa_avg_tfr_across_sessions(lfp_tfr.session(m_idx), lfp_tfa_cfg);
+               else
+                 lfp_tfr.sessions_avg(m) = ...
+                    lfp_tfa_avg_tfr_across_sessions(lfp_tfr.session(m_idx), lfp_tfa_cfg);  
+               end
             end
             % LFP evoked response
             if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))
@@ -303,8 +307,13 @@ for m=1:numel(lfp_tfa_cfg.monkeys)
             % Average of site averages of LFP TFR, LFP evoked response and LFP
             % power spectrum
             if any(strcmp(lfp_tfa_cfg.analyses, 'tfs'))
-                lfp_tfr.sites_avg(m) = ...
+                if ~isfield(lfp_tfr, 'sites_avg')
+                lfp_tfr.sites_avg = ...
                     lfp_tfa_avg_tfr_across_sites(lfp_tfr.session(m_idx), lfp_tfa_cfg);
+                else
+                 lfp_tfr.sites_avg(m) = ...
+                    lfp_tfa_avg_tfr_across_sites(lfp_tfr.session(m_idx), lfp_tfa_cfg);   
+                end
             end
             % LFP evoked response
             if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))

@@ -171,6 +171,15 @@ for i = 1:length(diff_condition)/2
                     
                     diff_tfr.difference(dcn) = postinj_tfr;
                     
+                    % calculate the number of time frequency bins in all
+                    % windows for later bonferroni correction
+                    bon_time_sum = 0;
+                    for stb = 1:size(postinj_tfr.hs_tuned_tfs, 1)
+                      bon_time_sum = bon_time_sum + size(preinj_sync.hs_tuned_tfs(stb, 1).freq.time,2); 
+                    end
+                    bon_factor = bon_time_sum*size(preinj_sync.hs_tuned_tfs(1, 1).freq.freq,2); 
+                    
+                    
                     % change the condition label
                     diff_tfr.difference(dcn).label = ['( ' postinj_tfr.label, ' - ', ...
                         preinj_sync.label ' )'];
@@ -225,7 +234,8 @@ for i = 1:length(diff_condition)/2
                                             diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.adj_ci_cvrg = adj_ci_cvrg;
                                             diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.adj_p = adj_p;
                                         elseif strcmp(lfp_tfa_cfg.correction_method,'Bonferroni');
-                                            corrected_p_val_sig = 0.05/(size(preinj_sync.hs_tuned_tfs(st, hs).freq.time,2)*size(preinj_sync.hs_tuned_tfs(st, hs).freq.freq,2));
+                                            
+                                            corrected_p_val_sig = 0.05/bon_factor;
                                             diff_tfr.difference(dcn).hs_tuned_tfs(st, hs).freq.stat_test.h = p < corrected_p_val_sig;
                                         end
                                     end
@@ -244,7 +254,14 @@ for i = 1:length(diff_condition)/2
             end
             
         elseif strcmp(compare.field, 'reach_hands') || strcmp(compare.field, 'reach_spaces') % need to average same hand or same space for each lfp_tfr(d), then do the difference between the 2 averages
-            
+              
+                    % calculate the number of time frequency bins in all
+                    % windows for later bonferroni correction
+                    bon_time_sum = 0;
+                    for stb = 1:size(lfp_tfr(1).hs_tuned_tfs, 1)
+                      bon_time_sum = bon_time_sum + size(lfp_tfr(1).hs_tuned_tfs(stb, 1).freq.time,2); 
+                    end
+                    bon_factor = bon_time_sum*size(lfp_tfr(1).hs_tuned_tfs(1, 1).freq.freq,2); 
             
             for d = 1:length(lfp_tfr)
                 diff_tfr.difference(d) = lfp_tfr(d);
@@ -254,6 +271,8 @@ for i = 1:length(diff_condition)/2
                     %                     diff_tfr.difference(d).cfg_condition.reach_hands = ['diff' num2str(i)];
                     diff_tfr.difference(d).cfg_condition = lfp_tfr(d).cfg_condition;
                     diff_tfr.difference(d).cfg_condition.diff = 'hands';
+                    
+                    
                     
                     for st = 1:size(lfp_tfr(d).hs_tuned_tfs, 1) %st is windows here
                         %calculate difference between same space,
@@ -307,7 +326,7 @@ for i = 1:length(diff_condition)/2
                                     diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.adj_ci_cvrg = adj_ci_cvrg;
                                     diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.adj_p = adj_p;
                                 elseif strcmp(lfp_tfa_cfg.correction_method,'Bonferroni');
-                                    corrected_p_val_sig = 0.05/size(lfp_tfr(d).hs_tuned_tfs(st,hs).freq.powspctrm,1);
+                                    corrected_p_val_sig = 0.05/bon_factor;
                                     diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.h = p < corrected_p_val_sig;
                                 end
                             end
@@ -372,7 +391,7 @@ for i = 1:length(diff_condition)/2
                                         diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.adj_ci_cvrg = adj_ci_cvrg;
                                         diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.adj_p = adj_p;
                                     elseif strcmp(lfp_tfa_cfg.correction_method,'Bonferroni');
-                                        corrected_p_val_sig = 0.05/size(lfp_tfr(d).hs_tuned_tfs(st,hs).freq.powspctrm,1);
+                                        corrected_p_val_sig = 0.05/bon_factor;
                                         diff_tfr.difference(d).hs_tuned_tfs(st, hs).freq.stat_test.h = p < corrected_p_val_sig;
                                     end
                                     
@@ -417,7 +436,7 @@ for i = 1:length(diff_condition)/2
                                         diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.stat_test.adj_ci_cvrg = adj_ci_cvrg;
                                         diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.stat_test.adj_p = adj_p;
                                     elseif strcmp(lfp_tfa_cfg.correction_method,'Bonferroni');
-                                        corrected_p_val_sig = 0.05/size(lfp_tfr(d).hs_tuned_tfs(st,1).freq.powspctrm,1);
+                                        corrected_p_val_sig = 0.05/bon_factor;
                                         diff_tfr.difference(d).hs_tuned_tfs(st, 1).freq.stat_test.h = p < corrected_p_val_sig;
                                     end
                                     

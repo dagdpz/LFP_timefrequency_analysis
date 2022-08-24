@@ -90,7 +90,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(Sessions, lfp_tfa_cfg, varargi
             for i = 1:length(Sessions)  
                 for j = 1:length(Sessions(i).sites)                        
                     %% LS 2021 
-                    if ~ismember(lfp_tfa_cfg.compare.targets{t}, Sessions(i).sites(j).target) 
+                    if ~strcmp(lfp_tfa_cfg.compare.targets{t}, Sessions(i).sites(j).target) 
                         continue;
                     end
                     if ~Sessions(i).sites(j).use_for_avg
