@@ -98,7 +98,7 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(Sessions, lfp_tfa_cfg, varargi
                     end
                     if ~isempty(Sessions(i).sites(j).condition(cn).hs_tuned_tfs) && ... 
                         isfield(Sessions(i).sites(j).condition(cn).hs_tuned_tfs, 'freq')
-                        %nsites = nsites + 1;   
+                        nsites = nsites + 1;   
                         for st = 1:size(Sessions(i).sites(j).condition(cn).hs_tuned_tfs, 1)
                             for hs = 1:size(Sessions(i).sites(j).condition(cn).hs_tuned_tfs, 2)
                                 if isfield(Sessions(i).sites(j).condition(cn).hs_tuned_tfs(st, hs).freq, 'powspctrm') ...
@@ -149,18 +149,18 @@ function sites_avg = lfp_tfa_avg_tfr_across_sites(Sessions, lfp_tfa_cfg, varargi
                 end
             end
 
-%             % compute average
-%             if ~isempty(sites_avg(t).condition(cn).hs_tuned_tfs)
-%                 if isfield(sites_avg(t).condition(cn).hs_tuned_tfs, 'powspctrm')
-%                     for st = 1:size(sites_avg(t).condition(cn).hs_tuned_tfs, 1)
-%                         for hs = 1:size(sites_avg(t).condition(cn).hs_tuned_tfs, 2)
-%                             sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites = nsites;                                
-%                             sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm = ...
-%                                 (1/nsites) * sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm;
-%                         end
-%                     end
-%                 end
-%             end
+            % compute average
+            if ~isempty(sites_avg(t).condition(cn).hs_tuned_tfs)
+                if isfield(sites_avg(t).condition(cn).hs_tuned_tfs, 'powspctrm')
+                    for st = 1:size(sites_avg(t).condition(cn).hs_tuned_tfs, 1)
+                        for hs = 1:size(sites_avg(t).condition(cn).hs_tuned_tfs, 2)
+                            sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).nsites = nsites;                                
+                            sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm = ...
+                                (1/nsites) * sites_avg(t).condition(cn).hs_tuned_tfs(st,hs).powspctrm;
+                        end
+                    end
+                end
+            end
 
 
             if ~isempty(sites_avg(t).condition(cn).hs_tuned_tfs)

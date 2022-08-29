@@ -99,7 +99,7 @@ function lfp_tfa_plot_evoked_lfp( evoked_lfp, lfp_tfa_cfg, plottitle, results_fi
             subplot(nhandlabels, nspacelabels, hs)
             hold on;
             plot(concat_states_lfp.mean, 'b');
-            plot(concat_states_lfp.error', 'b--');
+%             plot(concat_states_lfp.error', 'b--');
             %plot(concat_states_lfp.mean - concat_states_lfp.std, 'r--');
             % mark state onsets
             %if isfield(evoked_lfp, 'state_name')

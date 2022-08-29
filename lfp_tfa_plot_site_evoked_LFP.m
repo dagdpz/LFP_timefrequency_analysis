@@ -315,39 +315,39 @@ for t = 1:length(targets)
             end
         end
         % plot average evoked LFP across sites for this session
-        if ~isempty(fieldnames(session_avg(t).condition(cn).hs_tuned_evoked))
-            plottitle = ['Session: ', session_avg(t).condition(cn).session ', Target = ' ...
-                session_avg(t).condition(cn).target ' (ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
-                site_conditions(cn).label ', '];
-            if site_conditions(cn).choice == 0
-                plottitle = [plottitle 'Instructed trials'];
-            elseif site_conditions(cn).choice == 1
-                plottitle = [plottitle 'Choice trials'];
-            end
-            result_file = fullfile(results_folder_evoked, ['LFP_Evoked_' session_avg(t).condition(cn).target ...
-                '_' session_avg(t).condition(cn).session '_' site_conditions(cn).label]);
-            lfp_tfa_plot_evoked_lfp (session_avg(t).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
-                plottitle, result_file);
-        end
-    end
+%         if ~isempty(fieldnames(session_avg(t).condition(cn).hs_tuned_evoked))
+%             plottitle = ['Session: ', session_avg(t).condition(cn).session ', Target = ' ...
+%                 session_avg(t).condition(cn).target ' (ref_' lfp_tfa_cfg.ref_hemisphere '), '  ...
+%                 site_conditions(cn).label ', '];
+%             if site_conditions(cn).choice == 0
+%                 plottitle = [plottitle 'Instructed trials'];
+%             elseif site_conditions(cn).choice == 1
+%                 plottitle = [plottitle 'Choice trials'];
+%             end
+%             result_file = fullfile(results_folder_evoked, ['LFP_Evoked_' session_avg(t).condition(cn).target ...
+%                 '_' session_avg(t).condition(cn).session '_' site_conditions(cn).label]);
+%             lfp_tfa_plot_evoked_lfp (session_avg(t).condition(cn).hs_tuned_evoked, lfp_tfa_cfg, ...
+%                 plottitle, result_file);
+%         end
+%     end
     %% plot evoked LFP for pre and post injection on same plot (average across sites)
-    for trial_type = 1:2
-        plottitle = ['Session: ', session_avg(t).condition(cn).session  ', Target = ' ...
-            session_avg(t).condition(cn).target '(ref_' lfp_tfa_cfg.ref_hemisphere ') '];
-        if trial_type == 1
-            plottitle = [plottitle 'Instructed trials'];
-            trial_title = 'Instructed trials';
-        elseif trial_type == 2
-            plottitle = [plottitle 'Choice trials'];
-            trial_title = 'Choice trials';
-        end
-        result_file = fullfile(results_folder_evoked,['LFP_Evoked_' session_avg(t).condition(cn).target ...
-            ' '  session_avg(t).condition(cn).session '_combined_' trial_title ]);
-        
-        lfp_tfa_plot_evoked_lfp_combined(session_avg(t).condition, lfp_tfa_cfg, ...
-            plottitle, result_file,trial_type);
-        
-    end
+%     for trial_type = 1:2
+%         plottitle = ['Session: ', session_avg(t).condition(cn).session  ', Target = ' ...
+%             session_avg(t).condition(cn).target '(ref_' lfp_tfa_cfg.ref_hemisphere ') '];
+%         if trial_type == 1
+%             plottitle = [plottitle 'Instructed trials'];
+%             trial_title = 'Instructed trials';
+%         elseif trial_type == 2
+%             plottitle = [plottitle 'Choice trials'];
+%             trial_title = 'Choice trials';
+%         end
+%         result_file = fullfile(results_folder_evoked,['LFP_Evoked_' session_avg(t).condition(cn).target ...
+%             ' '  session_avg(t).condition(cn).session '_combined_' trial_title ]);
+%         
+%         lfp_tfa_plot_evoked_lfp_combined(session_avg(t).condition, lfp_tfa_cfg, ...
+%             plottitle, result_file,trial_type);
+%         
+%     end
     
 end
 

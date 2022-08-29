@@ -161,6 +161,14 @@ function sites_avg = lfp_tfa_avg_evoked_LFP_across_sites(Sessions, lfp_tfa_cfg, 
                 end
             end            
         end
+                % difference between conditions
+        sites_avg(t).difference = [];
+        for diff = 1:size(lfp_tfa_cfg.diff_condition, 2)
+            diff_condition = lfp_tfa_cfg.diff_condition{diff};
+            sites_avg(t).difference = [sites_avg(t).difference, ...
+                lfp_tfa_compute_difference_condition_ev(sites_avg(t).condition, ...
+                diff_condition, 1, lfp_tfa_cfg)];
+        end
     end
     % save session average tfs
     save(fullfile(results_fldr, 'LFP_Evoked_sites_average.mat'), 'sites_avg');
