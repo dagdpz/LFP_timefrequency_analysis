@@ -125,33 +125,33 @@ for i = 1:length(sessions_info)
     % different conditions and hand-space labels
     if any(strcmp(lfp_tfa_cfg.analyses, 'tfs'))
         % check if site-wise average needs to be computed
-%         if lfp_tfa_cfg.compute_site_average
-%             lfp_tfr.session(i) = ...
-%                 lfp_tfa_plot_site_average_tfr( session_proc_lfp, ...
-%                 conditions, lfp_tfa_cfg );
-%         else
+        if lfp_tfa_cfg.compute_site_average
+            lfp_tfr.session(i) = ...
+                lfp_tfa_plot_site_average_tfr( session_proc_lfp, ...
+                conditions, lfp_tfa_cfg );
+        else
             % load pre-computed results if available
             lfp_tfr_files = dir(fullfile(...
                 sessions_info(i).lfp_tfs_results_fldr, 'LFP_TFR*.mat'));
             load(fullfile(sessions_info(i).lfp_tfs_results_fldr, ...
                 lfp_tfr_files(1).name), 'session_tfs');
             lfp_tfr.session(i) = session_tfs;
-%         end
+        end
     end
     if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))
         % check if site-wise average needs to be computed
-%         if lfp_tfa_cfg.compute_site_average
-%             lfp_evoked.session(i) = ...
-%                 lfp_tfa_plot_site_evoked_LFP( session_proc_lfp, ...
-%                 conditions, lfp_tfa_cfg );
-%         else
+        if lfp_tfa_cfg.compute_site_average
+            lfp_evoked.session(i) = ...
+                lfp_tfa_plot_site_evoked_LFP( session_proc_lfp, ...
+                conditions, lfp_tfa_cfg );
+        else
             % load pre-computed results if available
             lfp_evoked_files = dir(fullfile(...
                 sessions_info(i).lfp_evoked_results_fldr, 'LFP_Evoked*.mat'));
             load(fullfile(sessions_info(i).lfp_evoked_results_fldr, ...
                 lfp_evoked_files(1).name), 'session_evoked');
             lfp_evoked.session(i) = session_evoked;
-%         end
+        end
     end
     if any(strcmp(lfp_tfa_cfg.analyses, 'pow'))
         % check if site-wise average needs to be computed
@@ -326,8 +326,7 @@ if sum(m_idx) > 1
     end
 end
 
-plottitle = 'CS vs IS, Instr and Choice';
-results_file = [lfp_tfa_cfg.analyse_lfp_folder filesep 'final_evoked_plot'];
-lfp_tfa_plot_evoked_total(lfp_evoked.sessions_avg, lfp_tfa_cfg, plottitle, results_file)
+
+lfp_tfa_plot_evoked_total(lfp_evoked.sessions_avg, lfp_tfa_cfg)
 % close all;
 % clear;

@@ -68,7 +68,7 @@ end
 
 if ~isempty([lfp_evoked.cfg_condition])
     conditions = [lfp_evoked.cfg_condition];
-% elseif ~isempty(
+    % elseif ~isempty(
 else
     return;
 end
@@ -202,6 +202,13 @@ for i = 1:length(diff_condition)/2
                                     size(preinj_sync.avg_across_sessions(st, hs).lfp, 3)]);
                                 diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp.time = ...
                                     postinj_evoked.avg_across_sessions(st, hs).lfp.time(1:ntimebins);
+                            else
+                                ntimebins = length(postinj_evoked.avg_across_sessions(st, hs).time);
+                                diff_evoked.difference(d).hs_tuned_evoked = lfp_evoked(d).avg_across_sessions;
+                                diff_evoked.difference(d).label = [lfp_evoked(d).label];
+                                %                     diff_tfr.difference(d).cfg_condition.reach_spaces = ['diff' num2str(i)];
+                                diff_evoked.difference(d).cfg_condition = lfp_evoked(d).cfg_condition;
+                                diff_evoked.difference(d).cfg_condition.diff = 'choice';
                                 % calculate the difference
                                 if isfield(postinj_evoked.avg_across_sessions(st, hs), 'ntrials')
                                     diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp = ...
@@ -233,12 +240,12 @@ for i = 1:length(diff_condition)/2
                                     end
                                 end
                                 
-                            else
-                                diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp = [];
-                                diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp.time = [];
-                                diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp.lfp = [];
+                                %                             else
+                                %                                 diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp = [];
+                                %                                 diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp.time = [];
+                                %                                 diff_evoked.difference(dcn).hs_tuned_evoked(st, hs).lfp.lfp = [];
                             end
-
+                            
                         end
                     end
                 else
@@ -246,11 +253,12 @@ for i = 1:length(diff_condition)/2
                 end
             end
             
+            
         elseif strcmp(compare.field, 'reach_hands') || strcmp(compare.field, 'reach_spaces') % need to average same hand or same space for each lfp_tfr(d), then do the difference between the 2 averages
             
             
             for d = 1:length(lfp_evoked)
-%                 diff_evoked.difference(d) = lfp_evoked(d);
+                %                 diff_evoked.difference(d) = lfp_evoked(d);
                 if strcmp(compare.field, 'reach_hands')
                     diff_evoked.difference(d).hs_tuned_evoked = lfp_evoked(d).avg_across_sessions;
                     diff_evoked.difference(d).label = [lfp_evoked(d).label, 'CH - IH'];
@@ -271,12 +279,7 @@ for i = 1:length(diff_condition)/2
                                 - nanmean(lfp_evoked(d).avg_across_sessions(st,3).lfp(:,1:ntimebins_CS));
                             diff_evoked.difference(d).hs_tuned_evoked(st, 2).lfp = nanmean(lfp_evoked(d).avg_across_sessions(st,2).lfp(:,1:ntimebins_IS))...
                                 - nanmean(lfp_evoked(d).avg_across_sessions(st,4).lfp(:,1:ntimebins_IS));
-                            
-                            
                         else
-                            
-                            
-                            
                             diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp = lfp_evoked(d).avg_across_sessions(st,1).lfp(:,1:ntimebins_CS)...
                                 - lfp_evoked(d).avg_across_sessions(st,3).lfp(:,1:ntimebins_CS);
                             diff_evoked.difference(d).hs_tuned_evoked(st, 2).lfp = lfp_evoked(d).avg_across_sessions(st,2).lfp(:,1:ntimebins_IS)...
@@ -393,38 +396,38 @@ for i = 1:length(diff_condition)/2
                             else
                                 diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp = lfp_evoked(d).avg_across_sessions(st,1).lfp(:,1:ntimebins_space)...
                                     - lfp_evoked(d).avg_across_sessions(st,2).lfp(:,1:ntimebins_space);
-                               
+                                
                             end
-                             %change hand space label
+                            %change hand space label
                             diff_evoked.difference(d).hs_tuned_evoked(st, 1).hs_label = {'anyH_CS - anyH_IS'};
-                                   %empty other hand space condition since not needed
+                            %empty other hand space condition since not needed
                             %here
                             diff_evoked.difference(d).hs_tuned_evoked(st,2).lfp = [];
-%                             diff_evoked.difference(d).hs_tuned_evoked(st,2).lfp.time = [];
-%                             diff_evoked.difference(d).hs_tuned_evoked(st,2).lfp.lfp = [];
-
+                            %                             diff_evoked.difference(d).hs_tuned_evoked(st,2).lfp.time = [];
+                            %                             diff_evoked.difference(d).hs_tuned_evoked(st,2).lfp.lfp = [];
                             
-                               if stat_test == true
+                            
+                            if stat_test == true
                                 
-                                    % paired ttest
-                                    [~, p] = ttest(...
-                                        diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp);
-                                    % multiple comparison correction
-                                    if strcmp(lfp_tfa_cfg.correction_method,'FDR');
-                                        [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p, fd_rate,...
-                                            fdr_method, 'yes');
-                                        diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.h = h;
-                                        diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.crit_p = crit_p;
-                                        diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.adj_ci_cvrg = adj_ci_cvrg;
-                                        diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.adj_p = adj_p;
-                                    elseif strcmp(lfp_tfa_cfg.correction_method,'Bonferroni');
-                                        corrected_p_val_sig = 0.05/size(lfp_evoked(d).avg_across_sessions(st,1).lfp,1);
-                                        diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.h = p < corrected_p_val_sig;
-                                    end
-                                    
+                                % paired ttest
+                                [~, p] = ttest(...
+                                    diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp);
+                                % multiple comparison correction
+                                if strcmp(lfp_tfa_cfg.correction_method,'FDR');
+                                    [h, crit_p, adj_ci_cvrg, adj_p]=fdr_bh(p, fd_rate,...
+                                        fdr_method, 'yes');
+                                    diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.h = h;
+                                    diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.crit_p = crit_p;
+                                    diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.adj_ci_cvrg = adj_ci_cvrg;
+                                    diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.adj_p = adj_p;
+                                elseif strcmp(lfp_tfa_cfg.correction_method,'Bonferroni');
+                                    corrected_p_val_sig = 0.05/size(lfp_evoked(d).avg_across_sessions(st,1).lfp,1);
+                                    diff_evoked.difference(d).hs_tuned_evoked(st, 1).lfp.stat_test.h = p < corrected_p_val_sig;
+                                end
+                                
                                 
                             end
-                                    
+                            
                             
                         end
                     end
