@@ -24,7 +24,7 @@ lfp_tfa_cfg.contra_ipsi_relative_to='perturbation_site';
 % time frequency spectrograms will be calculated and stored in 
 % lfp_tfa_cfg.results_folder.  If the time frequency spectrograms 
 % should be computed, set this variable to true. 
-lfp_tfa_cfg.process_LFP = true;
+lfp_tfa_cfg.process_LFP = false;
 
 % folder where the results of LFP time frequency spectrograms are stored
 lfp_tfa_cfg.proc_lfp_folder = [];
@@ -175,8 +175,8 @@ lfp_tfa_cfg.compare.targets = {'LIP_L','LIP_R'};
 % the target pairs between which the LFP-LFP phase synchronization should
 % be calculated - valid only if LFP-LFP phase sync should be calculated
 if any(strcmp(lfp_tfa_cfg.analyses, 'sync') | strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
-    lfp_tfa_cfg.compare.target_pairs = {{'LIP_R', 'LIP_R'}, {'dPul_R', 'LIP_R'}, ...
-        {'dPul_R', 'dPul_R'}}; 
+    lfp_tfa_cfg.compare.target_pairs = {{'LIP_R', 'LIP_R'}, {'LIP_L', 'LIP_L'}, ...
+        {'LIP_L', 'LIP_R'}}; 
 end
 
 % reference hemisphere for hand-space labelling

@@ -170,7 +170,7 @@ for i = 1:length(sessions_info)
     clear session_proc_lfp session_lfp;
     
     if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) ...
-            || any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
+            || any(strcmp(lfp_tfa_cfg.analyses, 'syncsp')) 
         % session cross power spctrum folder
         session_csd_folder = ...
             fullfile(sessions_info(i).proc_results_fldr, 'crossspectrum');
