@@ -47,8 +47,8 @@ function lfp_tfa_cfg = lfp_tfa_define_settings(settings_filepath)
     % set random seed for reproducibility
     rng(lfp_tfa_cfg.random_seed);
     
-    % read info excel file (Sorted neurons file)
-    lfp_tfa_cfg.sites_info = lfp_tfa_read_info_file(lfp_tfa_cfg);
+%     % read info excel file (Sorted neurons file)
+%     lfp_tfa_cfg.sites_info = lfp_tfa_read_info_file(lfp_tfa_cfg);
      
     % create a root folder to save results of the analysis
     % root_results_folder = [lfp_tfa_cfg.results_folder, '\', date, '\ver_' lfp_tfa_cfg.version]
