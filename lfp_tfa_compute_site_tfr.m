@@ -95,6 +95,10 @@ for r = (unique([site_lfp.trials.run]))
     cfg.toi          = concat_time(1):lfp_tfa_cfg.tfr.timestep*ts:...
         concat_time(end);% time window "slides" from start time to and time in steps of timestep number of LFP samples
     cfg.channel      = ft_data_lfp.label;
+    
+    if concat_time(end)<10 %% debug really short runs such as Bac_20210903_Site_05 run 6
+        cfg.pad=10;
+    end
     TFR_wavelet      = ft_freqanalysis(cfg, ft_data_lfp);
     
     % now divide into trials
