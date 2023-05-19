@@ -67,8 +67,6 @@ if ~exist(results_fldr, 'dir')
     mkdir(results_fldr);
 end
 
-% struct to save data for a site
-site_lfp = struct();
 
 % structure array to store lfp data for all sites
 % to be used for cross power spectrum calculation
@@ -84,6 +82,8 @@ allsites_lfp = [];
 % first loop through each site
 for i = 1:length(sites)
     
+    % struct to save data for a site
+    site_lfp = struct();
     
     % for future use
     % find if this site's entry is available in usable_sites_table
@@ -172,6 +172,9 @@ for i = 1:length(sites)
         site_lfp.trials(t).time        = timestamps;
         site_lfp.trials(t).fsample     = fs;
         site_lfp.trials(t).tsample     = ts;
+
+        %% need information about which trial it was(originally?)
+        site_lfp.trials(t).n  = sites(i).trial(t).n;
         
         % save retrieved data into struct
                 
