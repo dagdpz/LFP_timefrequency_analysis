@@ -69,16 +69,18 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
 
             trial_start_state = trial.states(1);
             trial_end_state = trial.states(end);
-            trial_time = lfp_time(lfp_time >= trial.trialperiod(1) & ...
-                lfp_time <= trial.trialperiod(2));
-            trial_lfp_raw = lfp_data(lfp_time >= trial.trialperiod(1) & ...
-                lfp_time <= trial.trialperiod(2));
-            trial_lfp_pow = lfp_tfs.powspctrm(1,:,...
-                lfp_tfs.time >= trial.trialperiod(1) & ...
-                lfp_tfs.time <= trial.trialperiod(2));
-            trial_pow_tbins = lfp_tfs.time(...
-                lfp_tfs.time >= trial.trialperiod(1) & ...
-                lfp_tfs.time <= trial.trialperiod(2));
+            time_index=lfp_time >= trial.trialperiod(1) & lfp_time <= trial.trialperiod(2);
+            trial_time = lfp_time(time_index);
+            trial_lfp_raw = lfp_data(time_index);
+            if isfield(lfp_tfs,'time') %% basically means, this has been resampled
+                time_index_tfs=lfp_tfs.time >= trial.trialperiod(1) & lfp_tfs.time <= trial.trialperiod(2);
+                trial_lfp_pow = lfp_tfs.powspctrm(1,:,time_index_tfs);
+                trial_pow_tbins = lfp_tfs.time(time_index_tfs);
+            else
+                trial_lfp_pow = lfp_tfs.powspctrm(1,:,time_index);
+                trial_pow_tbins = trial_time;
+            end
+            
             trial_pow_timestep = trial_pow_tbins(2) - trial_pow_tbins(1);
             trial_pow_fbins = lfp_tfs.freq;
             tsample = 1/trial.fsample;
