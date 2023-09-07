@@ -357,6 +357,7 @@ function [site_lfp] = lfp_tfa_reject_noisy_lfp_trials( site_lfp, cfg_noise )
         site_lfp.ntrails = length(site_lfp.trials);
         site_lfp.noisytrails = sum(noisy_trials);
 
+        close(gcf);
     %fprintf('Noise rejection in LFP done. \n');
     %fprintf('=============================================================\n');
 
