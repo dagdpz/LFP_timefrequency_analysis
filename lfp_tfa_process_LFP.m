@@ -118,7 +118,7 @@ for i = 1:length(sites)
     [sitetrials.fixation]=deal(fixations{:});
     [sites(i).trial]=sitetrials;
     
-    sites(i)=ph_LR_to_CI(lfp_tfa_cfg,sites(i));  %% convert... 
+    sites(i)=lfp_tfa_LR_to_CI(lfp_tfa_cfg,sites(i));  %% convert... 
     
     %% now loop through each trial for this site
     for t = 1:length(sites(i).trial)

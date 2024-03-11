@@ -7,7 +7,7 @@ function lfp_tfa_mainscript(project,versions)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 lfp_analysis_location     =which('lfp_tfa_mainscript');
-db_folder              =[lfp_analysis_location(1:strfind(lfp_analysis_location,['spike_analysis' filesep 'ph_initiation'])-1) 'Settings' filesep project filesep 'LFP' filesep];
+db_folder              =[lfp_analysis_location(1:strfind(lfp_analysis_location,['LFP_timefrequency_analysis' filesep 'lfp_tfa_mainscript'])-1) 'Settings' filesep project filesep 'LFP' filesep];
 for v = 1:length(versions)
     version = versions{v};
    
