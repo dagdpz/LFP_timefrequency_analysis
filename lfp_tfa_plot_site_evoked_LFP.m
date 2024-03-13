@@ -198,7 +198,8 @@ for i = 1:length(sites_lfp)
     % save to a mother struct
     session_evoked.sites(i) = site_evoked_lfp;
     %% plot evoked LFP for pre and post injection on same plot
-    for trial_type = 1:2
+    for choice = unique([site_conditions.choice])
+        trial_type = choice+1;
         plottitle = ['Site ID: ', sites_evoked(i).site_ID ', Target = ' ...
             sites_evoked(i).target '(ref_' lfp_tfa_cfg.ref_hemisphere ') '];
         if trial_type == 1
@@ -211,8 +212,8 @@ for i = 1:length(sites_lfp)
         result_file = fullfile(site_results_folder, ...
             ['LFP_Evoked_' sites_evoked(i).site_ID '__combined_' trial_title ]);
         if lfp_tfa_cfg.plot_site_average
-        lfp_tfa_plot_evoked_lfp_combined(sites_evoked(i).condition, lfp_tfa_cfg, ...
-            plottitle, result_file,trial_type);
+        lfp_tfa_plot_evoked_lfp_combined(sites_evoked(i).condition([site_conditions.choice]==choice), lfp_tfa_cfg, ...
+            plottitle, result_file);
         end
     end
     
@@ -331,7 +332,9 @@ for t = 1:length(targets)
         end
     end
     %% plot evoked LFP for pre and post injection on same plot (average across sites)
-    for trial_type = 1:2
+    cons=[session_avg(t).condition.condition];
+    for choice = unique([cons.choice])
+        trial_type = choice+1;
         plottitle = ['Session: ', session_avg(t).condition(cn).session  ', Target = ' ...
             session_avg(t).condition(cn).target '(ref_' lfp_tfa_cfg.ref_hemisphere ') '];
         if trial_type == 1
@@ -344,8 +347,8 @@ for t = 1:length(targets)
         result_file = fullfile(results_folder_evoked,['LFP_Evoked_' session_avg(t).condition(cn).target ...
             ' '  session_avg(t).condition(cn).session '_combined_' trial_title ]);
         
-        lfp_tfa_plot_evoked_lfp_combined(session_avg(t).condition, lfp_tfa_cfg, ...
-            plottitle, result_file,trial_type);
+        lfp_tfa_plot_evoked_lfp_combined(session_avg(t).condition([cons.choice]==choice), lfp_tfa_cfg, ...
+            plottitle, result_file);
         
     end
     

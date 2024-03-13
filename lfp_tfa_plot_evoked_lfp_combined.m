@@ -1,4 +1,4 @@
-function lfp_tfa_plot_evoked_lfp_combined( evoked_lfp, lfp_tfa_cfg, plottitle, results_file,trial_type )
+function lfp_tfa_plot_evoked_lfp_combined( evoked_lfp, lfp_tfa_cfg, plottitle, results_file )
 %lfp_tfa_plot_evoked_lfp  - Plots the LFP evoked response
 %for single trial and perturbation on same plot for different hand-space conditions
 %
@@ -43,17 +43,17 @@ noffset = 100;
 % number of subplots required
 nhandlabels = length(lfp_tfa_cfg.compare.reach_hands);
 nspacelabels = length(lfp_tfa_cfg.compare.reach_spaces);
-if trial_type == 1
-    cond_to_plot = [1,3];
-elseif trial_type == 2
-    cond_to_plot = [2,4];
-end
+% if trial_type == 1
+%     cond_to_plot = [1,3];
+% elseif trial_type == 2
+%     cond_to_plot = [2,4];
+% end
 concat_states_lfp = struct();
-for cnd = 1:length(cond_to_plot)
+for cnd = 1:length(evoked_lfp)
     
     % loop through handspace
-    for hs = 1:size(evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked, 2)
-        if ~isempty([evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(:,hs).lfp])% &&  ~isempty([evoked_lfp(:,hs).std])
+    for hs = 1:size(evoked_lfp(cnd).hs_tuned_evoked, 2)
+        if ~isempty([evoked_lfp(cnd).hs_tuned_evoked(:,hs).lfp])% &&  ~isempty([evoked_lfp(:,hs).std])
             % concatenate states
             
             concat_states_lfp(cnd).mean = [];
@@ -62,15 +62,15 @@ for cnd = 1:length(cond_to_plot)
             concat_states_lfp(cnd).lfp = [];
             
             state_info = struct();
-            for st = 1:size(evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked, 1)
+            for st = 1:size(evoked_lfp(cnd).hs_tuned_evoked, 1)
                 
                 state_info(cnd,st).onset_s = find(...
-                    evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(st, hs).time <= 0, 1, 'last');
+                    evoked_lfp(cnd).hs_tuned_evoked(st, hs).time <= 0, 1, 'last');
                 state_info(cnd,st).onset_t = 0;
                 state_info(cnd,st).start_s = 1;
-                state_info(cnd,st).start_t =  evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(st, hs).time(1);
-                state_info(cnd,st).finish_s = length( evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(st, hs).time);
-                state_info(cnd,st).finish_t =  evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(st, hs).time(end);
+                state_info(cnd,st).start_t =  evoked_lfp(cnd).hs_tuned_evoked(st, hs).time(1);
+                state_info(cnd,st).finish_s = length( evoked_lfp(cnd).hs_tuned_evoked(st, hs).time);
+                state_info(cnd,st).finish_t =  evoked_lfp(cnd).hs_tuned_evoked(st, hs).time(end);
                 
                 if st > 1
                     state_info(cnd,st).start_s = length(concat_states_lfp(cnd).time) + ...
@@ -84,19 +84,19 @@ for cnd = 1:length(cond_to_plot)
                 % concatenate mean, std and time of evoked LFP for
                 % different states
                 [state_mean, state_error] = ...
-                    lfp_tfa_compute_statistics(evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(st, hs).lfp, lfp_tfa_cfg.error_measure);
+                    lfp_tfa_compute_statistics(evoked_lfp(cnd).hs_tuned_evoked(st, hs).lfp, lfp_tfa_cfg.error_measure);
                 
                 concat_states_lfp(cnd).lfp = [concat_states_lfp(cnd).lfp, ...
-                    evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(st, hs).lfp, ...
-                    nan(size(evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(st, hs).lfp,1), noffset)];
+                    evoked_lfp(cnd).hs_tuned_evoked(st, hs).lfp, ...
+                    nan(size(evoked_lfp(cnd).hs_tuned_evoked(st, hs).lfp,1), noffset)];
                 
                 concat_states_lfp(cnd).mean = [concat_states_lfp(cnd).mean, ...
                     state_mean, nan(1, noffset)];
                 concat_states_lfp(cnd).error = [concat_states_lfp(cnd).error, ...
                     state_error, nan(2, noffset)];
                 concat_states_lfp(cnd).time = [concat_states_lfp(cnd).time, ...
-                    evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(st, hs).time, nan(1, noffset)];
-                concat_states_lfp(cnd).label = evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(st, hs).hs_label;
+                    evoked_lfp(cnd).hs_tuned_evoked(st, hs).time, nan(1, noffset)];
+                concat_states_lfp(cnd).label = evoked_lfp(cnd).hs_tuned_evoked(st, hs).hs_label;
                 
                 
                 
@@ -122,9 +122,9 @@ for cnd = 1:length(cond_to_plot)
             set(gca,'xtick',state_samples)
             for so = state_onsets
                 line([so so], ylim, 'color', 'k');
-                if isfield(evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(state_onsets == so, hs), 'state_name') && ...
-                        ~isempty(evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(state_onsets == so, hs).state_name)
-                    state_name = evoked_lfp(cond_to_plot(cnd)).hs_tuned_evoked(state_onsets == so, hs).state_name;
+                if isfield(evoked_lfp(cnd).hs_tuned_evoked(state_onsets == so, hs), 'state_name') && ...
+                        ~isempty(evoked_lfp(cnd).hs_tuned_evoked(state_onsets == so, hs).state_name)
+                    state_name = evoked_lfp(cnd).hs_tuned_evoked(state_onsets == so, hs).state_name;
                     ypos = ylim;
                     ypos = ypos(1) + (ypos(2) - ypos(1))*0.2;
                     text(so+1, ypos, state_name, 'fontsize', 8);
@@ -136,13 +136,13 @@ for cnd = 1:length(cond_to_plot)
             xlabel('Time(s)');
             ylabel('LFP amplitude');
             subplottitle = [concat_states_lfp.label{1}];
-            if isfield(evoked_lfp(1, hs), 'nsessions')
+            if isfield(evoked_lfp(cnd), 'nsessions')
                 subplottitle = [subplottitle ' (nsessions = ' num2str(evoked_lfp(1, hs).nsessions) ')'];
-            elseif isfield(evoked_lfp(1, hs), 'nsites')
+            elseif isfield(evoked_lfp(cnd), 'nsites')
                 subplottitle = [subplottitle ' (nsites = ' num2str(evoked_lfp(1, hs).nsites) ')'];
-            elseif isfield(evoked_lfp(1, hs), 'trials')
+            elseif isfield(evoked_lfp(cnd), 'trials')
                 subplottitle = [subplottitle ' (ntrials = ' ...
-                    num2str(length(evoked_lfp(1, hs).trials)) ')'];
+                    num2str(length(evoked_lfp(cnd).trials)) ')'];
             end
             title(subplottitle);
                    plot(concat_states_lfp(cnd).error', 'b--');
