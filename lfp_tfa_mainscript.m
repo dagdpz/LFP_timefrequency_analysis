@@ -11,7 +11,8 @@ clc
 %   settings_filepath = 'C:\Users\mpachoud\Documents\GitHub\LFP_timefrequency_analysis\settings\PPC_pulv_eye_hand\Linus\Linus_dPul_LIP_inactivation_combined.m';
 %settings_filepath = 'C:\Users\lschneider\GitHub\Settings\LFP_time_frequency_analysis\Pulv_eye_hand\Interleaved\lfp_tfa_settings.m';
 %    settings_filepath = 'C:\Users\lschneider\GitHub\Settings\LFP_time_frequency_analysis\Pulv_oculomotor\paper\lfp_tfa_settings.m';
-settings_filepath = 'C:\Users\KProfesorsky\Documents\GitHub\Settings\LFP_time_frequency_analysis\LIP_Caltech\lfp_tfa_settings.m';
+% settings_filepath = 'C:\Users\KProfesorsky\Documents\GitHub\Settings\LFP_time_frequency_analysis\LIP_Caltech\lfp_tfa_settings.m';
+settings_filepath = 'E:\Dropbox\Sources\Repos\Settings\LFP_time_frequency_analysis\LIP_Caltech\lfp_tfa_settings_Igor.m';
 
 %% INITIALIZATION
 close all;
