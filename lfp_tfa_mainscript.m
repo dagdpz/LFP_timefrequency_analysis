@@ -274,10 +274,30 @@ for v = 1:length(versions)
             m_idx=true(size(sessions_info));
         else
             lfp_tfa_cfg.monkey=[lfp_tfa_cfg.monkeys{m} '_'];
-            m_idx=ismember({sessions_info.Monkey},lfp_tfa_cfg.monkeys{m});
+            m_idx=ismember({sessions_info.Monkey},lfp_tfa_cfg.monkeys{m}(1:3));
         end
         if sum(m_idx) > 1
             % average session averages
+            
+            for i = 1:length(sessions_info)
+                if any(strcmp(lfp_tfa_cfg.analyses, 'tfs'))
+                    
+                    results_folder = fullfile(lfp_tfa_cfg.results_folder,'LFP Analysis',sessions_info(i).session, 'Condition_based_TFS');
+                    load(fullfile(results_folder, ['LFP_TFR_' sessions_info(i).session '.mat']));
+                    lfp_tfr.session(i) = session_tfs ;
+                end
+                if any(strcmp(lfp_tfa_cfg.analyses, 'evoked'))
+                    results_folder = fullfile(lfp_tfa_cfg.results_folder,'LFP Analysis',sessions_info(i).session, 'Condition_based_Evoked_LFP');
+                    load(fullfile(results_folder, ['LFP_evoked_' sessions_info(i).session '.mat']));       
+                    lfp_evoked.session(i) = session_evoked;
+                end
+                if any(strcmp(lfp_tfa_cfg.analyses, 'pow'))
+                    results_folder = fullfile(lfp_tfa_cfg.results_folder,'LFP Analysis',sessions_info(i).session, 'Condition_based_LFP_power');
+                    load(fullfile(results_folder, ['LFP_Power_' sessions_info(i).session '.mat']));             
+                    lfp_pow.session(i) = session_pow;
+                end
+            end
+            
             if any(strcmp(lfp_tfa_cfg.compute_avg_across, 'sessions'))
                 % Average of session averages of LFP TFR, LFP evoked responce and
                 % LFP power
