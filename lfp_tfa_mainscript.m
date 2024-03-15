@@ -47,6 +47,7 @@ for v = 1:length(versions)
     
     %% LFP processing
     % loop through each session to process
+    
     for i = 1:length(sessions_info)
         % name of session = [Monkey name '_' Recording date]
         session_name = [sessions_info(i).Monkey '_' sessions_info(i).Date];
