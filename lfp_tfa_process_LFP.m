@@ -80,6 +80,7 @@ allsites_lfp = [];
 
 % save data inside struct
 % first loop through each site
+if 1
 for i = 1:length(sites)
     
     % struct to save data for a site
@@ -256,10 +257,12 @@ for i = 1:length(sites)
     allsites_lfp = [allsites_lfp, site_lfp];
     
 end
+end
 
 % save allsites_lfp
 results_mat = fullfile(results_fldr, 'allsites_lfp.mat');
 save(results_mat, 'allsites_lfp', '-v7.3');
+% load(results_mat);
 
 %% calculate cross power spectrum between sites and sync measure spectrogram
 if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) || ...
