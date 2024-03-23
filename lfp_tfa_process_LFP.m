@@ -261,6 +261,8 @@ end
 results_mat = fullfile(results_fldr, 'allsites_lfp.mat');
 save(results_mat, 'allsites_lfp', '-v7.3');
 
+%% add sitepair trial matching here
+
 %% calculate cross power spectrum between sites and sync measure spectrogram
 if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) || ...
         any(strcmp(lfp_tfa_cfg.analyses, 'syncsp'))
@@ -269,12 +271,32 @@ if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) || ...
     if ~exist(results_fldr, 'dir')
         mkdir(results_fldr);
     end
+    
+    %% replace the double loop with one loop through sitepairs
+    [site_pairs] = lfp_tfa_site_pairs_finder(monkey_session_allsites_path);
+    for sp=1:site_pairs
+            % define j (from sitepair(sp))
+            % define i
+
+            
+            %% reduce site1 to the matching trials for this pair
+            %% reduce site 2 to the matching trials
+            site2_lfp = allsites_lfp(j); %% reduce the trials in this variable (site2_lfp) by using sitepair(sp).site2_trials index
+            site1_lfp = allsites_lfp(i); %% reduce those
+    end
+    
+    
     % loop through each site
     for i = 1:length(allsites_lfp)-1
-        site1_lfp = allsites_lfp(i);
         % pair a site
         for j = i+1:length(allsites_lfp)
-            site2_lfp = allsites_lfp(j);
+            
+            %% reduce site1 to the matching trials for this pair
+            %% reduce site 2 to the matching trials
+            site2_lfp = allsites_lfp(j); %% reduce this variable (site2_lfp
+            site1_lfp = allsites_lfp(i); %% reduce those
+            
+            
             fprintf('Computing cross power spectrum for site pair %s - %s\n', ...
                 site1_lfp.site_ID, site2_lfp.site_ID);
             sitepair_crosspow = lfp_tfa_compute_sitepair_csd(site1_lfp, site2_lfp, lfp_tfa_cfg);
@@ -287,7 +309,7 @@ if any(strcmp(lfp_tfa_cfg.analyses, 'sync')) || ...
 end
 
 %% calculate sync measure spectrum
-%     if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm'))
+%     if any(strcmp(lfp_tfa_cfg.analyses, 'syncspctrm')) 
 %         % loop through each site
 %         for i = 1:length(allsites_lfp)-1
 %             site1_lfp = allsites_lfp(i);
